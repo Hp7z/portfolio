@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Windows 7 Портфолио</title>
+  <link rel="stylesheet" href="https://unpkg.com/7.css">
+  <link rel="stylesheet" href="https://unpkg.com/winbox@0.2.6/dist/css/winbox.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-win7">
+  <!-- Рабочий стол -->
+  <div class="desktop">
+    <div class="shortcut" id="shortcut-about" data-window="about">
+      <img src="icons/my-pc.png" alt="Обо мне">
+      <span>Обо мне</span>
+    </div>
+    <div class="shortcut" id="shortcut-portfolio" data-window="portfolio">
+      <img src="icons/portfolio.png" alt="Портфолио">
+      <span>Портфолио</span>
+    </div>
+  </div>
+
+  <!-- Панель задач -->
+  <div class="taskbar">
+    <div class="start-button" onclick="toggleStartMenu()">
+      <img src="icons/start.png" alt="Пуск">
+    </div>
+    <div class="taskbar-items" id="taskbarItems"></div>
+    <div class="clock" id="clock"></div>
+  </div>
+
+  <!-- Стартовое меню -->
+  <div class="start-menu" id="startMenu">
+    <div class="menu-item" data-window="about">
+      <img src="icons/my-pc.png" alt="Обо мне">
+      <span>Обо мне</span>
+    </div>
+    <div class="menu-item" data-window="portfolio">
+      <img src="icons/portfolio.png" alt="Портфолио">
+      <span>Портфолио</span>
+    </div>
+  </div>
+
+  <!-- Контекстное меню -->
+  <div id="contextMenu" class="context-menu">
+    <div class="menu-item" onclick="refreshDesktop()">Обновить</div>
+    <div class="menu-item" onclick="changeWallpaper()">Сменить обои</div>
+  </div>
+
+  <!-- Системные звуки -->
+  <audio id="soundClick" src="sounds/click.wav" preload="auto"></audio>
+  <audio id="soundError" src="sounds/error.wav" preload="auto"></audio>
+
+  <script src="https://unpkg.com/winbox@0.2.6/dist/winbox.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
