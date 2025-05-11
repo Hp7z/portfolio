@@ -1,164 +1,136 @@
-// Глобальные переменные
-const activeWindows = {};
-let clickTimer = null;
+const trayWindows = {};
+const projects = [
+  {
+    title: "Istok Lab",
+    url: "https://istoklabpro.ru/",
+    preview: "img/istoklab.jpg",
+    credits: "Design by Leria agency"
+  },
+  {
+    title: "Fiorichi",
+    url: "https://fiorichi.shop/",
+    preview: "img/fiorichi.jpg",
+    credits: "Design by Leria agency"
+  },
+  {
+    title: "Larfex STM",
+    url: "https://xn--80aehlcj0acakfhgax4r.xn--p1ai/",
+    preview: "img/larfexstm.jpg",
+    credits: "Design by Leria agency"
+  },
+  {
+    title: "Larfex",
+    url: "https://larfex.com/",
+    preview: "img/larfex.jpg",
+    credits: "Design by Leria agency"
+  },
+  {
+    title: "Leri Agency",
+    url: "https://leriagency.ru/",
+    preview: "img/leriagency.jpg",
+    credits: "Design by Leria agency"
+  }
+];
 
-// Инициализация при загрузке
-window.addEventListener('DOMContentLoaded', () => {
-  loadDesktopLayout();
-  setupEventListeners();
+document.addEventListener('DOMContentLoaded', () => {
   updateClock();
   setInterval(updateClock, 1000);
+  
+  document.querySelectorAll('.shortcut, .menu-item').forEach(item => {
+    item.addEventListener('click', function() {
+      const type = this.getAttribute('data-window');
+      if (type) openWindow(type);
+    });
+  });
 });
 
-// Настройка всех обработчиков событий
-function setupEventListeners() {
-  // Двойной клик
-  document.querySelectorAll('.shortcut, .menu-item').forEach(item => {
-    item.addEventListener('click', function(e) {
-      if (clickTimer === null) {
-        clickTimer = setTimeout(() => {
-          clickTimer = null;
-        }, 300);
-      } else {
-        clearTimeout(clickTimer);
-        clickTimer = null;
-        const type = this.getAttribute('data-window');
-        if (type) openWindow(type);
-      }
-    });
-  });
-
-  // Drag&Drop для ярлыков
-  document.querySelectorAll('.shortcut').forEach(shortcut => {
-    shortcut.setAttribute('draggable', 'true');
-    
-    shortcut.addEventListener('dragstart', (e) => {
-      e.dataTransfer.setData('text/plain', shortcut.id);
-      setTimeout(() => { shortcut.style.opacity = '0.4'; }, 0);
-    });
-
-    shortcut.addEventListener('dragend', () => {
-      shortcut.style.opacity = '1';
-    });
-  });
-
-  document.querySelector('.desktop').addEventListener('dragover', (e) => {
-    e.preventDefault();
-  });
-
-  document.querySelector('.desktop').addEventListener('drop', (e) => {
-    e.preventDefault();
-    const id = e.dataTransfer.getData('text/plain');
-    const shortcut = document.getElementById(id);
-    if (shortcut) {
-      shortcut.style.position = 'absolute';
-      shortcut.style.left = `${e.clientX - 40}px`;
-      shortcut.style.top = `${e.clientY - 40}px`;
-      saveDesktopLayout();
-    }
-  });
-
-  // Контекстное меню
-  document.addEventListener('contextmenu', (e) => {
-    e.preventDefault();
-    const menu = document.getElementById('contextMenu');
-    menu.style.display = 'block';
-    menu.style.left = `${e.clientX}px`;
-    menu.style.top = `${e.clientY}px`;
-  });
-
-  document.addEventListener('click', () => {
-    document.getElementById('contextMenu').style.display = 'none';
-  });
-}
-
-// Функции окон
 function openWindow(type) {
-  playSound('Click');
-  
-  const titleMap = {
-    about: "Обо мне — Windows Explorer",
-    portfolio: "Портфолио — Windows Explorer"
-  };
+  if (trayWindows[type] && !trayWindows[type].closed) {
+    trayWindows[type].focus();
+    return;
+  }
 
   const win = new WinBox({
-    title: titleMap[type],
-    url: `windows/${type}.html`,
-    width: type === 'portfolio' ? 800 : 600,
-    height: 500,
+    title: type === 'about' ? 'Обо мне' : 'Портфолио',
+    class: 'win7-theme',
+    width: 800,
+    height: 600,
     x: "center",
     y: "center",
-    class: "win7-theme",
-    top: 40,
-    background: "linear-gradient(to bottom, #d6e5f8, #c6d9f4)",
-    border: "1px solid #a3bde3",
-    onclose: function() {
-      playSound('Error');
+    background: '#ebf3ff',
+    onclose: () => {
+      delete trayWindows[type];
+      updateTaskbar();
       return false;
     }
   });
 
-  // Кастомное закрытие с анимацией
-  win.close = function() {
-    win.body.style.animation = 'fadeOut 0.3s forwards';
-    setTimeout(() => {
-      WinBox.prototype.close.call(win);
-      delete activeWindows[type];
-      updateTaskbar();
-    }, 300);
-  };
+  if (type === 'about') {
+    win.body.innerHTML = `
+      <div class="window-body">
+        <h1>Обо мне</h1>
+        <p>Информация о вас...</p>
+      </div>
+    `;
+  } else {
+    let portfolioContent = '<div class="window-body"><h1>Портфолио</h1>';
+    
+    projects.forEach(project => {
+      portfolioContent += `
+        <div class="project-container">
+          <div class="project-info">
+            <div class="project-title">${project.title}</div>
+            <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+            <span class="project-credits">${project.credits}</span>
+          </div>
+          <div class="project-preview">
+            <img src="${project.preview}" alt="${project.title}">
+          </div>
+        </div>
+      `;
+    });
+    
+    portfolioContent += '</div>';
+    win.body.innerHTML = portfolioContent;
+    
+    win.body.querySelectorAll('.project-link').forEach(link => {
+      link.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = this.getAttribute('data-url');
+        openProjectWindow(url);
+      });
+    });
+  }
 
-  // Добавляем в панель задач
-  activeWindows[type] = win;
+  trayWindows[type] = win;
   updateTaskbar();
 }
 
-// Обновление панели задач
+function openProjectWindow(url) {
+  new WinBox({
+    title: 'Просмотр проекта',
+    class: 'win7-theme',
+    width: 1000,
+    height: 700,
+    x: "center",
+    y: "center",
+    background: '#ebf3ff',
+    url: url,
+    onclose: () => false
+  });
+}
+
 function updateTaskbar() {
   const taskbar = document.getElementById('taskbarItems');
   taskbar.innerHTML = '';
   
-  Object.keys(activeWindows).forEach(type => {
-    const item = document.createElement('div');
+  Object.entries(trayWindows).forEach(([type, win]) => {
+    const item = document.createElement('button');
     item.className = 'taskbar-item';
-    item.innerHTML = `<img src="icons/${type}.png" alt="${type}">`;
-    item.onclick = () => activeWindows[type].focus();
+    item.innerHTML = `<img src="icons/${type}.png">`;
+    item.onclick = () => win.focus();
     taskbar.appendChild(item);
   });
-}
-
-// LocalStorage функции
-function saveDesktopLayout() {
-  const layout = [];
-  document.querySelectorAll('.shortcut').forEach(shortcut => {
-    layout.push({
-      id: shortcut.id,
-      left: shortcut.style.left,
-      top: shortcut.style.top
-    });
-  });
-  localStorage.setItem('desktopLayout', JSON.stringify(layout));
-}
-
-function loadDesktopLayout() {
-  const layout = JSON.parse(localStorage.getItem('desktopLayout')) || [];
-  layout.forEach(item => {
-    const shortcut = document.getElementById(item.id);
-    if (shortcut) {
-      shortcut.style.position = 'absolute';
-      shortcut.style.left = item.left;
-      shortcut.style.top = item.top;
-    }
-  });
-}
-
-// Системные функции
-function playSound(type) {
-  const sound = document.getElementById(`sound${type}`);
-  if (sound) {
-    sound.currentTime = 0;
-    sound.play();
-  }
 }
 
 function toggleStartMenu() {
@@ -167,20 +139,6 @@ function toggleStartMenu() {
 }
 
 function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-function refreshDesktop() {
-  localStorage.removeItem('desktopLayout');
-  location.reload();
-}
-
-function changeWallpaper() {
-  const wallpapers = ['wallpaper1.jpg', 'wallpaper2.jpg'];
-  const randomWallpaper = wallpapers[Math.floor(Math.random() * wallpapers.length)];
-  document.body.style.backgroundImage = `url('${randomWallpaper}')`;
+  document.getElementById('clock').textContent = 
+    new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
