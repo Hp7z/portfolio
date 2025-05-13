@@ -3,45 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Windows 7 Portfolio</title>
-  <link rel="stylesheet" href="https://unpkg.com/7.css">
+  <title>GNOME Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cantarell:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="animation-fix.css">
+  <style>
+    /* Встроенные исправления */
+    .color-block:hover .color-text { color: inherit !important; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .slide-right, .slide-left, .slide-out-right, .slide-out-left { display: block !important; }
+    .model-gallery-container { display: flex; height: 100%; width: 100%; flex-wrap: wrap; }
+    .model-gallery-left { flex: 65; padding: 15px; position: relative; }
+    .model-gallery-right { flex: 35; padding: 15px; overflow-y: auto; }
+    body.light-theme { --switch-bg: #9a9996 !important; }
+    .light-theme .project-container:hover { background: rgba(0, 0, 0, 0.1) !important; }
+    .static-model-preview { height: 300px !important; }
+  </style>
+  <link rel="stylesheet" href="fixes.css">
 </head>
-<body class="theme-win7">
+<body class="dark-theme">
   <div class="desktop">
-    <div class="shortcut" data-window="about">
-      <img src="icons/my-pc.png" alt="About">
+    <div class="shortcut" data-window="about" style="top: 50px; left: 20px;">
+      <img src="icons/about.png" alt="About">
       <span>Обо мне</span>
     </div>
-    <div class="shortcut" data-window="portfolio">
+    <div class="shortcut" data-window="portfolio" style="top: 50px; left: 120px;">
       <img src="icons/portfolio.png" alt="Portfolio">
       <span>Портфолио</span>
+    </div>
+    <div class="shortcut" data-window="services" style="top: 150px; left: 20px;">
+      <img src="icons/services.png" alt="Services">
+      <span>Услуги</span>
+    </div>
+    <div class="shortcut" data-window="contacts" style="top: 150px; left: 120px;">
+      <img src="icons/contacts.png" alt="Contacts">
+      <span>Контакты</span>
     </div>
   </div>
 
   <div class="taskbar">
-    <button class="start-button" onclick="toggleStartMenu()">
-      <img src="icons/start.png" alt="Start">
-      <span>Пуск</span>
+    <button class="activities-button" onclick="toggleStartMenu()">
+      <div class="activities-icon">
+        <img src="icons/activities.png" alt="Activities">
+      </div>
     </button>
     <div class="taskbar-items" id="taskbarItems"></div>
-    <div class="clock" id="clock"></div>
+    <div class="taskbar-text" id="taskbartext">Theme switcher</div>
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <div class="theme-icon"></div>
+    </div>
+    <div class="clock-container">
+      <div id="clock"></div>
+      <div id="date" onclick="toggleCalendar()"></div>
+      <div id="calendar" class="calendar-popup">
+        <!-- Здесь будет календарь -->
+      </div>
+    </div>
   </div>
 
-  <div class="window start-menu" id="startMenu">
-    <div class="title-bar">
-      <div class="title-bar-text">Меню Пуск</div>
-    </div>
-    <div class="window-body">
-      <div class="menu-item" data-window="about">
-        <img src="icons/my-pc.png">
-        <span>Обо мне</span>
-      </div>
-      <div class="menu-item" data-window="portfolio">
-        <img src="icons/portfolio.png">
-        <span>Портфолио</span>
-      </div>
-    </div>
+  <div class="start-menu" id="startMenu">
+    <!-- Содержимое меню будет генерироваться динамически -->
   </div>
 
   <script src="https://unpkg.com/winbox@0.2.6/dist/winbox.bundle.min.js"></script>

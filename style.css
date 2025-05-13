@@ -1,18 +1,99 @@
+:root {
+  --gnome-blue: #3584e4;
+  --gnome-dark-blue: #1c71d8;
+  --gnome-green: #33d17a;
+  --gnome-yellow: #f6d32d;
+  --gnome-orange: #ff7800;
+  --gnome-red: #e01b24;
+  --gnome-dark: #241f31;
+  --gnome-charcoal: #2e3436;
+  --gnome-gray: #9a9996;
+  --gnome-light-gray: #deddda;
+  --gnome-lighter-gray: #f6f5f4;
+  --gnome-border-radius: 8px;
+  --gnome-padding: 12px;
+  --gnome-header-height: 36px;
+}
+
+body.dark-theme {
+  --bg-color: #1e1e1e;
+  --text-color: #ffffff;
+  --header-bg: #2e3436;
+  --window-bg: #2e3436;
+  --window-border: #1e1e1e;
+  --panel-bg: rgba(46, 52, 54, 0.95);
+  --panel-text: #ffffff;
+  --menu-bg: rgba(46, 52, 54, 0.95);
+  --menu-hover: rgba(255, 255, 255, 0.1);
+  --tab-bg: #2e3436;
+  --tab-active-bg: #3e4446;
+  --button-bg: #3584e4;
+  --button-hover: #1c71d8;
+  --icon-color: #ffffff;
+  --button-hover-bg: rgba(255, 255, 255, 0.1);
+  --input-bg: #383838;
+  --input-border: #555555;
+  --input-focus-border: #3584e4;
+  --switch-bg: #383838;
+  --switch-active-bg: #3584e4;
+}
+
+body.light-theme {
+  --bg-color: #f6f5f4;
+  --text-color: #2e3436;
+  --header-bg: #f6f5f4;
+  --window-bg: #ffffff;
+  --window-border: #deddda;
+  --panel-bg: rgba(246, 245, 244, 0.95);
+  --panel-text: #2e3436;
+  --menu-bg: rgba(246, 245, 244, 0.95);
+  --menu-hover: rgba(0, 0, 0, 0.1);
+  --tab-bg: #f6f5f4;
+  --tab-active-bg: #ffffff;
+  --button-bg: #3584e4;
+  --button-hover: #1c71d8;
+  --icon-color: #2e3436;
+  --button-hover-bg: rgba(0, 0, 0, 0.1);
+  --input-bg: #ffffff;
+  --input-border: #deddda;
+  --input-focus-border: #3584e4;
+  --switch-bg: #8f8f8f;
+  --switch-active-bg: #3584e4;
+}
+
 body {
   margin: 0;
   overflow: hidden;
-  background: url('img/wallpaper.jpg') no-repeat center/cover;
+  background: var(--bg-color) url('img/wallpaper.jpg') no-repeat center/cover;
   height: 100vh;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Cantarell', 'Ubuntu', 'DejaVu Sans', sans-serif;
   user-select: none;
+  color: var(--text-color);
+  position: relative;
+}
+
+body.dark-theme {
+  background-color: var(--bg-color);
+}
+
+body.light-theme {
+  background-color: var(--bg-color);
+}
+
+img {
+  width: inherit;
+  height: inherit;
 }
 
 .desktop {
   padding: 20px;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 56px);
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
+  margin-top: 36px;
+  position: relative;
+  overflow: hidden;
 }
 
 .shortcut {
@@ -23,12 +104,18 @@ body {
   align-items: center;
   cursor: pointer;
   color: white;
-  text-shadow: 1px 1px 2px black;
-  transition: all 0.2s;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+  transition: transform 0.2s;
+  border-radius: var(--gnome-border-radius);
+  padding: 5px;
+  position: absolute;
+  touch-action: none;
+  user-select: none;
 }
 
 .shortcut:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-2px);
 }
 
 .shortcut img {
@@ -39,27 +126,36 @@ body {
 
 .taskbar {
   position: fixed;
-  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
-  height: 40px;
-  background: linear-gradient(to bottom, #245edb, #1e56c7);
+  height: 36px;
+  background: var(--panel-bg);
   display: flex;
   align-items: center;
   padding: 0 10px;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
-  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  z-index: 1001;
+  color: var(--panel-text);
 }
 
 .taskbar-items {
   display: flex;
   margin-left: 20px;
-  gap: 5px;
+  gap: 8px;
+  flex: 1;
 }
 
 .taskbar-item {
   padding: 5px 10px;
   cursor: pointer;
-  border-radius: 3px;
+  border-radius: var(--gnome-border-radius);
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  height: 26px;
+  transition: all 0.2s;
 }
 
 .taskbar-item:hover {
@@ -69,71 +165,704 @@ body {
 .taskbar-item img {
   width: 16px;
   height: 16px;
+  margin-right: 8px;
 }
 
-.start-button {
+.taskbar-item-title {
+  color: var(--panel-text);
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+.activities-button {
   display: flex;
   align-items: center;
-  padding: 0 10px;
   height: 100%;
-  background: linear-gradient(to bottom, #4c8bf5, #1a5fdf);
+  background: transparent;
   border: none;
-  color: white;
-  font-family: 'Segoe UI', sans-serif;
+  color: var(--panel-text);
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 15px;
+  transition: all 0.2s;
 }
 
-.start-button img {
-  width: 16px;
-  height: 16px;
-  margin-right: 5px;
+.activities-button:hover .activities-icon {
+  background: var(--gnome-blue);
+}
+
+.activities-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  transition: all 0.3s;
+}
+
+.activities-icon span {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.activities-icon img {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-toggle {
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  background-color: #e4e4e4;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 0 10px;
+}
+
+.theme-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background-color: white;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.dark-theme .theme-toggle {
+  background-color: #4cd964;
+}
+
+.dark-theme .theme-icon::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+}
+
+.light-theme .theme-icon {
+  background: var(--gnome-yellow);
+  box-shadow: 0 0 5px var(--gnome-yellow);
+}
+
+.dark-theme .theme-icon {
+  transform: translateX(20px);
+}
+
+.clock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  padding: 0 15px;
+  position: relative;
+  cursor: pointer;
+}
+
+#clock {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#date {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.calendar-popup {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 300px;
+  background: var(--menu-bg);
+  border-radius: var(--gnome-border-radius);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  padding: 15px;
+  display: none;
+  z-index: 1002;
+  color: var(--panel-text);
+}
+
+.calendar-header {
+  text-align: center;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.day-name {
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 5px 0;
+}
+
+.day {
+  text-align: center;
+  padding: 5px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.day:hover {
+  background: var(--menu-hover);
+}
+
+.day.today {
+  background: var(--gnome-blue);
+  color: white;
+}
+
+.day.empty {
+  visibility: hidden;
 }
 
 .start-menu {
   position: absolute;
-  bottom: 40px;
-  left: 0;
+  top: 50px;
+  left: 10px;
   width: 300px;
   display: none;
+  z-index: 1001;
+  background: var(--menu-bg);
+  border-radius: var(--gnome-border-radius);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  padding: 10px 0;
+  color: var(--panel-text) !important;
+}
+
+.menu-section {
+  padding: 5px 0 !important;
+  margin: 0 !important;
+}
+
+.menu-section-title {
+  padding: 5px 15px !important;
+  font-size: 12px !important;
+  font-weight: bold !important;
+  color: var(--panel-text) !important;
+  opacity: 0.7 !important;
+}
+
+.menu-item {
+  display: flex !important;
+  align-items: center !important;
+  padding: 10px 15px !important;
+  color: var(--panel-text) !important;
+  text-decoration: none !important;
+  transition: background 0.2s !important;
+  cursor: pointer !important;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.menu-item:hover {
+  background: var(--menu-hover) !important;
+}
+
+.menu-item img {
+  width: 24px !important;
+  height: 24px !important;
+  margin-right: 10px !important;
+}
+
+.adwaita-theme {
+  background: var(--window-bg) !important;
+  border: 1px solid var(--window-border) !important;
+  border-radius: var(--gnome-border-radius) !important;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  z-index: 10 !important;
+}
+
+.adwaita-theme.active {
+  z-index: 100 !important;
+}
+
+.adwaita-theme .wb-header {
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--window-border) !important;
+  border-radius: var(--gnome-border-radius) var(--gnome-border-radius) 0 0 !important;
+  height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 !important;
+  position: relative !important;
+  flex-direction: row-reverse !important;
+}
+
+.adwaita-theme .wb-title {
+  font-family: 'Cantarell', 'Ubuntu', sans-serif !important;
+  color: var(--text-color) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 36px !important;
+  text-align: left !important;
+  cursor: default !important;
+  padding-left: 5px !important;
+  position: relative !important;
+  z-index: 2 !important;
+  pointer-events: none !important;
+}
+
+.adwaita-theme .wb-drag {
+  height: 100% !important;
+  width: 100% !important;
+  cursor: move !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+.adwaita-theme .wb-icon {
+  display: none !important;
+}
+
+.adwaita-theme .wb-controls {
+  display: flex !important;
+  align-items: center !important;
+  z-index: 2 !important;
+  position: relative !important;
+}
+
+.adwaita-theme .wb-min,
+.adwaita-theme .wb-max,
+.adwaita-theme .wb-close {
+  width: 16px !important;
+  height: 16px !important;
+  border-radius: 50% !important;
+  margin: 0 4px !important;
+  padding: 0 !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 10px !important;
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+.adwaita-theme .wb-min {
+  background-color: var(--gnome-yellow) !important;
+}
+
+.adwaita-theme .wb-max {
+  background-color: var(--gnome-green) !important;
+}
+
+.adwaita-theme .wb-close {
+  background-color: var(--gnome-red) !important;
+}
+
+.adwaita-theme .wb-min:hover::after {
+  content: '_';
+  position: absolute;
+  color: var(--icon-color);
+  font-size: 10px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: -2px;
+}
+
+.adwaita-theme .wb-max:hover::after {
+  content: '□';
+  position: absolute;
+  color: var(--icon-color);
+  font-size: 8px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.adwaita-theme .wb-close:hover::after {
+  content: '×';
+  position: absolute;
+  color: var(--icon-color);
+  font-size: 10px;
+  font-weight: bold;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.adwaita-theme .wb-full {
+  display: none !important;
+}
+
+.adwaita-theme .wb-body {
+  background: var(--window-bg) !important;
+  border-radius: 0 0 var(--gnome-border-radius) var(--gnome-border-radius) !important;
+  padding: 15px !important;
+  color: var(--text-color) !important;
+  overflow: auto !important;
+  margin-top: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+.iframe-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.iframe-container iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.iframe-container.loaded .progress-container {
+  display: none;
+}
+
+.model-gallery-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.model-gallery-left {
+  flex: 0 0 65%;
+  padding: 15px;
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.model-gallery-right {
+  flex: 0 0 35%;
+  padding: 15px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.iframe-error {
+  padding: 20px;
+  text-align: center;
+}
+
+.iframe-error h2 {
+  margin-top: 0;
+  color: var(--text-color);
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.iframe-error .project-description {
+  margin-bottom: 20px;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.adwaita-theme.wb-max {
+  top: 36px !important;
+  height: calc(100% - 36px) !important;
+  border-top: none !important;
+  border-radius: 0 !important;
+}
+
+.adwaita-theme.wb-max .wb-header {
+  position: relative !important;
+  top: 0 !important;
+  z-index: 10 !important;
+  background: var(--header-bg) !important;
+}
+
+.adwaita-theme.wb-max .wb-body {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.adwaita-theme .btn {
+  background: var(--button-bg);
+  color: white;
+  border: none;
+  border-radius: var(--gnome-border-radius);
+  padding: 8px 15px;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.adwaita-theme .btn:hover {
+  background: var(--button-hover);
+}
+
+.adwaita-theme .btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 1px rgba(0,0,0,0.2);
+}
+
+.adwaita-theme input[type="text"],
+.adwaita-theme input[type="password"],
+.adwaita-theme input[type="email"],
+.adwaita-theme textarea {
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--gnome-border-radius);
+  padding: 8px 10px;
+  color: var(--text-color);
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+  font-size: 14px;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.adwaita-theme input[type="text"]:focus,
+.adwaita-theme input[type="password"]:focus,
+.adwaita-theme input[type="email"]:focus,
+.adwaita-theme textarea:focus {
+  border-color: var(--input-focus-border);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(53, 132, 228, 0.3);
+}
+
+.adwaita-theme .switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  background-color: #e4e4e4;
+  border-radius: 34px;
+  padding: 2px;
+  transition: background-color 0.3s;
+}
+
+.adwaita-theme .switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.adwaita-theme .switch-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #e4e4e4;
+  transition: .4s;
+  border-radius: 34px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2) inset;
+}
+
+.adwaita-theme .switch-slider:before {
+  position: absolute;
+  content: "";
+  height: 27px;
+  width: 27px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.3);
+}
+
+.adwaita-theme .switch input:checked + .switch-slider {
+  background-color: #34c759;
+}
+
+.adwaita-theme .switch input:checked + .switch-slider:before {
+  transform: translateX(20px);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--window-border);
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  padding: 8px 15px;
+  cursor: pointer;
+  background: var(--tab-bg);
+  border: 1px solid var(--window-border);
+  border-bottom: none;
+  margin-right: 5px;
+  border-radius: var(--gnome-border-radius) var(--gnome-border-radius) 0 0;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+  font-size: 14px;
+  color: var(--text-color);
+  transition: background 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.tab:hover {
+  background: var(--button-hover-bg);
+}
+
+.tab.active {
+  background: var(--tab-active-bg);
+  border-bottom: 1px solid var(--tab-active-bg);
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+
+.tab-content {
+  display: none;
+  color: var(--text-color);
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  transform: translateX(50px);
+}
+
+.tab-content.active {
+  display: block;
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .project-container {
   display: flex;
   margin-bottom: 20px;
-  align-items: center;
+  padding: 15px;
+  background: var(--tab-bg);
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
+  flex-wrap: wrap;
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-container:hover {
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+}
+
+.project-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s ease;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.project-container:hover::before {
+  left: 100%;
+}
+
+.project-container.wave-effect::before {
+  left: 100%;
+}
+
+.dark-theme .project-container:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.light-theme .project-container:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 .project-info {
   flex: 1;
-  padding-right: 20px;
+  min-width: 200px;
 }
 
 .project-title {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
+  color: var(--text-color);
+}
+
+.project-description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  opacity: 0.9;
 }
 
 .project-link {
   display: inline-block;
-  padding: 5px 10px;
-  background: #245edb;
+  padding: 8px 15px;
+  background: var(--button-bg);
   color: white;
   text-decoration: none;
-  border-radius: 3px;
-  margin-right: 10px;
+  border-radius: var(--gnome-border-radius);
+  margin-right: 15px;
+  font-size: 14px;
+  transition: background 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.project-link:hover {
+  background: var(--button-hover);
+}
+
+.project-link:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 1px rgba(0,0,0,0.2);
 }
 
 .project-credits {
-  display: inline-block;
-  color: #666;
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 12px;
 }
 
 .project-preview {
   width: 200px;
   height: 120px;
   overflow: hidden;
-  border: 1px solid #ddd;
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
   transition: transform 0.3s;
+  position: relative;
+}
+
+.static-model-preview {
+  height: 300px;
 }
 
 .project-preview img {
@@ -147,6 +876,37 @@ body {
   transform: scale(1.05);
 }
 
+.progress-container {
+  margin: 15px 0;
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--window-border);
+  border: none;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--button-bg);
+  width: 0;
+  transition: width 0.5s;
+  border-radius: 3px;
+}
+
+.progress-text {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  line-height: 6px;
+  color: var(--text-color);
+  font-size: 10px;
+  margin-top: 10px;
+}
+
 @media (max-width: 768px) {
   .desktop {
     padding: 10px;
@@ -158,7 +918,7 @@ body {
   }
   
   .taskbar {
-    height: 50px;
+    height: 40px;
   }
   
   .project-container {
@@ -169,4 +929,113 @@ body {
     width: 100%;
     margin-top: 10px;
   }
+  
+  .adwaita-theme {
+    width: 90vw !important;
+    height: 80vh !important;
+    left: 5vw !important;
+    top: 50px !important;
+  }
+  
+  .tab {
+    padding: 6px 10px;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .tabs {
+    margin-bottom: 20px;
+  }
+}
+
+.adwaita-theme.wb-full {
+  width: calc(100vw - 2px) !important;
+  height: calc(100vh - 38px) !important;
+  top: 36px !important;
+  left: 0 !important;
+}
+
+.main-tabs {
+  margin-bottom: 20px;
+}
+
+.sub-tabs {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid var(--window-border);
+}
+
+.project-footer, .model-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.project-date, .model-date {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 12px;
+  text-align: right;
+}
+
+.model-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.model-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: var(--text-color);
+}
+
+.model-preview {
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
+  margin-bottom: 15px;
+}
+
+.model-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.model-preview:hover img {
+  transform: scale(1.05);
+}
+
+.model-description {
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 15px;
+  color: var(--text-color);
+  opacity: 0.9;
+  text-align: left;
+}
+
+.model-footer {
+  width: 100%;
+  padding-top: 10px;
+  border-top: 1px solid var(--window-border);
+}
+
+.model-credits {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.model-3d-container {
+  width: 100%;
+  height: 400
 }
