@@ -816,9 +816,13 @@ body {
 
 /* Выравнивание текста в окне просмотра модели */
 .model-gallery-container .model-description,
-.iframe-error .project-description,
 .model-3d-container .model-description {
   text-align: left;
+}
+
+/* Центрирование текста в окне проекта */
+.iframe-error .project-description {
+  text-align: center;
 }
 
 .project-link {
@@ -1557,4 +1561,71 @@ body {
 
 .color-block-invert .color-svg {
   fill: #000;
+}
+/* Стили для калькулятора услуг */
+.calculator-section {
+  margin-bottom: 20px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--gnome-border-radius);
+}
+
+.calculator-section h3 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.calculator-item {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.calculator-item input[type="checkbox"] {
+  margin-right: 10px;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.calculator-item label {
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.calculator-result {
+  margin-top: 30px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: var(--gnome-border-radius);
+}
+
+.calculator-note {
+  font-size: 12px;
+  font-style: italic;
+  opacity: 0.8;
+  margin-bottom: 15px;
+}
+
+.calculator-total {
+  margin-bottom: 15px;
+}
+
+.calculator-total h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+#total-price {
+  font-weight: bold;
+  color: var(--gnome-green);
+}
+
+#order-button {
+  background: var(--gnome-green);
+}
+
+#order-button:hover {
+  background: var(--gnome-blue);
 }

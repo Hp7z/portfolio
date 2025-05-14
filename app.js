@@ -129,6 +129,11 @@ const startMenuItems = {
       action: "services"
     },
     {
+      title: "Калькулятор услуг",
+      icon: "icons/calculator.png",
+      action: "calculator"
+    },
+    {
       title: "Контакты",
       icon: "icons/contacts.png",
       action: "contacts"
@@ -422,28 +427,39 @@ function generateCalendar() {
 
 // Функция для активации окна
 function activateWindow(type) {
+  console.log('Активация окна:', type);
+  
   // Деактивируем все окна
   Object.values(trayWindows).forEach(win => {
     win.removeClass('active');
-    // Проверяем наличие метода setIndex перед вызовом
-    if (typeof win.setIndex === 'function') {
-      win.setIndex(10);
-    } else if (win.dom && win.dom.style) {
-      // Альтернативный способ установки z-index
+    
+    // Принудительно удаляем класс active с DOM-элемента
+    if (win.dom) {
+      win.dom.classList.remove('active');
       win.dom.style.zIndex = 10;
     }
   });
   
   // Активируем нужное окно
-  trayWindows[type].addClass('active');
-  // Проверяем наличие метода setIndex перед вызовом
-  if (typeof trayWindows[type].setIndex === 'function') {
-    trayWindows[type].setIndex(100);
-  } else if (trayWindows[type].dom && trayWindows[type].dom.style) {
-    // Альтернативный способ установки z-index
-    trayWindows[type].dom.style.zIndex = 100;
+  if (trayWindows[type]) {
+    console.log('Найдено окно для активации:', type);
+    
+    // Добавляем класс active
+    trayWindows[type].addClass('active');
+    
+    // Принудительно обновляем стили для активного окна
+    if (trayWindows[type].dom) {
+      trayWindows[type].dom.classList.add('active');
+      trayWindows[type].dom.style.zIndex = 100;
+    }
+    
+    // Фокусируем окно
+    trayWindows[type].focus();
+    
+    // Обновляем панель задач
+    updateTaskbar();
   }
-  trayWindows[type].focus();
+}
   
   // Добавляем обработчик для отслеживания движения мыши для эффекта параллакса
   updateParallaxEffect();
@@ -457,6 +473,11 @@ function openWindow(type) {
     }
     // Поднимаем окно на передний план
     activateWindow(type);
+    
+    // Принудительно перемещаем окно на передний план в DOM
+    if (trayWindows[type].dom) {
+      document.body.appendChild(trayWindows[type].dom);
+    }
     return;
   }
 
@@ -509,7 +530,10 @@ function openWindow(type) {
     },
     onrestore: () => {
       win.minimized = false;
-      updateTaskbar();
+      activateWindow(type);
+    },
+    onfocus: () => {
+      activateWindow(type);
     }
   });
 
@@ -542,18 +566,27 @@ function openWindow(type) {
   
   // Добавляем обработчик клика на окно для активации
   if (win.dom) {
+    // Используем делегирование событий для всего окна
     win.dom.addEventListener('mousedown', function(e) {
       // Предотвращаем всплытие события, чтобы оно не перехватывалось другими обработчиками
       e.stopPropagation();
+      // Активируем окно при любом клике внутри него
       activateWindow(type);
     });
-  }
-  
-  // Добавляем обработчик для заголовка окна
-  if (win.dom) {
+    
+    // Добавляем обработчик для заголовка окна
     const header = win.dom.querySelector('.wb-header');
     if (header) {
       header.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+        activateWindow(type);
+      });
+    }
+    
+    // Добавляем обработчик для тела окна
+    const body = win.dom.querySelector('.wb-body');
+    if (body) {
+      body.addEventListener('mousedown', function(e) {
         e.stopPropagation();
         activateWindow(type);
       });
@@ -1840,3 +1873,193 @@ document.addEventListener('DOMContentLoaded', function() {
   // Инициализируем подсказки для новых пользователей
   initUserTips();
 });
+
+// Функция для рендеринга содержимого калькулятора услуг
+function renderCalculatorContent() {
+  return `
+    <h2>Калькулятор услуг</h2>
+    <p>Выберите необходимые услуги для расчета стоимости:</p>
+    
+    <div class="calculator-section">
+      <h3>Разработка сайта</h3>
+      <div class="calculator-item">
+        <input type="checkbox" id="landing" class="service-checkbox" data-price="20000" data-type="website">
+        <label for="landing">Лендинг (20 000₽)</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="shop" class="service-checkbox" data-price="50000" data-type="website">
+        <label for="shop">Интернет-магазин (50 000₽)</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="corporate" class="service-checkbox" data-price="80000" data-type="website">
+        <label for="corporate">Корпоративный сайт (80 000₽)</label>
+      </div>
+    </div>
+    
+    <div class="calculator-section">
+      <h3>Дополнительные услуги</h3>
+      <div class="calculator-item">
+        <input type="checkbox" id="design" class="service-checkbox" data-price="15000" data-type="additional">
+        <label for="design">Дизайн (15 000₽)</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="seo" class="service-checkbox" data-price="20000" data-type="additional">
+        <label for="seo">SEO-продвижение (20 000₽)</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="content" class="service-checkbox" data-price="10000" data-type="additional">
+        <label for="content">Наполнение контентом (10 000₽)</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="hosting" class="service-checkbox" data-price="5000" data-type="additional">
+        <label for="hosting">Хостинг на 1 год (5 000₽)</label>
+      </div>
+    </div>
+    
+    <div class="calculator-result">
+      <div class="calculator-note">
+        <p>* При заказе разработки сайта на все дополнительные услуги действует скидка 20%</p>
+      </div>
+      <div class="calculator-total">
+        <h3>Итоговая стоимость: <span id="total-price">0</span> ₽</h3>
+      </div>
+      <button class="btn" id="order-button">Заказать</button>
+    </div>
+  `;
+}
+
+// Функция для инициализации калькулятора
+function initCalculator() {
+  const checkboxes = document.querySelectorAll('.service-checkbox');
+  const totalPriceElement = document.getElementById('total-price');
+  const orderButton = document.getElementById('order-button');
+  
+  // Функция для расчета итоговой стоимости
+  function calculateTotal() {
+    let totalPrice = 0;
+    let hasWebsite = false;
+    let additionalServicesPrice = 0;
+    
+    // Проверяем, выбран ли хотя бы один сайт
+    checkboxes.forEach(checkbox => {
+      if (checkbox.checked && checkbox.dataset.type === 'website') {
+        hasWebsite = true;
+      }
+    });
+    
+    // Считаем стоимость
+    checkboxes.forEach(checkbox => {
+      if (checkbox.checked) {
+        const price = parseInt(checkbox.dataset.price);
+        
+        if (checkbox.dataset.type === 'website') {
+          totalPrice += price;
+        } else if (checkbox.dataset.type === 'additional') {
+          // Если выбран сайт, то на дополнительные услуги скидка 20%
+          if (hasWebsite) {
+            additionalServicesPrice += price * 0.8; // Скидка 20%
+          } else {
+            additionalServicesPrice += price;
+          }
+        }
+      }
+    });
+    
+    totalPrice += additionalServicesPrice;
+    totalPriceElement.textContent = totalPrice.toLocaleString('ru-RU');
+  }
+  
+  // Добавляем обработчики событий для чекбоксов
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', calculateTotal);
+  });
+  
+  // Добавляем обработчик для кнопки заказа
+  if (orderButton) {
+    orderButton.addEventListener('click', function() {
+      const selectedServices = [];
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          selectedServices.push(checkbox.nextElementSibling.textContent);
+        }
+      });
+      
+      if (selectedServices.length > 0) {
+        alert('Спасибо за заказ! Выбранные услуги:\n' + selectedServices.join('\n'));
+      } else {
+        alert('Пожалуйста, выберите хотя бы одну услугу.');
+      }
+    });
+  }
+}
+
+// Добавляем обработчик для открытия калькулятора
+document.addEventListener('DOMContentLoaded', function() {
+  const calculatorShortcut = document.querySelector('[data-window="calculator"]');
+  if (calculatorShortcut) {
+    calculatorShortcut.addEventListener('click', function() {
+      openWindow('calculator');
+    });
+  }
+});
+
+// Добавляем кейс для калькулятора в функцию openWindow
+const originalOpenWindow = openWindow;
+openWindow = function(type) {
+  if (type === 'calculator' && !trayWindows[type]) {
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    const win = new WinBox({
+      title: 'Калькулятор услуг',
+      class: ['adwaita-theme'],
+      width: 600,
+      height: 500,
+      x: Math.floor(Math.random() * 100),
+      y: Math.floor(Math.random() * 100) + 50,
+      top: 36,
+      background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+      border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+      borderRadius: '8px',
+      shadow: true,
+      max: false,
+      html: renderCalculatorContent(),
+      header: 36,
+      onclose: () => {
+        delete trayWindows[type];
+        updateTaskbar();
+        return false;
+      },
+      onminimize: () => {
+        updateTaskbar();
+      },
+      onrestore: () => {
+        win.minimized = false;
+        activateWindow(type);
+      },
+      onfocus: () => {
+        activateWindow(type);
+      }
+    });
+    
+    // Сохраняем окно в объекте trayWindows
+    trayWindows[type] = win;
+    
+    // Активируем новое окно
+    activateWindow(type);
+    
+    // Перемещаем окно на передний план в DOM
+    if (win.dom) {
+      document.body.appendChild(win.dom);
+    }
+    
+    // Инициализируем калькулятор
+    setTimeout(initCalculator, 100);
+    
+    // Обновляем панель задач
+    updateTaskbar();
+    
+    return;
+  }
+  
+  // Для всех остальных типов окон используем оригинальную функцию
+  return originalOpenWindow(type);
+};
