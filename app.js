@@ -136,6 +136,23 @@ const startMenuItems = {
   ]
 };
 
+// Функция для обновления эффекта параллакса
+function updateParallaxEffect() {
+  document.addEventListener('mousemove', function(e) {
+    const bodyBefore = document.querySelector('body::before');
+    if (!bodyBefore) return;
+    
+    const mouseX = e.clientX / window.innerWidth;
+    const mouseY = e.clientY / window.innerHeight;
+    
+    const moveX = mouseX * 20 - 10;
+    const moveY = mouseY * 20 - 10;
+    
+    document.body.style.setProperty('--parallax-x', moveX + 'px');
+    document.body.style.setProperty('--parallax-y', moveY + 'px');
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Проверяем сохраненную тему
   const savedTheme = localStorage.getItem('darkTheme');
@@ -145,6 +162,9 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     document.body.classList.add('dark-theme');
   }
+  
+  // Инициализируем эффект параллакса
+  updateParallaxEffect();
 
   function updateClock() {
     const clockElement = document.getElementById('clock');
@@ -400,13 +420,43 @@ function generateCalendar() {
   calendar.innerHTML = calendarHTML;
 }
 
+// Функция для активации окна
+function activateWindow(type) {
+  // Деактивируем все окна
+  Object.values(trayWindows).forEach(win => {
+    win.removeClass('active');
+    // Проверяем наличие метода setIndex перед вызовом
+    if (typeof win.setIndex === 'function') {
+      win.setIndex(10);
+    } else if (win.dom && win.dom.style) {
+      // Альтернативный способ установки z-index
+      win.dom.style.zIndex = 10;
+    }
+  });
+  
+  // Активируем нужное окно
+  trayWindows[type].addClass('active');
+  // Проверяем наличие метода setIndex перед вызовом
+  if (typeof trayWindows[type].setIndex === 'function') {
+    trayWindows[type].setIndex(100);
+  } else if (trayWindows[type].dom && trayWindows[type].dom.style) {
+    // Альтернативный способ установки z-index
+    trayWindows[type].dom.style.zIndex = 100;
+  }
+  trayWindows[type].focus();
+  
+  // Добавляем обработчик для отслеживания движения мыши для эффекта параллакса
+  updateParallaxEffect();
+}
+
 function openWindow(type) {
   // Если окно уже открыто и свернуто - развернуть
   if (trayWindows[type]) {
     if (trayWindows[type].minimized) {
       trayWindows[type].restore();
     }
-    trayWindows[type].focus();
+    // Поднимаем окно на передний план
+    activateWindow(type);
     return;
   }
 
@@ -484,7 +534,32 @@ function openWindow(type) {
     }
   }
 
+  // Сохраняем окно в объекте trayWindows
   trayWindows[type] = win;
+  
+  // Активируем новое окно
+  activateWindow(type);
+  
+  // Добавляем обработчик клика на окно для активации
+  if (win.dom) {
+    win.dom.addEventListener('mousedown', function(e) {
+      // Предотвращаем всплытие события, чтобы оно не перехватывалось другими обработчиками
+      e.stopPropagation();
+      activateWindow(type);
+    });
+  }
+  
+  // Добавляем обработчик для заголовка окна
+  if (win.dom) {
+    const header = win.dom.querySelector('.wb-header');
+    if (header) {
+      header.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+        activateWindow(type);
+      });
+    }
+  }
+  
   updateTaskbar();
 }
 
@@ -644,23 +719,6 @@ function renderContactsContent() {
           </a>
         </div>
       </div>
-      
-      <h3>Форма обратной связи</h3>
-      <form class="contact-form">
-        <div class="form-group">
-          <label for="name">Ваше имя</label>
-          <input type="text" id="name" placeholder="Введите ваше имя">
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" placeholder="Введите ваш email">
-        </div>
-        <div class="form-group">
-          <label for="message">Сообщение</label>
-          <textarea id="message" rows="5" placeholder="Введите ваше сообщение"></textarea>
-        </div>
-        <button type="button" class="btn" onclick="submitContactForm()">Отправить</button>
-      </form>
     </div>
   `;
 }
@@ -668,17 +726,15 @@ function renderContactsContent() {
 function renderProjects(projects) {
   return projects.map(project => `
     <div class="project-container">
-      <div class="project-info">
-        <div class="project-title">${project.title}</div>
-        <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
-        <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
-        <div class="project-footer">
-          <span class="project-credits">${project.credits}</span>
-          <span class="project-date">${project.date || ''}</span>
-        </div>
-      </div>
+      <div class="project-title">${project.title}</div>
       <div class="project-preview">
         <img src="${project.preview}" alt="${project.title}">
+      </div>
+      <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
+      <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+      <div class="project-footer">
+        <span class="project-credits">${project.credits}</span>
+        <span class="project-date">${project.date || ''}</span>
       </div>
     </div>
   `).join('');
@@ -875,23 +931,38 @@ function setupTabs(container) {
         setTimeout(() => {
           activeContent.classList.remove('active');
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          
+          // Активируем текущую главную вкладку
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = document.getElementById(`${tabId}-tab`);
+          
+          // Анимируем появление нового контента
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
         }, 300);
-      }
-      
-      // Активируем текущую главную вкладку
-      this.classList.add('active');
-      const tabId = this.getAttribute('data-tab');
-      const newContent = document.getElementById(`${tabId}-tab`);
-      
-      // Анимируем появление нового контента
-      if (newContent) {
-        newContent.classList.add(`slide-${direction}`);
-        setTimeout(() => {
+      } else {
+        // Активируем текущую главную вкладку
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = document.getElementById(`${tabId}-tab`);
+        
+        // Анимируем появление нового контента
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
-          newContent.classList.remove(`slide-${direction}`);
-        }, 10);
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
       }
-    });
+      }
+    ,);
   });
   
   // Настраиваем подвкладки для веб-сайтов
@@ -916,21 +987,35 @@ function setupTabs(container) {
         setTimeout(() => {
           activeContent.classList.remove('active');
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          
+          // Активируем текущую подвкладку после исчезновения предыдущего контента
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = document.getElementById(`${tabId}-tab`);
+          
+          // Анимируем появление нового контента
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
         }, 300);
-      }
-      
-      // Активируем текущую подвкладку
-      this.classList.add('active');
-      const tabId = this.getAttribute('data-tab');
-      const newContent = document.getElementById(`${tabId}-tab`);
-      
-      // Анимируем появление нового контента
-      if (newContent) {
-        newContent.classList.add(`slide-${direction}`);
-        setTimeout(() => {
+      } else {
+        // Активируем текущую подвкладку если нет активного контента
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = document.getElementById(`${tabId}-tab`);
+        
+        // Анимируем появление нового контента
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
-          newContent.classList.remove(`slide-${direction}`);
-        }, 10);
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
       }
     });
   });
@@ -957,21 +1042,35 @@ function setupTabs(container) {
         setTimeout(() => {
           activeContent.classList.remove('active');
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          
+          // Активируем текущую подвкладку после исчезновения предыдущего контента
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = document.getElementById(`${tabId}-tab`);
+          
+          // Анимируем появление нового контента
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
         }, 300);
-      }
-      
-      // Активируем текущую подвкладку
-      this.classList.add('active');
-      const tabId = this.getAttribute('data-tab');
-      const newContent = document.getElementById(`${tabId}-tab`);
-      
-      // Анимируем появление нового контента
-      if (newContent) {
-        newContent.classList.add(`slide-${direction}`);
-        setTimeout(() => {
+      } else {
+        // Активируем текущую подвкладку если нет активного контента
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = document.getElementById(`${tabId}-tab`);
+        
+        // Анимируем появление нового контента
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
-          newContent.classList.remove(`slide-${direction}`);
-        }, 10);
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
       }
     });
   });
@@ -1007,13 +1106,13 @@ function setupTabs(container) {
     });
   });
   
-  // Добавляем эффект волны при наведении на проекты
-  container.querySelectorAll('.project-container').forEach(project => {
-    project.addEventListener('mouseenter', function() {
+  // Добавляем эффект волны при наведении на проекты и модели
+  container.querySelectorAll('.project-container, .model-container, .color-block').forEach(element => {
+    element.addEventListener('mouseenter', function() {
       this.classList.add('wave-effect');
     });
     
-    project.addEventListener('mouseleave', function() {
+    element.addEventListener('mouseleave', function() {
       this.classList.remove('wave-effect');
     });
   });
@@ -1072,6 +1171,7 @@ function updateTaskbar() {
     item.onclick = () => {
       if (win.minimized) {
         win.restore();
+        activateWindow(type);
       } else {
         win.minimize();
       }
