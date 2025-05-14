@@ -451,6 +451,9 @@ function activateWindow(type) {
     if (trayWindows[type].dom) {
       trayWindows[type].dom.classList.add('active');
       trayWindows[type].dom.style.zIndex = 100;
+      
+      // Перемещаем окно на передний план в DOM
+      document.body.appendChild(trayWindows[type].dom);
     }
     
     // Фокусируем окно
@@ -463,7 +466,6 @@ function activateWindow(type) {
   
   // Добавляем обработчик для отслеживания движения мыши для эффекта параллакса
   updateParallaxEffect();
-}
 
 function openWindow(type) {
   // Если окно уже открыто и свернуто - развернуть
@@ -699,9 +701,19 @@ function renderServicesContent() {
       <p>Я предлагаю полный цикл разработки веб-сайтов:</p>
       <ul>
         <li>Лендинги от 20 000₽</li>
+      </ul>
+      <p class="service-description">Одностраничный сайт для презентации товара, услуги или события. Включает современный дизайн, адаптивную верстку, формы обратной связи и интеграцию с аналитикой.</p>
+      
+      <ul>
         <li>Интернет-магазины от 50 000₽</li>
+      </ul>
+      <p class="service-description">Полноценный онлайн-магазин с каталогом товаров, корзиной, личным кабинетом и системой оплаты. Включает настройку CMS, фильтры товаров, SEO-оптимизацию и мобильную версию.</p>
+      
+      <ul>
         <li>Корпоративные сайты от 80 000₽</li>
       </ul>
+      <p class="service-description">Многостраничный сайт для представления компании в интернете. Включает уникальный дизайн, структурированную информацию о компании, блог, интеграцию с CRM и социальными сетями.</p>
+      
       <p>Все сайты адаптивны, оптимизированы для поисковых систем и имеют удобную панель управления.</p>
     </div>
     
@@ -710,9 +722,18 @@ function renderServicesContent() {
       <p>Создаю уникальный дизайн для вашего бренда:</p>
       <ul>
         <li>UI/UX дизайн</li>
+      </ul>
+      <p class="service-description">Разработка интерфейсов с фокусом на удобство использования. Включает прототипирование, создание макетов всех экранов, анимации и интерактивные элементы.</p>
+      
+      <ul>
         <li>Логотипы и фирменный стиль</li>
+      </ul>
+      <p class="service-description">Создание уникального логотипа и фирменного стиля компании. Включает несколько концепций на выбор, финальные файлы в различных форматах и брендбук.</p>
+      
+      <ul>
         <li>Баннеры и рекламные материалы</li>
       </ul>
+      <p class="service-description">Разработка графических материалов для рекламных кампаний. Включает баннеры для сайтов, социальных сетей, email-рассылок и печатной продукции.</p>
     </div>
     
     <div class="tab-content" id="seo-tab">
@@ -720,10 +741,23 @@ function renderServicesContent() {
       <p>Помогу вашему сайту занять высокие позиции в поисковых системах:</p>
       <ul>
         <li>Аудит сайта</li>
+      </ul>
+      <p class="service-description">Комплексный анализ сайта для выявления технических ошибок и SEO-проблем. Включает проверку скорости загрузки, мобильной версии, структуры URL и метатегов.</p>
+      
+      <ul>
         <li>Оптимизация контента</li>
+      </ul>
+      <p class="service-description">Создание и оптимизация текстов для повышения релевантности поисковым запросам. Включает подбор ключевых слов, написание SEO-текстов и оптимизацию существующего контента.</p>
+      
+      <ul>
         <li>Техническое SEO</li>
+      </ul>
+      <p class="service-description">Устранение технических проблем, влияющих на индексацию сайта. Включает настройку robots.txt, XML-карты сайта, микроразметки и ускорение загрузки страниц.</p>
+      
+      <ul>
         <li>Анализ конкурентов</li>
       </ul>
+      <p class="service-description">Исследование стратегий продвижения конкурентов для выявления эффективных подходов. Включает анализ ключевых слов, ссылочного профиля и контент-стратегии.</p>
     </div>
   `;
 }
@@ -2063,3 +2097,434 @@ openWindow = function(type) {
   // Для всех остальных типов окон используем оригинальную функцию
   return originalOpenWindow(type);
 };
+
+// Функция для активации окна
+function activateWindow(type) {
+  console.log('Активация окна:', type);
+  
+  // Деактивируем все окна
+  Object.values(trayWindows).forEach(win => {
+    win.removeClass('active');
+    
+    // Принудительно удаляем класс active с DOM-элемента
+    if (win.dom) {
+      win.dom.classList.remove('active');
+      win.dom.style.zIndex = 10;
+    }
+  });
+  
+  // Активируем нужное окно
+  if (trayWindows[type]) {
+    console.log('Найдено окно для активации:', type);
+    
+    // Добавляем класс active
+    trayWindows[type].addClass('active');
+    
+    // Принудительно обновляем стили для активного окна
+    if (trayWindows[type].dom) {
+      trayWindows[type].dom.classList.add('active');
+      trayWindows[type].dom.style.zIndex = 100;
+      
+      // Перемещаем окно на передний план в DOM
+      document.body.appendChild(trayWindows[type].dom);
+    }
+    
+    // Фокусируем окно
+    trayWindows[type].focus();
+    
+    // Обновляем панель задач
+    updateTaskbar();
+  }
+}
+// Модифицируем функцию открытия окон проектов и моделей
+function registerWindowInSystem(win, type) {
+  // Сохраняем окно в объекте trayWindows
+  trayWindows[type] = win;
+  
+  // Активируем новое окно
+  activateWindow(type);
+  
+  // Добавляем обработчик клика на окно для активации
+  if (win.dom) {
+    win.dom.addEventListener('mousedown', function(e) {
+      e.stopPropagation();
+      activateWindow(type);
+    });
+    
+    // Добавляем обработчик для заголовка окна
+    const header = win.dom.querySelector('.wb-header');
+    if (header) {
+      header.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+        activateWindow(type);
+      });
+    }
+    
+    // Добавляем обработчик для тела окна
+    const body = win.dom.querySelector('.wb-body');
+    if (body) {
+      body.addEventListener('mousedown', function(e) {
+        e.stopPropagation();
+        activateWindow(type);
+      });
+    }
+  }
+  
+  // Обновляем панель задач
+  updateTaskbar();
+}
+
+// Модифицируем функцию открытия окна проекта
+const originalOpenProjectWindow = window.openProjectWindow;
+window.openProjectWindow = function(url) {
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  
+  // Получаем заголовок из URL
+  let projectTitle = 'Проект';
+  try {
+    const urlObj = new URL(url);
+    projectTitle = urlObj.hostname.replace(/^www\\./, '');
+  } catch (e) {
+    console.error('Ошибка при парсинге URL:', e);
+  }
+
+  // Находим информацию о проекте по URL
+  let projectInfo = null;
+  Object.values(projects.websites).forEach(category => {
+    category.forEach(project => {
+      if (project.url === url) {
+        projectInfo = project;
+      }
+    });
+  });
+
+  // Генерируем уникальный идентификатор для окна
+  const windowId = 'project-' + Date.now();
+
+  // Создаем окно
+  const win = new WinBox({
+    title: projectInfo ? projectInfo.title : projectTitle,
+    class: ['adwaita-theme'],
+    width: 800,
+    height: 600,
+    x: "center",
+    y: "center",
+    top: 36,
+    background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+    border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false,
+    header: 36,
+    index: 9999,
+    html: `
+      <div class="window-body">
+        <div id="iframe-container-${Date.now()}" class="iframe-container">
+          <iframe src="${url}" frameborder="0" width="100%" height="100%" 
+            onload="this.parentNode.classList.add('loaded')" 
+            onerror="handleIframeError(this, '${url}')"
+            style="display:none;"></iframe>
+          <div class="progress-container">
+            <div class="progress-bar">
+              <div class="progress-fill" id="progress-fill-${Date.now()}"></div>
+              <div class="progress-text" id="progress-text-${Date.now()}">0%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `,
+    onclose: () => {
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    },
+    onminimize: () => {
+      updateTaskbar();
+    },
+    onrestore: () => {
+      win.minimized = false;
+      activateWindow(windowId);
+    },
+    onfocus: () => {
+      activateWindow(windowId);
+    }
+  });
+  
+  // Регистрируем окно в системе
+  registerWindowInSystem(win, windowId);
+  
+  // Запускаем анимацию загрузки
+  const progressId = Date.now();
+  const progressFill = document.getElementById(`progress-fill-${progressId}`);
+  const progressText = document.getElementById(`progress-text-${progressId}`);
+  
+  if (progressFill && progressText) {
+    simulateLoadingForElement(progressFill, progressText);
+  }
+  
+  return win;
+};
+
+// Модифицируем функцию открытия 3D модели
+const originalOpen3DModelViewer = window.open3DModelViewer;
+window.open3DModelViewer = function(modelId) {
+  const model = projects.models3d.interactive.find(m => m.id === modelId);
+  if (!model) return;
+  
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  
+  // Генерируем уникальный идентификатор для окна
+  const windowId = 'model-' + modelId + '-' + Date.now();
+  
+  // Создаем HTML для окна просмотра 3D модели
+  let viewerHTML = `
+    <div class="model-gallery-container">
+      <div class="model-gallery-left model-3d-container" id="model-container-${modelId}" data-model-url="${model.modelUrl}" style="flex: 65;">
+        <!-- Превью изображение с кнопкой Play поверх -->
+        <div class="model-preview-container" id="model-preview-${modelId}">
+          <img src="${model.preview}" alt="${model.title}">
+          <!-- Кнопка Play внутри превью -->
+          <div class="model-play-btn" id="model-play-${modelId}" onclick="loadAndPlay('${modelId}')"></div>
+        </div>
+        
+        <!-- Контейнер для 3D модели (изначально скрыт) -->
+        <div class="model-3d-viewer hidden" id="model-viewer-${modelId}"></div>
+        
+        <!-- Индикатор загрузки (скрыт изначально) -->
+        <div class="model-loading hidden" id="model-loading-${modelId}">
+          <div class="loading-spinner"></div>
+          <div>Загрузка модели</div>
+          <div class="model-loading-progress">
+            <div class="model-loading-bar" id="model-progress-${modelId}"></div>
+          </div>
+        </div>
+      </div>
+      <div class="model-gallery-right" style="flex: 35;">
+        <h2>${model.title}</h2>
+        <p class="model-description">${model.description || 'Описание модели отсутствует'}</p>
+        
+        <div class="model-software">
+          <h3>Используемые программы</h3>
+          <div class="software-icons">
+            ${model.software ? model.software.map(sw => `
+              <div class="software-icon" title="${sw}">
+                <img src="icons/software/${sw.toLowerCase()}.png" alt="${sw}">
+                <span>${sw}</span>
+              </div>
+            `).join('') : '<span>Blender</span>'}
+          </div>
+        </div>
+        
+        <div class="model-info-footer">
+          <div class="model-author">
+            <strong>Автор:</strong> ${model.credits}
+          </div>
+          <div class="model-date">
+            <strong>Дата:</strong> ${model.date || 'Не указана'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Открываем окно с 3D моделью
+  const win = new WinBox({
+    title: model.title,
+    class: ['adwaita-theme', 'model-viewer-window'],
+    width: 1000,
+    height: 600,
+    x: "center",
+    y: "center",
+    top: 36,
+    background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+    border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false,
+    html: viewerHTML,
+    onclose: () => {
+      // Останавливаем анимацию и освобождаем ресурсы при закрытии окна
+      if (loadedModels[modelId]) {
+        if (loadedModels[modelId].renderer) {
+          loadedModels[modelId].renderer.dispose();
+        }
+        delete loadedModels[modelId];
+      }
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    },
+    onminimize: () => {
+      updateTaskbar();
+    },
+    onrestore: () => {
+      win.minimized = false;
+      activateWindow(windowId);
+    },
+    onfocus: () => {
+      activateWindow(windowId);
+    }
+  });
+  
+  // Регистрируем окно в системе
+  registerWindowInSystem(win, windowId);
+  
+  return win;
+};
+
+// Модифицируем функцию открытия галереи статичных моделей
+const originalOpenModelGallery = window.openModelGallery;
+window.openModelGallery = function(modelId) {
+  const model = projects.models3d.static.find(m => m.id === modelId);
+  if (!model) return;
+  
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  
+  // Генерируем уникальный идентификатор для окна
+  const windowId = 'gallery-' + modelId + '-' + Date.now();
+  
+  // Создаем массив изображений для галереи
+  const images = [model.preview];
+  if (model.additionalImages) {
+    images.push(...model.additionalImages);
+  }
+  
+  // Создаем HTML для галереи
+  let galleryHTML = `
+    <div class="model-gallery-container">
+      <div class="model-gallery-left" style="flex: 65;">
+        <div class="model-gallery-main">
+          <img src="${model.preview}" alt="${model.title}" id="gallery-main-image">
+          <div class="gallery-nav">
+            <button class="gallery-nav-btn prev" onclick="changeGalleryImage('prev')" title="Предыдущее изображение">❮</button>
+            <button class="gallery-nav-btn next" onclick="changeGalleryImage('next')" title="Следующее изображение">❯</button>
+          </div>
+        </div>
+        <div class="model-gallery-thumbnails">
+  `;
+  
+  // Добавляем миниатюры
+  images.forEach((img, index) => {
+    galleryHTML += `
+      <div class="model-gallery-thumb ${index === 0 ? 'active' : ''}" onclick="changeGalleryImage(${index})" data-index="${index}">
+        <img src="${img}" alt="Вид ${index + 1}">
+      </div>
+    `;
+  });
+  
+  // Добавляем информацию о модели
+  galleryHTML += `
+        </div>
+      </div>
+      <div class="model-gallery-right" style="flex: 35;">
+        <h2>${model.title}</h2>
+        <p class="model-description">${model.description || 'Описание модели отсутствует'}</p>
+        
+        <div class="model-software">
+          <h3>Используемые программы</h3>
+          <div class="software-icons">
+            ${model.software ? model.software.map(sw => `
+              <div class="software-icon" title="${sw}">
+                <img src="icons/software/${sw.toLowerCase()}.png" alt="${sw}">
+                <span>${sw}</span>
+              </div>
+            `).join('') : '<span>Blender</span>'}
+          </div>
+        </div>
+        
+        <div class="model-info-footer">
+          <div class="model-author">
+            <strong>Автор:</strong> ${model.credits}
+          </div>
+          <div class="model-date">
+            <strong>Дата:</strong> ${model.date || 'Не указана'}
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Открываем окно с галереей
+  const win = new WinBox({
+    title: model.title,
+    class: ['adwaita-theme', 'gallery-window'],
+    width: 1000,
+    height: 600,
+    x: "center",
+    y: "center",
+    top: 36,
+    background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+    border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false,
+    html: galleryHTML,
+    onclose: () => {
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    },
+    onminimize: () => {
+      updateTaskbar();
+    },
+    onrestore: () => {
+      win.minimized = false;
+      activateWindow(windowId);
+    },
+    onfocus: () => {
+      activateWindow(windowId);
+    }
+  });
+  
+  // Регистрируем окно в системе
+  registerWindowInSystem(win, windowId);
+  
+  // Сохраняем информацию о текущей галерее
+  window.currentGallery = {
+    images: images,
+    currentIndex: 0
+  };
+  
+  return win;
+};
+window.addEventListener("DOMContentLoaded", function() {
+// Удаляем все предыдущие обработчики
+  if (window._glitchHandlers) {
+    window._glitchHandlers.forEach(handler => {
+      document.removeEventListener("mousemove", handler);
+    });
+  }
+  
+  // Очищаем текст
+  const glitchText = document.querySelector(".glitch-text");
+  if (glitchText) {
+    glitchText.innerHTML = "MAXIM&nbsp;LUZAN";
+    glitchText.setAttribute("data-text", "MAXIM LUZAN");
+  }
+  
+  // Создаем новый обработчик
+  const mouseMoveHandler = function(e) {
+    if (!glitchText) return;
+    
+    const mouseX = e.clientX;
+    const mouseY = e.clientY;
+    
+    const textRect = glitchText.getBoundingClientRect();
+    const textCenterX = textRect.left + textRect.width / 2;
+    const textCenterY = textRect.top + textRect.height / 2;
+    
+    const distance = Math.sqrt(
+      Math.pow(mouseX - textCenterX, 2) + 
+      Math.pow(mouseY - textCenterY, 2)
+    );
+    
+    const maxDistance = 200;
+    
+    if (distance < maxDistance) {
+      glitchText.classList.add("active");
+    } else {
+      glitchText.classList.remove("active");
+    }
+  };
+  
+  // Добавляем новый обработчик
+  document.addEventListener("mousemove", mouseMoveHandler);
+  window._glitchHandlers = [mouseMoveHandler];
+});
