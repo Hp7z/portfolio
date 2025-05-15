@@ -720,6 +720,7 @@ body {
 
 .project-container, .model-container {
   display: flex;
+  height: 250px;
   flex-direction: row;
   align-items: center;
   padding-left: 20px;
@@ -786,7 +787,7 @@ body {
 .project-preview, .model-preview {
   width: 40%;
   max-width: 100%;
-  height: auto;
+  height: inherit;
   max-height: 250px;
   overflow: hidden;
   border-radius: var(--gnome-border-radius);
