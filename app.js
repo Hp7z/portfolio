@@ -197,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   updateClock();
-  setInterval(updateClock, 1000);
+  // Обновляем часы каждую минуту вместо каждой секунды
+  setInterval(updateClock, 60000);
   
   // Рендерим меню "Пуск"
   renderStartMenu();
@@ -217,7 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Проверяем наличие иконок для окон
   console.log("Проверка наличия иконок для окон:");
   ['about', 'portfolio'].forEach(type => { // Проверяем только существующие иконки
-    const iconPath = `icons/${type}.png`;
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    const iconPath = isDarkTheme ? 
+      `icons/${type}-dark.svg` : 
+      `icons/${type}-light.svg`;
     const img = new Image();
     img.onload = () => console.log(`Иконка ${iconPath} загружена успешно`);
     img.onerror = () => console.error(`Ошибка загрузки иконки ${iconPath}`);
@@ -470,9 +474,6 @@ function activateWindow(type) {
     updateTaskbar();
   }
 }
-  
-  // Добавляем обработчик для отслеживания движения мыши для эффекта параллакса
-  updateParallaxEffect();
 
 function openWindow(type) {
   // Если окно уже открыто и свернуто - развернуть
@@ -491,32 +492,42 @@ function openWindow(type) {
   }
 
   const isDarkTheme = document.body.classList.contains('dark-theme');
-  let title, content;
+  let title, content, icon;
 
   switch(type) {
     case 'about':
       title = 'Обо мне';
       content = renderAboutContent();
+      icon = getIconForTheme(windowIcons.about);
       break;
     case 'portfolio':
       title = 'Портфолио';
       content = renderPortfolioContent();
+      icon = getIconForTheme(windowIcons.portfolio);
       break;
     case 'services':
       title = 'Услуги';
       content = renderServicesContent();
+      icon = getIconForTheme(windowIcons.services);
       break;
     case 'contacts':
       title = 'Контакты';
       content = renderContactsContent();
+      icon = getIconForTheme(windowIcons.contacts);
+      break;
+    case 'calculator':
+      title = 'Калькулятор услуг';
+      content = renderCalculatorContent();
+      icon = getIconForTheme(windowIcons.calculator);
       break;
     default:
       content = '<p>Содержимое окна</p>';
+      icon = getIconForTheme(windowIcons.about);
   }
   
   const win = new WinBox({
     title: title,
-    class: ['adwaita-theme'],
+    class: ['adwaita-theme', 'active'], // Добавляем класс active сразу при создании
     width: 800,
     height: 600,
     x: Math.floor(Math.random() * 100),
@@ -529,6 +540,7 @@ function openWindow(type) {
     max: false, // Отключаем автоматическое разворачивание окна на весь экран
     html: content,
     header: 36, // Устанавливаем высоту заголовка
+    icon: icon, // Добавляем иконку с учетом текущей темы
     onclose: () => {
       delete trayWindows[type];
       updateTaskbar();
@@ -801,15 +813,17 @@ function renderContactsContent() {
 function renderProjects(projects) {
   return projects.map(project => `
     <div class="project-container">
-      <div class="project-title">${project.title}</div>
+      <div class="project-content">
+        <div class="project-title">${project.title}</div>
+        <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
+        <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+        <div class="project-footer">
+          <span class="project-credits">${project.credits}</span>
+          <span class="project-date">${project.date || ''}</span>
+        </div>
+      </div>
       <div class="project-preview">
         <img src="${project.preview}" alt="${project.title}">
-      </div>
-      <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
-      <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
-      <div class="project-footer">
-        <span class="project-credits">${project.credits}</span>
-        <span class="project-date">${project.date || ''}</span>
       </div>
     </div>
   `).join('');
@@ -821,16 +835,18 @@ function render3DModels(models) {
     if (model.type === 'interactive' && model.modelUrl) {
       return `
         <div class="project-container model-container color-block" onclick="open3DModelViewer('${model.id}')">
-          <div class="model-title color-text">${model.title}</div>
+          <div class="model-content">
+            <div class="model-title color-text">${model.title}</div>
+            <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+            <div class="model-footer">
+              <span class="model-credits color-text">${model.credits}</span>
+              <span class="model-date color-text">${model.date || ''}</span>
+            </div>
+          </div>
           <div class="model-preview static-model-preview">
             <img src="${model.preview}" alt="${model.title}">
             <!-- Кнопка Play поверх превью -->
             <div class="model-play-btn"></div>
-          </div>
-          <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
-          <div class="model-footer">
-            <span class="model-credits color-text">${model.credits}</span>
-            <span class="model-date color-text">${model.date || ''}</span>
           </div>
         </div>
       `;
@@ -838,19 +854,298 @@ function render3DModels(models) {
       // Для статичных моделей используем изображение с увеличенной высотой
       return `
         <div class="project-container model-container color-block" onclick="openModelGallery('${model.id}')">
-          <div class="model-title color-text">${model.title}</div>
+          <div class="model-content">
+            <div class="model-title color-text">${model.title}</div>
+            <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+            <div class="model-footer">
+              <span class="model-credits color-text">${model.credits}</span>
+              <span class="model-date color-text">${model.date || ''}</span>
+            </div>
+          </div>
           <div class="model-preview static-model-preview">
             <img src="${model.preview}" alt="${model.title}">
-          </div>
-          <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
-          <div class="model-footer">
-            <span class="model-credits color-text">${model.credits}</span>
-            <span class="model-date color-text">${model.date || ''}</span>
           </div>
         </div>
       `;
     }
   }).join('');
+}
+
+// Функция для открытия просмотрщика 3D моделей
+function open3DModelViewer(modelId) {
+  // Находим модель по ID
+  let modelData = null;
+  Object.values(projects.models3d).forEach(category => {
+    category.forEach(model => {
+      if (model.id === modelId) {
+        modelData = model;
+      }
+    });
+  });
+  
+  if (!modelData) {
+    console.error('Модель не найдена:', modelId);
+    return;
+  }
+  
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  const windowId = `model-${modelId}-${Date.now()}`;
+  
+  // Получаем иконку для 3D модели в зависимости от темы
+  const icon = getIconForTheme(windowIcons.model3d);
+  
+  // Создаем окно для просмотра 3D модели
+  const win = new WinBox({
+    title: modelData.title,
+    class: ['adwaita-theme', 'active'], // Добавляем класс active сразу при создании
+    width: 800,
+    height: 600,
+    x: "center",
+    y: "center",
+    top: 36, // Отступ сверху равен высоте панели задач
+    background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+    border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false, // Отключаем автоматическое разворачивание окна
+    header: 36, // Устанавливаем высоту заголовка
+    icon: icon, // Добавляем иконку для 3D модели
+    html: `
+      <div class="model-3d-container">
+        <!-- Превью модели -->
+        <div class="model-preview-container">
+          <img src="${modelData.preview}" alt="${modelData.title}">
+          <div class="model-play-btn"></div>
+        </div>
+        
+        <!-- 3D просмотрщик -->
+        <div class="model-3d-viewer hidden" id="model-viewer-${modelId}"></div>
+        
+        <!-- Индикатор загрузки -->
+        <div class="model-loading hidden">
+          <div class="loading-spinner"></div>
+          <span>Загрузка модели...</span>
+          <div class="model-loading-progress">
+            <div class="model-loading-bar" id="loading-bar-${modelId}"></div>
+          </div>
+        </div>
+        
+        <!-- Информация о модели -->
+        <div class="model-info-overlay">
+          ${modelData.title}
+        </div>
+        
+        <!-- Элементы управления -->
+        <div class="model-controls">
+          <div class="model-control-btn" title="Сбросить вид" onclick="resetModelView('${modelId}')">
+            <i class="fas fa-sync-alt"></i>
+          </div>
+          <div class="model-control-btn" title="Полный экран" onclick="toggleModelFullscreen('${modelId}')">
+            <i class="fas fa-expand"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="model-description">
+        ${modelData.description || 'Описание отсутствует'}
+      </div>
+      
+      <div class="model-info-footer">
+        <span class="model-credits">${modelData.credits}</span>
+        <span class="model-date">${modelData.date || ''}</span>
+      </div>
+    `,
+    onclose: () => {
+      // Удаляем окно из списка окон
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    }
+  });
+  
+  // Сохраняем окно в объекте trayWindows
+  trayWindows[windowId] = win;
+  
+  // Активируем окно
+  activateWindow(windowId);
+  
+  // Добавляем обработчик для кнопки Play
+  const playBtn = win.body.querySelector('.model-play-btn');
+  const previewContainer = win.body.querySelector('.model-preview-container');
+  const modelViewer = win.body.querySelector(`#model-viewer-${modelId}`);
+  const loadingIndicator = win.body.querySelector('.model-loading');
+  
+  if (playBtn) {
+    playBtn.addEventListener('click', function() {
+      // Показываем индикатор загрузки
+      loadingIndicator.classList.remove('hidden');
+      
+      // Загружаем модель
+      loadModel(modelData.modelUrl, modelId).then(() => {
+        // Скрываем превью и показываем 3D просмотрщик
+        previewContainer.classList.add('hidden');
+        modelViewer.classList.remove('hidden');
+        
+        // Скрываем индикатор загрузки
+        loadingIndicator.classList.add('hidden');
+      }).catch(error => {
+        console.error('Ошибка загрузки модели:', error);
+        
+        // Показываем сообщение об ошибке
+        loadingIndicator.innerHTML = `
+          <div class="model-error">
+            <h3>Ошибка загрузки модели</h3>
+            <p>${error.message || 'Не удалось загрузить 3D модель'}</p>
+            <button onclick="this.parentNode.parentNode.classList.add('hidden'); document.querySelector('.model-preview-container').classList.remove('hidden');">
+              Вернуться к превью
+            </button>
+          </div>
+        `;
+      });
+    });
+  }
+  
+  // Функция для загрузки модели
+  window.loadModel = function(url, modelId) {
+    return new Promise((resolve, reject) => {
+      // Имитация загрузки модели
+      const loadingBar = document.getElementById(`loading-bar-${modelId}`);
+      let progress = 0;
+      
+      const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          // Здесь должна быть реальная загрузка модели
+          // Например, с использованием Three.js или другой библиотеки
+          
+          // Для демонстрации просто показываем сообщение об успешной загрузке
+          const modelViewer = document.getElementById(`model-viewer-${modelId}`);
+          if (modelViewer) {
+            modelViewer.innerHTML = `
+              <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; text-align: center; padding: 20px;">
+                <div>
+                  <h3>3D модель загружена</h3>
+                  <p>Это демонстрационный режим. В реальном приложении здесь была бы интерактивная 3D модель.</p>
+                </div>
+              </div>
+            `;
+            
+            // Добавляем небольшую задержку перед разрешением промиса
+            setTimeout(() => {
+              resolve();
+            }, 500);
+          } else {
+            reject(new Error('Элемент просмотрщика не найден'));
+          }
+        }
+        
+        if (loadingBar) {
+          loadingBar.style.width = `${progress}%`;
+        }
+      }, 200);
+    });
+  };
+  
+  // Функции для управления моделью
+  window.resetModelView = function(modelId) {
+    console.log('Сброс вида модели:', modelId);
+    // Здесь должен быть код для сброса вида модели
+  };
+  
+  window.toggleModelFullscreen = function(modelId) {
+    const container = document.querySelector('.model-3d-container');
+    if (container) {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        container.requestFullscreen().catch(err => {
+          console.error('Ошибка при переходе в полноэкранный режим:', err);
+        });
+      }
+    }
+  };
+}
+
+// Функция для открытия галереи статичных моделей
+function openModelGallery(modelId) {
+  // Находим модель по ID
+  let modelData = null;
+  Object.values(projects.models3d).forEach(category => {
+    category.forEach(model => {
+      if (model.id === modelId) {
+        modelData = model;
+      }
+    });
+  });
+  
+  if (!modelData) {
+    console.error('Модель не найдена:', modelId);
+    return;
+  }
+  
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  const windowId = `gallery-${modelId}-${Date.now()}`;
+  
+  // Получаем иконку для 3D модели в зависимости от темы
+  const icon = getIconForTheme(windowIcons.model3d);
+  
+  // Создаем окно для просмотра галереи
+  const win = new WinBox({
+    title: modelData.title,
+    class: ['adwaita-theme', 'active'], // Добавляем класс active сразу при создании
+    width: 800,
+    height: 600,
+    x: "center",
+    y: "center",
+    top: 36, // Отступ сверху равен высоте панели задач
+    background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+    border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false, // Отключаем автоматическое разворачивание окна
+    header: 36, // Устанавливаем высоту заголовка
+    icon: icon, // Добавляем иконку для 3D модели
+    html: `
+      <div class="model-gallery-container">
+        <div class="model-gallery-left">
+          <div class="model-gallery-main">
+            <img src="${modelData.preview}" alt="${modelData.title}">
+            <div class="gallery-nav">
+              <button class="gallery-nav-btn gallery-prev">❮</button>
+              <button class="gallery-nav-btn gallery-next">❯</button>
+            </div>
+          </div>
+          <div class="model-gallery-thumbnails">
+            <div class="model-gallery-thumb active">
+              <img src="${modelData.preview}" alt="${modelData.title}">
+            </div>
+            <!-- Дополнительные изображения будут добавлены динамически -->
+          </div>
+        </div>
+        <div class="model-gallery-right">
+          <h2>${modelData.title}</h2>
+          <p class="model-description">${modelData.description || 'Описание отсутствует'}</p>
+          <div class="model-info-footer">
+            <span class="model-credits">${modelData.credits}</span>
+            <span class="model-date">${modelData.date || ''}</span>
+          </div>
+        </div>
+      </div>
+    `,
+    onclose: () => {
+      // Удаляем окно из списка окон
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    }
+  });
+  
+  // Сохраняем окно в объекте trayWindows
+  trayWindows[windowId] = win;
+  
+  // Активируем окно
+  activateWindow(windowId);
 }
 
 function openProjectWindow(url) {
@@ -876,10 +1171,16 @@ function openProjectWindow(url) {
     });
   });
 
+  // Создаем уникальный ID для окна
+  const windowId = `project-${Date.now()}`;
+
+  // Получаем иконку для веб-сайта в зависимости от темы
+  const icon = getIconForTheme(windowIcons.website);
+
   // Пробуем открыть сайт в iframe
   const win = new WinBox({
     title: projectInfo ? projectInfo.title : projectTitle,
-    class: ['adwaita-theme'],
+    class: ['adwaita-theme', 'active'], // Добавляем класс active сразу при создании
     width: 800,
     height: 600,
     x: "center",
@@ -891,6 +1192,7 @@ function openProjectWindow(url) {
     max: false, // Отключаем автоматическое разворачивание окна
     header: 36, // Устанавливаем высоту заголовка
     index: 9999, // Устанавливаем высокий z-index, чтобы окно было поверх других
+    icon: icon, // Добавляем иконку для веб-сайта
     html: `
       <div class="window-body">
         <div id="iframe-container-${Date.now()}" class="iframe-container">
@@ -907,8 +1209,19 @@ function openProjectWindow(url) {
         </div>
       </div>
     `,
-    onclose: () => false
+    onclose: () => {
+      // Удаляем окно из списка окон
+      delete trayWindows[windowId];
+      updateTaskbar();
+      return false;
+    }
   });
+  
+  // Сохраняем окно в объекте trayWindows
+  trayWindows[windowId] = win;
+  
+  // Активируем окно
+  activateWindow(windowId);
   
   // Запускаем анимацию загрузки
   const progressId = Date.now();
@@ -1227,6 +1540,7 @@ function updateTaskbar() {
     else if (type === 'portfolio-corporate') title = 'Корпоративные сайты';
     else if (type === 'services') title = 'Услуги';
     else if (type === 'contacts') title = 'Контакты';
+    else if (type === 'calculator') title = 'Калькулятор услуг';
     else title = win.title;
     
     if (win.minimized) {
@@ -1234,12 +1548,36 @@ function updateTaskbar() {
     }
     
     // Определяем иконку
-    let icon = type;
-    if (type.startsWith('portfolio-')) icon = 'portfolio';
-    if (type.startsWith('service-')) icon = 'services';
+    let iconPath;
+    const isDarkTheme = document.body.classList.contains('dark-theme');
+    
+    if (type === 'about') {
+      iconPath = isDarkTheme ? 'icons/about-light.svg' : 'icons/about-dark.svg';
+    }
+    else if (type === 'portfolio') {
+      iconPath = isDarkTheme ? 'icons/portfolio-light.svg' : 'icons/portfolio-dark.svg';
+    }
+    else if (type === 'services') {
+      iconPath = isDarkTheme ? 'icons/services-light.svg' : 'icons/services-dark.svg';
+    }
+    else if (type === 'contacts') {
+      iconPath = isDarkTheme ? 'icons/contacts-light.svg' : 'icons/contacts-dark.svg';
+    }
+    else if (type === 'calculator') {
+      iconPath = isDarkTheme ? 'icons/calculator-light.svg' : 'icons/calculator-dark.svg';
+    }
+    else if (type.startsWith('project-')) {
+      iconPath = isDarkTheme ? 'icons/website-light.svg' : 'icons/website-dark.svg';
+    }
+    else if (type.startsWith('model-') || type.startsWith('gallery-')) {
+      iconPath = isDarkTheme ? 'icons/model3d-light.svg' : 'icons/model3d-dark.svg';
+    }
+    else {
+      iconPath = isDarkTheme ? 'icons/about-light.svg' : 'icons/about-dark.svg';
+    }
     
     item.innerHTML = `
-      <img src="icons/${icon}.png">
+      <img src="${iconPath}">
       <span class="taskbar-item-title">${title}</span>
     `;
     
@@ -1323,6 +1661,13 @@ window.loadAndPlay = function(modelId) {
   const loadingElement = document.getElementById(`model-loading-${modelId}`);
   
   if (!container || !previewContainer || !playButton || !loadingElement || !viewerContainer) return;
+  
+  // Проверяем, загружена ли уже эта модель
+  if (loadedModels[modelId]) {
+    showModel(modelId);
+    return;
+  }
+  
   // Показываем индикатор загрузки и скрываем кнопку Play
   loadingElement.classList.remove('hidden');
   playButton.classList.add('hidden');
@@ -2035,77 +2380,6 @@ function initCalculator() {
   }
 }
 
-// Добавляем обработчик для открытия калькулятора
-document.addEventListener('DOMContentLoaded', function() {
-  const calculatorShortcut = document.querySelector('[data-window="calculator"]');
-  if (calculatorShortcut) {
-    calculatorShortcut.addEventListener('click', function() {
-      openWindow('calculator');
-    });
-  }
-});
-
-// Добавляем кейс для калькулятора в функцию openWindow
-const originalOpenWindow = openWindow;
-openWindow = function(type) {
-  if (type === 'calculator' && !trayWindows[type]) {
-    const isDarkTheme = document.body.classList.contains('dark-theme');
-    const win = new WinBox({
-      title: 'Калькулятор услуг',
-      class: ['adwaita-theme'],
-      width: 600,
-      height: 500,
-      x: Math.floor(Math.random() * 100),
-      y: Math.floor(Math.random() * 100) + 50,
-      top: 36,
-      background: isDarkTheme ? '#2e3436' : '#f6f5f4',
-      border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
-      borderRadius: '8px',
-      shadow: true,
-      max: false,
-      html: renderCalculatorContent(),
-      header: 36,
-      onclose: () => {
-        delete trayWindows[type];
-        updateTaskbar();
-        return false;
-      },
-      onminimize: () => {
-        updateTaskbar();
-      },
-      onrestore: () => {
-        win.minimized = false;
-        activateWindow(type);
-      },
-      onfocus: () => {
-        activateWindow(type);
-      }
-    });
-    
-    // Сохраняем окно в объекте trayWindows
-    trayWindows[type] = win;
-    
-    // Активируем новое окно
-    activateWindow(type);
-    
-    // Перемещаем окно на передний план в DOM
-    if (win.dom) {
-      document.body.appendChild(win.dom);
-    }
-    
-    // Инициализируем калькулятор
-    setTimeout(initCalculator, 100);
-    
-    // Обновляем панель задач
-    updateTaskbar();
-    
-    return;
-  }
-  
-  // Для всех остальных типов окон используем оригинальную функцию
-  return originalOpenWindow(type);
-};
-
 // Функция для активации окна
 function activateWindow(type) {
   console.log('Активация окна:', type);
@@ -2493,3 +2767,369 @@ window.openModelGallery = function(modelId) {
   return win;
 };
 
+
+// Функция для симуляции загрузки
+function simulateLoadingForElement(progressFill, progressText) {
+  let progress = 0;
+  const interval = setInterval(() => {
+    progress += Math.random() * 5;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(interval);
+    }
+    
+    if (progressFill && progressText) {
+      progressFill.style.width = `${progress}%`;
+      progressText.textContent = `${Math.floor(progress)}%`;
+    }
+  }, 100);
+}
+// Функция для исправления проблемы с активацией окон
+function fixWindowActivation() {
+  // Переопределяем метод создания окна в WinBox
+  const originalWinBox = window.WinBox;
+  window.WinBox = function() {
+    // Создаем окно с помощью оригинального конструктора
+    const win = new originalWinBox(...arguments);
+    
+    // Добавляем класс active сразу после создания
+    if (win.dom) {
+      win.dom.classList.add('active');
+      win.dom.style.zIndex = 100;
+      
+      // Перемещаем окно на передний план в DOM
+      document.body.appendChild(win.dom);
+    }
+    
+    return win;
+  };
+  
+  // Копируем все свойства и методы оригинального WinBox
+  for (const prop in originalWinBox) {
+    if (originalWinBox.hasOwnProperty(prop)) {
+      window.WinBox[prop] = originalWinBox[prop];
+    }
+  }
+  
+  // Копируем прототип
+  window.WinBox.prototype = originalWinBox.prototype;
+}
+
+// Вызываем функцию исправления после загрузки страницы
+document.addEventListener('DOMContentLoaded', fixWindowActivation);
+// Функция для проверки загрузки модели
+function checkModelLoading() {
+  // Находим все элементы загрузки модели
+  const loadingElements = document.querySelectorAll('.model-loading:not(.hidden)');
+  
+  if (loadingElements.length > 0) {
+    console.log('Обнаружена бесконечная загрузка модели, исправляем...');
+    
+    loadingElements.forEach(loadingElement => {
+      // Находим родительский контейнер
+      const container = loadingElement.closest('.model-3d-container');
+      if (!container) return;
+      
+      // Находим элементы превью и просмотрщика
+      const previewContainer = container.querySelector('.model-preview-container');
+      const modelViewer = container.querySelector('.model-3d-viewer');
+      
+      // Скрываем индикатор загрузки
+      loadingElement.classList.add('hidden');
+      
+      // Если есть просмотрщик, показываем его, иначе возвращаем превью
+      if (modelViewer && modelViewer.innerHTML.trim() !== '') {
+        previewContainer.classList.add('hidden');
+        modelViewer.classList.remove('hidden');
+      } else {
+        previewContainer.classList.remove('hidden');
+        
+        // Добавляем сообщение об ошибке
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'model-error';
+        errorDiv.innerHTML = `
+          <h3>Ошибка загрузки модели</h3>
+          <p>Не удалось загрузить 3D модель</p>
+          <button onclick="this.parentNode.classList.add('hidden');">
+            Вернуться к превью
+          </button>
+        `;
+        container.appendChild(errorDiv);
+      }
+    });
+  }
+}
+
+// Запускаем проверку загрузки модели каждые 10 секунд
+setInterval(checkModelLoading, 10000);
+
+// Функция для исправления проблемы с активацией окон
+function fixWindowActivation() {
+  // Переопределяем метод создания окна в WinBox
+  const originalWinBox = window.WinBox;
+  if (!originalWinBox) return;
+  
+  window.WinBox = function() {
+    // Получаем аргументы
+    const args = Array.from(arguments);
+    
+    // Если есть объект с настройками, добавляем класс active
+    if (args.length > 0 && typeof args[0] === 'object') {
+      if (!args[0].class) {
+        args[0].class = ['adwaita-theme', 'active'];
+      } else if (Array.isArray(args[0].class)) {
+        if (!args[0].class.includes('active')) {
+          args[0].class.push('active');
+        }
+      } else if (typeof args[0].class === 'string') {
+        args[0].class = [args[0].class, 'active'];
+      }
+    }
+    
+    // Создаем окно с помощью оригинального конструктора
+    const win = new originalWinBox(...args);
+    
+    // Добавляем класс active сразу после создания
+    if (win.dom) {
+      win.dom.classList.add('active');
+      win.dom.style.zIndex = 100;
+      
+      // Перемещаем окно на передний план в DOM
+      document.body.appendChild(win.dom);
+    }
+    
+    return win;
+  };
+  
+  // Копируем все свойства и методы оригинального WinBox
+  for (const prop in originalWinBox) {
+    if (originalWinBox.hasOwnProperty(prop)) {
+      window.WinBox[prop] = originalWinBox[prop];
+    }
+  }
+  
+  // Копируем прототип
+  window.WinBox.prototype = originalWinBox.prototype;
+  
+  console.log('Исправление активации окон применено');
+}
+
+// Вызываем функцию исправления после загрузки страницы
+document.addEventListener('DOMContentLoaded', function() {
+  // Даем небольшую задержку для загрузки WinBox
+  setTimeout(fixWindowActivation, 500);
+});
+// Иконки для окон
+const windowIcons = {
+  // Основные иконки
+  about: {
+    light: 'icons/about-dark.svg',
+    dark: 'icons/about-light.svg'
+  },
+  portfolio: {
+    light: 'icons/portfolio-dark.svg',
+    dark: 'icons/portfolio-light.svg'
+  },
+  services: {
+    light: 'icons/services-dark.svg',
+    dark: 'icons/services-light.svg'
+  },
+  contacts: {
+    light: 'icons/contacts-dark.svg',
+    dark: 'icons/contacts-light.svg'
+  },
+  calculator: {
+    light: 'icons/calculator-dark.svg',
+    dark: 'icons/calculator-light.svg'
+  },
+  
+  // Иконки для веб-сайтов
+  website: {
+    light: 'icons/website-dark.svg',
+    dark: 'icons/website-light.svg'
+  },
+  
+  // Иконки для 3D моделей
+  model3d: {
+    light: 'icons/model3d-dark.svg',
+    dark: 'icons/model3d-light.svg'
+  }
+};
+
+// Функция для получения иконки в зависимости от темы
+function getIconForTheme(iconType) {
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  return isDarkTheme ? iconType.dark : iconType.light;
+}
+// Функция для обновления иконок при смене темы
+function updateWindowIcons() {
+  // Обновляем иконки для всех открытых окон
+  Object.entries(trayWindows).forEach(([type, win]) => {
+    // Для основных окон
+    if (type === 'about') {
+      win.setIcon(getIconForTheme(windowIcons.about));
+    }
+    else if (type === 'portfolio') {
+      win.setIcon(getIconForTheme(windowIcons.portfolio));
+    }
+    else if (type === 'services') {
+      win.setIcon(getIconForTheme(windowIcons.services));
+    }
+    else if (type === 'contacts') {
+      win.setIcon(getIconForTheme(windowIcons.contacts));
+    }
+    else if (type === 'calculator') {
+      win.setIcon(getIconForTheme(windowIcons.calculator));
+    }
+    // Для окон проектов
+    else if (type.startsWith('project-')) {
+      win.setIcon(getIconForTheme(windowIcons.website));
+    }
+    // Для окон 3D моделей и галерей
+    else if (type.startsWith('model-') || type.startsWith('gallery-')) {
+      win.setIcon(getIconForTheme(windowIcons.model3d));
+    }
+  });
+}
+
+// Добавляем обработчик для обновления иконок при смене темы
+const originalToggleTheme = toggleTheme;
+toggleTheme = function() {
+  // Вызываем оригинальную функцию
+  originalToggleTheme();
+  
+  // Обновляем иконки
+  updateWindowIcons();
+};
+// Функция для инициализации иконок окон при загрузке страницы
+function initWindowIcons() {
+  // Устанавливаем иконки для всех открытых окон
+  Object.entries(trayWindows).forEach(([type, win]) => {
+    // Для основных окон
+    if (type === 'about') {
+      win.setIcon(getIconForTheme(windowIcons.about));
+    }
+    else if (type === 'portfolio') {
+      win.setIcon(getIconForTheme(windowIcons.portfolio));
+    }
+    else if (type === 'services') {
+      win.setIcon(getIconForTheme(windowIcons.services));
+    }
+    else if (type === 'contacts') {
+      win.setIcon(getIconForTheme(windowIcons.contacts));
+    }
+    else if (type === 'calculator') {
+      win.setIcon(getIconForTheme(windowIcons.calculator));
+    }
+    // Для окон проектов
+    else if (type.startsWith('project-')) {
+      win.setIcon(getIconForTheme(windowIcons.website));
+    }
+    // Для окон 3D моделей и галерей
+    else if (type.startsWith('model-') || type.startsWith('gallery-')) {
+      win.setIcon(getIconForTheme(windowIcons.model3d));
+    }
+  });
+}
+
+// Вызываем функцию инициализации иконок после загрузки страницы
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(initWindowIcons, 500);
+});
+// Обновляем таскбар при смене темы
+const originalToggleTheme2 = toggleTheme;
+toggleTheme = function() {
+  // Вызываем предыдущую версию функции
+  originalToggleTheme2();
+  
+  // Обновляем таскбар
+  updateTaskbar();
+};
+// Модифицируем функцию openWindow для всех окон кроме калькулятора
+const originalOpenWindow = openWindow;
+openWindow = function(type) {
+  // Калькулятор обрабатывается отдельно
+  if (type === 'calculator') {
+    console.log('Калькулятор открывается через специальный обработчик');
+    return;
+  }
+  
+  return originalOpenWindow(type);
+};
+// Обновляем иконки при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+  // Проверяем, какая тема активна
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  
+  // Обновляем иконки в таскбаре
+  updateTaskbar();
+});
+// Полностью удаляем все обработчики для калькулятора и создаем новый
+document.addEventListener('DOMContentLoaded', function() {
+  // Удаляем все существующие обработчики с ярлыка калькулятора
+  const calculatorShortcut = document.querySelector('[data-window="calculator"]');
+  if (calculatorShortcut) {
+    // Клонируем элемент, чтобы удалить все обработчики событий
+    const newCalculatorShortcut = calculatorShortcut.cloneNode(true);
+    calculatorShortcut.parentNode.replaceChild(newCalculatorShortcut, calculatorShortcut);
+    
+    // Добавляем новый обработчик
+    newCalculatorShortcut.addEventListener('click', function(e) {
+      e.stopPropagation(); // Предотвращаем всплытие события
+      
+      // Если окно уже открыто, просто активируем его
+      if (trayWindows['calculator']) {
+        if (trayWindows['calculator'].minimized) {
+          trayWindows['calculator'].restore();
+        }
+        activateWindow('calculator');
+        return;
+      }
+      
+      // Если окно не открыто, создаем его
+      const isDarkTheme = document.body.classList.contains('dark-theme');
+      const win = new WinBox({
+        title: 'Калькулятор услуг',
+        class: ['adwaita-theme', 'active'],
+        width: 600,
+        height: 500,
+        x: Math.floor(Math.random() * 100),
+        y: Math.floor(Math.random() * 100) + 50,
+        top: 36,
+        background: isDarkTheme ? '#2e3436' : '#f6f5f4',
+        border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+        borderRadius: '8px',
+        shadow: true,
+        max: false,
+        html: renderCalculatorContent(),
+        header: 36,
+        icon: getIconForTheme(windowIcons.calculator),
+        onclose: () => {
+          delete trayWindows['calculator'];
+          updateTaskbar();
+          return false;
+        },
+        onminimize: () => {
+          updateTaskbar();
+        },
+        onrestore: () => {
+          win.minimized = false;
+          activateWindow('calculator');
+        },
+        onfocus: () => {
+          activateWindow('calculator');
+        }
+      });
+      
+      trayWindows['calculator'] = win;
+      activateWindow('calculator');
+      
+      if (win.dom) {
+        document.body.appendChild(win.dom);
+      }
+      
+      setTimeout(initCalculator, 100);
+      updateTaskbar();
+    });
+  }
+});

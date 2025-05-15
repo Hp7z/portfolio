@@ -126,6 +126,7 @@ body {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  color: white;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
   transition: transform 0.2s;
   border-radius: var(--gnome-border-radius);
@@ -138,12 +139,6 @@ body {
 .shortcut:hover {
   background: rgba(255,255,255,0.15);
   transform: translateY(-2px);
-}
-
-.shortcut img {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 5px;
 }
 
 /* Панель задач в стиле GNOME */
@@ -189,6 +184,7 @@ body {
   width: 16px;
   height: 16px;
   margin-right: 8px;
+  display: block !important;
 }
 
 .taskbar-item-title {
@@ -229,6 +225,7 @@ body {
   border-radius: 50%;
   background: rgba(255,255,255,0.2);
   transition: all 0.3s;
+  position: relative;
 }
 
 .activities-icon span {
@@ -242,6 +239,10 @@ body {
 .activities-icon img {
   width: 20px;
   height: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 
 /* Переключатель темы */
@@ -250,7 +251,7 @@ body {
   width: 50px;
   height: 30px;
   border-radius: 15px;
-  background-color: #e4e4e4;
+  background-color: rgba(0, 0, 0, 0.2);
   position: relative;
   cursor: pointer;
   transition: background-color 0.3s ease;
@@ -274,11 +275,27 @@ body {
 
 .dark-theme .theme-icon {
   transform: translateX(20px);
+  background-color: #333;
 }
 
 .light-theme .theme-icon {
   background: var(--gnome-yellow);
   box-shadow: 0 0 5px var(--gnome-yellow);
+}
+
+.theme-toggle i {
+  font-size: 14px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.theme-toggle .fa-sun {
+  right: 6px;
+}
+
+.theme-toggle .fa-moon {
+  left: 6px;
 }
 
 /* Часы и дата */
@@ -424,8 +441,18 @@ body {
 .adwaita-theme.active {
   z-index: 100 !important;
   box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important;
-  border-color: var(--gnome-blue) !important;
   transform: translateZ(1px);
+}
+
+/* Обводка активного окна с эффектом свечения */
+.dark-theme .adwaita-theme.active {
+  border: 2px solid var(--gnome-green) !important;
+  box-shadow: 0 0 15px rgba(51, 209, 122, 0.5) !important;
+}
+
+.light-theme .adwaita-theme.active {
+  border: 2px solid #000000 !important;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3) !important;
 }
 
 .adwaita-theme .wb-header {
@@ -467,7 +494,9 @@ body {
 }
 
 .adwaita-theme .wb-icon {
-  display: none !important;
+  display: block !important;
+  margin-right: 5px !important;
+  margin-left: 10px !important;
 }
 
 .adwaita-theme .wb-controls {
@@ -691,10 +720,10 @@ body {
 
 .project-container, .model-container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  margin-bottom: 20px;
-  padding: 15px;
+  padding-left: 20px;
+  margin-bottom: 25px;
   background: var(--tab-bg);
   border-radius: var(--gnome-border-radius);
   border: 1px solid var(--window-border);
@@ -751,24 +780,20 @@ body {
   font-weight: bold;
   margin-bottom: 10px;
   color: var(--text-color);
-  text-align: center;
+  text-align: left;
 }
 
 .project-preview, .model-preview {
-  width: 100%;
-  max-width: 400px;
+  width: 40%;
+  max-width: 100%;
   height: auto;
   max-height: 250px;
   overflow: hidden;
   border-radius: var(--gnome-border-radius);
   border: 1px solid var(--window-border);
-  margin-bottom: 15px;
   position: relative;
 }
 
-.static-model-preview {
-  height: 300px;
-}
 
 .project-preview img, .model-preview img {
   width: 100%;
@@ -781,13 +806,20 @@ body {
   transform: scale(1.05);
 }
 
+.project-content, .model-content {
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    margin-right: 25px;
+}
+
 .project-description, .model-description {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 15px;
   color: var(--text-color);
   opacity: 0.9;
-  text-align: center;
+  text-align: left;
   width: 100%;
 }
 
@@ -803,6 +835,8 @@ body {
 }
 
 .project-link {
+  width: 40%;
+  text-align: center;
   display: inline-block;
   padding: 8px 15px;
   background: var(--button-bg);
@@ -827,7 +861,8 @@ body {
 
 .project-footer, .model-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
+  flex-direction: column;
   width: 100%;
   margin-top: 10px;
 }
@@ -843,9 +878,17 @@ body {
   color: var(--text-color);
   opacity: 0.7;
   font-size: 12px;
-  text-align: right;
+  text-align: left;
 }
 
+.model-info-footer {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    width: 100%;
+    margin-top: 10px;
+    align-items: center;
+}
 .progress-container {
   margin: 15px 0;
 }
@@ -1606,137 +1649,57 @@ body {
 #order-button:hover {
   background: var(--gnome-blue);
 }
-/* Стили для описаний услуг */
-.service-description {
-  font-size: 13px;
-  line-height: 1.4;
-  margin-top: 5px;
-  margin-bottom: 15px;
-  padding-left: 15px;
+.shortcut img {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 5px;
+  display: none !important;
 }
 
-.dark-theme .service-description {
-  color: rgba(255, 255, 255, 0.7);
+.dark-theme .dark-theme-icon {
+  display: block !important;
 }
 
-.light-theme .service-description {
-  color: rgba(46, 52, 54, 0.7);
-}
-
-
-undefined
-
-undefined
-
-/* Стили для текста ярлыков в зависимости от темы */
-.dark-theme .shortcut-text {
-  color: #ffffff;
-}
-
-.light-theme .shortcut-text {
-  color: #000000;
-}
-
-/* Медиа-запрос для адаптивности на мобильных устройствах */
-@media (max-width: 768px) {
-    font-size: 64px;
-  }
-}
-
-@media (max-width: 480px) {
-    font-size: 42px;
-  }
+.light-theme .light-theme-icon {
+  display: block !important;
 }
 undefined
-/* Стили для эффекта глитча */
+/* Дополнительные стили для исправления проблемы с иконками ярлыков */
+.shortcut {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.shortcut-icon {
   position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 5px;
 }
 
-  content: attr(data-text);
+.shortcut-icon img {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  opacity: 0;
-  z-index: -1;
-  transition: all 0.2s ease;
+  display: none !important;
+}
+/* Сброс стилей для иконок */
+.shortcut img,
+.shortcut-icon img,
+.activities-icon img,
+.theme-toggle i {
+  display: none !important;
 }
 
-  color: #ff00ff;
-  text-shadow: 2px 0 #ff00ff;
+/* Показываем только нужные иконки в зависимости от темы */
+body.dark-theme .dark-theme-icon,
+body.light-theme .light-theme-icon {
+  display: block !important;
 }
 
-  color: #00ffff;
-  text-shadow: -2px 0 #00ffff;
-}
-
-  opacity: 0.8;
-  transform: translate(-5px, -2px);
-}
-
-  opacity: 0.8;
-  transform: translate(5px, 2px);
-}
-
-/* Анимация глитча */
-@keyframes glitch-anim {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
-}
-
-  animation: glitch-anim 0.3s infinite;
-}
-/* Очищенные стили для эффекта глитча */
-  position: relative;
-  display: inline-block;
-}
-
-.letter {
-  position: relative;
-  display: inline-block;
-  z-index: 2;
-}
-
-.letter::before,
-.letter::after {
-  content: attr(data-char);
-  position: absolute;
-  top: 0;
-  left: 0;
-  opacity: 0;
-  transition: opacity 0.1s ease;
-  z-index: -1;
-}
-
-.letter::before {
-  color: #ff00ff;
-  text-shadow: 2px 0 #ff00ff;
-}
-
-.letter::after {
-  color: #00ffff;
-  text-shadow: -2px 0 #00ffff;
-}
-
-.letter.active::before {
-  opacity: 0.8;
-  transform: translate(calc(var(--offset-x) * -1), calc(var(--offset-y) * -1));
-}
-
-.letter.active::after {
-  opacity: 0.8;
-  transform: translate(var(--offset-x), var(--offset-y));
-}
-
-.model-date {
-    color: var(--text-color);
-    opacity: 0.7;
-    font-size: 14px;
-    text-align: right;
-    align-self: center;
+/* Исключение для иконок в таскбаре */
+.taskbar-item img {
+  display: block !important;
 }
