@@ -114,29 +114,22 @@ const projects = {
 const startMenuItems = {
   main: [
     {
-      title: "Обо мне",
-      icon: "icons/about.png",
-      action: "about"
+      title: "Сапер",
+      icon: "icons/game-light.svg",      // поменяли местами
+      iconLight: "icons/game-dark.svg",  // поменяли местами
+      action: "minesweeper"
     },
     {
-      title: "Портфолио",
-      icon: "icons/portfolio.png",
-      action: "portfolio"
+      title: "2048",
+      icon: "icons/game-light.svg",
+      iconLight: "icons/game-dark.svg",
+      action: "game2048"
     },
     {
-      title: "Услуги",
-      icon: "icons/services.png",
-      action: "services"
-    },
-    {
-      title: "Калькулятор услуг",
-      icon: "icons/calculator.png",
-      action: "calculator"
-    },
-    {
-      title: "Контакты",
-      icon: "icons/contacts.png",
-      action: "contacts"
+      title: "Крестики-нолики",
+      icon: "icons/game-light.svg",
+      iconLight: "icons/game-dark.svg",
+      action: "tictactoe"
     }
   ]
 };
@@ -328,19 +321,18 @@ document.addEventListener('DOMContentLoaded', function() {
 function renderStartMenu() {
   const menu = document.getElementById('startMenu');
   let menuHTML = `<div class="menu-section">`;
-  
+  const isDarkTheme = document.body.classList.contains('dark-theme');
   startMenuItems.main.forEach(item => {
+    const iconPath = isDarkTheme ? item.icon : (item.iconLight || item.icon);
     menuHTML += `
       <div class="menu-item" data-window="${item.action}">
-        <img src="${item.icon}" alt="${item.title}">
+        <img src="${iconPath}" alt="${item.title}">
         <span>${item.title}</span>
       </div>
     `;
   });
-  
   menuHTML += `</div>`;
   menu.innerHTML = menuHTML;
-  
   menu.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', function() {
       const windowType = this.getAttribute('data-window');
@@ -516,6 +508,21 @@ function openWindow(type) {
       content = renderCalculatorContent();
       icon = getIconForTheme(windowIcons.calculator);
       break;
+    case 'minesweeper':
+      title = 'Сапер';
+      content = renderMinesweeperContent();
+      icon = getIconForTheme(windowIcons.game);
+      break;
+    case 'game2048':
+      title = '2048';
+      content = render2048Content();
+      icon = getIconForTheme(windowIcons.game);
+      break;
+    case 'tictactoe':
+      title = 'Крестики-нолики';
+      content = renderTicTacToeContent();
+      icon = getIconForTheme(windowIcons.game);
+      break;
     default:
       content = '<p>Содержимое окна</p>';
       icon = getIconForTheme(windowIcons.about);
@@ -528,7 +535,7 @@ function openWindow(type) {
     height: 600,
     x: Math.floor(Math.random() * 100),
     y: Math.floor(Math.random() * 100) + 50,
-    top: 36, // Отступ сверху равен высоте панели задач
+    top: 40, // <-- теперь 40px для игр
     background: isDarkTheme ? '#2e3436' : '#f6f5f4',
     border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
     borderRadius: '8px',
@@ -609,6 +616,17 @@ function openWindow(type) {
       });
     }
   }
+  
+  // --- Инициализация игр ---
+  if (type === 'minesweeper') setTimeout(() => {
+    if (document.getElementById('minesweeper-board')) initMinesweeper();
+  }, 100);
+  if (type === 'game2048') setTimeout(() => {
+    if (document.getElementById('game2048-board')) init2048();
+  }, 100);
+  if (type === 'tictactoe') setTimeout(() => {
+    if (document.getElementById('tictactoe-board')) initTicTacToe();
+  }, 100);
   
   updateTaskbar();
 }
@@ -1601,9 +1619,12 @@ function loadThreeJS(callback) {
       const orbitControlsScript = document.createElement('script');
       orbitControlsScript.src = 'https://cdn.jsdelivr.net/npm/three@0.149.0/examples/js/controls/OrbitControls.js';
       orbitControlsScript.onload = () => {
-        console.log('OrbitControls загружен');
-        
-        // Вызываем callback после загрузки всех библиотек
+        // --- Исправление: присваиваем OrbitControls в THREE ---
+        if (window.OrbitControls) {
+          THREE.OrbitControls = window.OrbitControls;
+        } else if (window.THREE && window.THREE.OrbitControls) {
+          // ничего не делаем, уже есть
+        }
         if (callback) callback();
       };
       document.head.appendChild(orbitControlsScript);
@@ -2931,6 +2952,11 @@ const windowIcons = {
   model3d: {
     light: 'icons/model3d-dark.svg',
     dark: 'icons/model3d-light.svg'
+  },
+  // Иконки для игр
+  game: {
+    light: 'icons/game-dark.svg', // поменяли местами
+    dark: 'icons/game-light.svg'    // поменяли местами
   }
 };
 
@@ -2966,6 +2992,10 @@ function updateWindowIcons() {
     // Для окон 3D моделей и галерей
     else if (type.startsWith('model-') || type.startsWith('gallery-')) {
       win.setIcon(getIconForTheme(windowIcons.model3d));
+    }
+    // Для окон игр
+    else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') {
+      win.setIcon(getIconForTheme(windowIcons.game));
     }
   });
 }
@@ -3006,6 +3036,10 @@ function initWindowIcons() {
     // Для окон 3D моделей и галерей
     else if (type.startsWith('model-') || type.startsWith('gallery-')) {
       win.setIcon(getIconForTheme(windowIcons.model3d));
+    }
+    // Для окон игр
+    else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') {
+      win.setIcon(getIconForTheme(windowIcons.game));
     }
   });
 }
@@ -3070,7 +3104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         title: 'Калькулятор услуг',
         class: ['adwaita-theme', 'active'],
         width: 600,
-        height: 500,
+        height: 750, // <--- высота 750px
         x: Math.floor(Math.random() * 100),
         y: Math.floor(Math.random() * 100) + 50,
         top: 36,
@@ -3114,16 +3148,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Массивы путей к картинкам
 const dayWallpapers = [
-  'img/day/1.jpg',
-  'img/day/2.jpg',
-  'img/day/3.jpg',
-  'img/day/4.jpg'
+  'img/day/1.jpg'
 ];
 const nightWallpapers = [
-  'img/night/1.jpg',
-  'img/night/2.jpg',
-  'img/night/3.jpg',
-  'img/night/4.jpg'
+  'img/night/1.jpg'
 ];
 
 // Получение и установка индекса картинки
@@ -3172,8 +3200,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const preloader = document.createElement('div');
   preloader.id = 'preloader-overlay';
   preloader.innerHTML = `
-    <div class="preloader-console">
-      <div class="preloader-text" id="preloader-text"></div>
+    <div class="preloader-console" style="display:flex;flex-direction:column;justify-content:flex-start;align-items:stretch;">
+      <div class="preloader-text" id="preloader-text" style="flex:1;overflow:auto;max-height:160px;"></div>
       <div class="preloader-progress-bar">
         <div class="preloader-progress-fill" id="preloader-progress"></div>
       </div>
@@ -3210,6 +3238,8 @@ document.addEventListener('DOMContentLoaded', function() {
       progress = Math.round(((currentLine + 1) / total) * 100);
       progressEl.style.width = progress + '%';
       currentLine++;
+      // --- скроллим вниз если не влезает ---
+      textEl.scrollTop = textEl.scrollHeight;
       setTimeout(nextLine, 250 + Math.random() * 250);
     } else {
       setTimeout(() => {
@@ -3225,3 +3255,384 @@ document.addEventListener('DOMContentLoaded', function() {
   document.body.classList.add('preloader-active');
   setTimeout(nextLine, 400);
 })();
+
+// --- Окна для игр (заглушки) ---
+function renderMinesweeperContent() {
+  return `
+    <div class="minesweeper-gnome">
+      <div class="minesweeper-header">
+        <span>Сапер</span>
+        <select id="minesweeper-diff" class="btn" style="margin-left:10px;">
+          <option value="9x9x10">Лёгко</option>
+          <option value="16x16x40">Средне</option>
+          <option value="30x16x99">Сложно</option>
+        </select>
+        <span id="minesweeper-timer" style="margin-left:auto;font-family:monospace;background:#111;color:#0f0;padding:2px 10px;border-radius:6px;">00:00</span>
+        <button class="btn" id="minesweeper-restart">⟳</button>
+      </div>
+      <div id="minesweeper-board"></div>
+      <div class="minesweeper-footer">
+        <span id="minesweeper-status"></span>
+      </div>
+    </div>
+    <style>
+      .minesweeper-gnome { font-family: 'Cantarell', 'Ubuntu', sans-serif; }
+      .minesweeper-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+      #minesweeper-board { display:grid; gap:2px; background:var(--tab-bg); border-radius:8px; padding:6px; }
+      .minesweeper-cell { width:32px; height:32px; background:var(--window-bg); border:1px solid var(--window-border); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; user-select:none; transition:background 0.2s; position:relative; }
+      .minesweeper-cell.open { background:var(--tab-active-bg); cursor:default; }
+      .minesweeper-cell.mine { color:#e01b24; }
+      .minesweeper-cell.flag::after { content:'🚩'; position:absolute; left:0; right:0; top:0; bottom:0; display:flex; align-items:center; justify-content:center; font-size:18px; }
+      .minesweeper-cell.num1 { color:#3584e4; }
+      .minesweeper-cell.num2 { color:#33d17a; }
+      .minesweeper-cell.num3 { color:#f6d32d; }
+      .minesweeper-cell.num4 { color:#ff7800; }
+      .minesweeper-footer { margin-top:10px; min-height:24px; }
+    </style>
+  `;
+}
+function initMinesweeper() {
+  let size = 9, mines = 10, width = 9, height = 9;
+  let board = [], opened = [], flagged = [], gameOver = false, cellsLeft = width*height-mines, timer = 0, timerInt = null, started = false;
+  const boardDiv = document.getElementById('minesweeper-board');
+  const status = document.getElementById('minesweeper-status');
+  const timerSpan = document.getElementById('minesweeper-timer');
+  const diffSel = document.getElementById('minesweeper-diff');
+  function setGrid() {
+    boardDiv.style.gridTemplateColumns = `repeat(${width},32px)`;
+  }
+  function placeMines() {
+    board = Array(width*height).fill(0);
+    let m = 0;
+    while (m < mines) {
+      let idx = Math.floor(Math.random()*width*height);
+      if (board[idx] === 'M') continue;
+      board[idx] = 'M'; m++;
+    }
+    for (let i=0;i<width*height;i++) {
+      if (board[i] === 'M') continue;
+      let n = 0;
+      for (let dx=-1;dx<=1;dx++) for (let dy=-1;dy<=1;dy++) {
+        if (dx===0&&dy===0) continue;
+        let x=i%width+dx, y=Math.floor(i/width)+dy;
+        if (x>=0&&x<width&&y>=0&&y<height&&board[y*width+x]==='M') n++;
+      }
+      board[i]=n;
+    }
+  }
+  function render() {
+    boardDiv.innerHTML = '';
+    setGrid();
+    for (let i=0;i<width*height;i++) {
+      const cell = document.createElement('div');
+      cell.className = 'minesweeper-cell';
+      if (opened[i]) {
+        cell.classList.add('open');
+        if (board[i]==='M') cell.classList.add('mine'), cell.textContent='💣';
+        else if (board[i]>0) cell.classList.add('num'+board[i]), cell.textContent=board[i];
+      } else if (flagged[i]) {
+        cell.classList.add('flag');
+      }
+      cell.onmousedown = (e) => {
+        e.preventDefault();
+        if (gameOver || opened[i]) return;
+        if (e.button === 2) { // ПКМ
+          flagged[i] = !flagged[i];
+          render();
+          return;
+        }
+        if (!started) startTimer();
+        openCell(i);
+      };
+      cell.oncontextmenu = e => e.preventDefault();
+      boardDiv.appendChild(cell);
+    }
+  }
+  function openCell(i) {
+    if (opened[i] || flagged[i]) return;
+    opened[i]=1;
+    if (board[i]==='M') {
+      gameOver = true;
+      stopTimer();
+      status.textContent = '💥 Вы проиграли!';
+      for (let j=0;j<width*height;j++) if (board[j]==='M') opened[j]=1;
+      render();
+      return;
+    }
+    cellsLeft--;
+    if (board[i]===0) {
+      let x=i%width, y=Math.floor(i/width);
+      for (let dx=-1;dx<=1;dx++) for (let dy=-1;dy<=1;dy++) {
+        let nx=x+dx, ny=y+dy, ni=ny*width+nx;
+        if (nx>=0&&nx<width&&ny>=0&&ny<height&&!opened[ni]) openCell(ni);
+      }
+    }
+    render();
+    if (cellsLeft===0) {
+      status.textContent = '🎉 Победа!';
+      stopTimer();
+      gameOver = true;
+    }
+  }
+  function restart() {
+    let val = diffSel.value.split('x');
+    width = +val[0]; height = +val[1]; mines = +val[2];
+    opened = Array(width*height).fill(0);
+    flagged = Array(width*height).fill(0);
+    gameOver = false;
+    cellsLeft = width*height-mines;
+    status.textContent = '';
+    timer = 0; started = false;
+    stopTimer(); updateTimer();
+    placeMines();
+    render();
+  }
+  function updateTimer() {
+    timerSpan.textContent = (timer<6000?`${String(Math.floor(timer/60)).padStart(2,'0')}:${String(timer%60).padStart(2,'0')}`:'99:59');
+  }
+  function startTimer() {
+    if (timerInt) return;
+    started = true;
+    timerInt = setInterval(() => {
+      timer++; updateTimer();
+      if (timer>=5999) stopTimer();
+    }, 1000);
+  }
+  function stopTimer() {
+    clearInterval(timerInt); timerInt = null;
+  }
+  document.getElementById('minesweeper-restart').onclick = restart;
+  diffSel.onchange = restart;
+  restart();
+}
+
+// --- Реализация игры 2048 ---
+function render2048Content() {
+  return `
+    <div class="game2048-gnome">
+      <div class="game2048-header">
+        <span>2048</span>
+        <select id="game2048-size" class="btn" style="margin-left:10px;">
+          <option value="4">4x4</option>
+          <option value="5">5x5</option>
+          <option value="6">6x6</option>
+        </select>
+        <button class="btn" id="game2048-restart">⟳</button>
+      </div>
+      <div id="game2048-board"></div>
+      <div class="game2048-footer">
+        <span>Счёт: <span id="game2048-score">0</span></span>
+      </div>
+      <div style="margin-top:8px;font-size:13px;opacity:0.7;">Управление: стрелки или кнопки</div>
+      <div class="game2048-controls">
+        <button class="btn" data-move="up">↑</button>
+        <button class="btn" data-move="left">←</button>
+        <button class="btn" data-move="down">↓</button>
+        <button class="btn" data-move="right">→</button>
+      </div>
+    </div>
+    <style>
+      .game2048-gnome { font-family: 'Cantarell', 'Ubuntu', sans-serif; }
+      .game2048-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+      #game2048-board { display:grid; gap:6px; background:var(--tab-bg); border-radius:8px; padding:10px; border:2px solid #222; }
+      .game2048-cell { width:56px; height:56px; background:var(--window-bg); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:bold; color:#333; transition:background 0.2s, transform 0.2s; border:1.5px solid #222; box-shadow:0 1px 4px #0002; }
+      .game2048-cell[data-v="2"] { background:#e0f7fa; }
+      .game2048-cell[data-v="4"] { background:#b2ebf2; }
+      .game2048-cell[data-v="8"] { background:#80deea; color:#fff; }
+      .game2048-cell[data-v="16"] { background:#4dd0e1; color:#fff; }
+      .game2048-cell[data-v="32"] { background:#26c6da; color:#fff; }
+      .game2048-cell[data-v="64"] { background:#00bcd4; color:#fff; }
+      .game2048-cell[data-v="128"] { background:#0097a7; color:#fff; }
+      .game2048-cell[data-v="256"] { background:#00838f; color:#fff; }
+      .game2048-cell[data-v="512"] { background:#006064; color:#fff; }
+      .game2048-cell[data-v="1024"] { background:#004d40; color:#fff; }
+      .game2048-cell[data-v="2048"] { background:#388e3c; color:#fff; }
+      .game2048-cell.new { animation: popin2048 0.18s; }
+      .game2048-cell.merged { animation: merge2048 0.18s; }
+      .game2048-footer { margin-top:10px; min-height:24px; }
+      .game2048-controls { margin-top:10px; display:flex; gap:8px; justify-content:center; }
+      @keyframes popin2048 { 0%{transform:scale(0.5);} 100%{transform:scale(1);} }
+      @keyframes merge2048 { 0%{transform:scale(1.2);} 100%{transform:scale(1);} }
+      .dark-theme #game2048-board, .dark-theme .game2048-cell { border-color:#444 !important; background:#222 !important; color:#fff !important; }
+    </style>
+  `;
+}
+function init2048() {
+  let size = 4;
+  let board = [], score = 0, won = false, anim = [];
+  const boardDiv = document.getElementById('game2048-board');
+  const scoreSpan = document.getElementById('game2048-score');
+  const sizeSel = document.getElementById('game2048-size');
+  function setGrid() {
+    boardDiv.style.gridTemplateColumns = `repeat(${size},56px)`;
+  }
+  function addTile() {
+    let empty = [];
+    for (let i=0;i<size*size;i++) if (!board[i]) empty.push(i);
+    if (empty.length) {
+      let idx = empty[Math.floor(Math.random()*empty.length)];
+      board[idx] = Math.random()<0.9?2:4;
+      anim[idx] = 'new';
+    }
+  }
+  function render() {
+    boardDiv.innerHTML = '';
+    setGrid();
+    for (let i=0;i<size*size;i++) {
+      const cell = document.createElement('div');
+      cell.className = 'game2048-cell';
+      if (board[i]) {
+        cell.textContent = board[i];
+        cell.setAttribute('data-v', board[i]);
+        if (anim[i]) cell.classList.add(anim[i]);
+      }
+      boardDiv.appendChild(cell);
+    }
+    scoreSpan.textContent = score;
+    anim = [];
+  }
+  function move(dir) {
+    let moved = false;
+    let b = board.slice(), a = [];
+    function idx(x,y){return y*size+x;}
+    for (let n=0;n<size;n++) {
+      let line = [];
+      for (let m=0;m<size;m++) {
+        let i = dir==='left'||dir==='right'?idx(dir==='left'?m:size-1-m,n):idx(n,dir==='up'?m:size-1-m);
+        if (b[i]) line.push(b[i]);
+      }
+      for (let k=0;k<line.length-1;k++) {
+        if (line[k]===line[k+1]) { line[k]*=2; score+=line[k]; line[k+1]=0; a[dir==='left'||dir==='right'?idx(dir==='left'?k:size-1-k,n):idx(n,dir==='up'?k:size-1-k)]='merged'; }
+      }
+      line = line.filter(x=>x);
+      while (line.length<size) line.push(0);
+      for (let m=0;m<size;m++) {
+        let i = dir==='left'||dir==='right'?idx(dir==='left'?m:size-1-m,n):idx(n,dir==='up'?m:size-1-m);
+        if (b[i]!==line[m]) { b[i]=line[m]; moved=true; }
+      }
+    }
+    if (moved) {
+      board = b; anim = a;
+      addTile();
+      render();
+      if (board.includes(2048) && !won) { won=true; setTimeout(()=>alert('🎉 Победа!'),100);}
+      if (!canMove()) setTimeout(()=>alert('Игра окончена!'),100);
+    }
+  }
+  function canMove() {
+    for (let i=0;i<size*size;i++) if (!board[i]) return true;
+    for (let y=0;y<size;y++) for (let x=0;x<size;x++) {
+      let v=board[y*size+x];
+      if (x<size-1&&v===board[y*size+x+1]) return true;
+      if (y<size-1&&v===board[(y+1)*size+x]) return true;
+    }
+    return false;
+  }
+  function restart() {
+    size = +sizeSel.value;
+    board = Array(size*size).fill(0); score=0; won=false; anim=[];
+    addTile(); addTile();
+    render();
+  }
+  document.getElementById('game2048-restart').onclick = restart;
+  sizeSel.onchange = restart;
+  document.querySelectorAll('.game2048-controls .btn').forEach(btn=>{
+    btn.onclick = ()=>move(btn.dataset.move);
+  });
+  window.addEventListener('keydown', function handler(e) {
+    if (!document.getElementById('game2048-board')) return window.removeEventListener('keydown', handler);
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+      move({ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right'}[e.key]);
+      e.preventDefault();
+    }
+  });
+  restart();
+}
+
+// --- Реализация игры Крестики-нолики ---
+function renderTicTacToeContent() {
+  return `
+    <div class="tictactoe-gnome">
+      <div class="tictactoe-header">
+        <span>Крестики-нолики</span>
+        <button class="btn" id="tictactoe-restart">⟳</button>
+      </div>
+      <div id="tictactoe-board"></div>
+      <div class="tictactoe-footer">
+        <span id="tictactoe-status"></span>
+      </div>
+    </div>
+    <style>
+      .tictactoe-gnome { font-family: 'Cantarell', 'Ubuntu', sans-serif; }
+      .tictactoe-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+      #tictactoe-board { display:grid; grid-template-columns:repeat(3,64px); gap:6px; background:var(--tab-bg); border-radius:8px; padding:10px; border:2px solid #222; }
+      .tictactoe-cell { width:64px; height:64px; background:var(--window-bg); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:bold; color:#3584e4; cursor:pointer; transition:background 0.2s; border:1.5px solid #222; }
+      .tictactoe-cell.x { color:#3584e4; }
+      .tictactoe-cell.o { color:#e01b24; }
+      .tictactoe-cell.win { background:#33d17a; color:#fff; }
+      .tictactoe-footer { margin-top:10px; min-height:24px; }
+      .dark-theme #tictactoe-board, .dark-theme .tictactoe-cell { border-color:#444 !important; background:#222 !important; color:#fff !important; }
+    </style>
+  `;
+}
+function initTicTacToe() {
+  let board = Array(9).fill(''), turn = 'X', gameOver = false;
+  const boardDiv = document.getElementById('tictactoe-board');
+  const status = document.getElementById('tictactoe-status');
+  function render() {
+    boardDiv.innerHTML = '';
+    for (let i=0;i<9;i++) {
+      const cell = document.createElement('div');
+      cell.className = 'tictactoe-cell';
+      if (board[i]) cell.classList.add(board[i].toLowerCase()), cell.textContent=board[i];
+      cell.onclick = () => {
+        if (gameOver || board[i]) return;
+        board[i]=turn;
+        render();
+        if (checkWin(turn)) {
+          status.textContent = (turn==='X'?'Вы':'Компьютер')+' победил!';
+          gameOver = true;
+          highlightWin(checkWin(turn));
+          return;
+        }
+        if (board.every(x=>x)) { status.textContent='Ничья!'; gameOver=true; return; }
+        turn = turn==='X'?'O':'X';
+        if (turn==='O') setTimeout(aiMove, 400);
+      };
+      boardDiv.appendChild(cell);
+    }
+    status.textContent = gameOver ? status.textContent : (turn==='X'?'Ваш ход':'Ход компьютера');
+  }
+  function checkWin(t) {
+    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for (let w of wins) if (w.every(i=>board[i]===t)) return w;
+    return null;
+  }
+  function highlightWin(w) {
+    if (!w) return;
+    const cells = boardDiv.querySelectorAll('.tictactoe-cell');
+    w.forEach(i=>cells[i].classList.add('win'));
+  }
+  function aiMove() {
+    let empty = board.map((v,i)=>v?'':i).filter(x=>x!==''), idx;
+    if (empty.length) {
+      idx = empty[Math.floor(Math.random()*empty.length)];
+      board[idx]='O';
+      render();
+      if (checkWin('O')) {
+        status.textContent = 'Компьютер победил!';
+        gameOver = true;
+        highlightWin(checkWin('O'));
+      }
+      if (board.every(x=>x) && !gameOver) { status.textContent='Ничья!'; gameOver=true; }
+      turn = 'X';
+    }
+  }
+  function restart() {
+    board = Array(9).fill(''); turn='X'; gameOver=false; status.textContent=''; render();
+  }
+  document.getElementById('tictactoe-restart').onclick = restart;
+  restart();
+}
+
+// ...existing code...

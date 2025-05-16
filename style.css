@@ -1721,7 +1721,7 @@ body.light-theme .light-theme-icon {
 }
 
 .preloader-console {
-  width: 480px;
+  width: 550px;
   max-width: 90vw;
   background: #111;
   border: 2px solid #0f0;
@@ -1733,20 +1733,23 @@ body.light-theme .light-theme-icon {
   font-size: 16px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
   min-height: 220px;
-  justify-content: flex-end;
 }
 
 .preloader-text {
   min-height: 120px;
+  max-height: 160px;
   margin-bottom: 24px;
   white-space: pre-line;
   line-height: 1.5;
   letter-spacing: 0.5px;
   color: #0f0;
   text-shadow: 0 0 4px #0f0a;
-  overflow: hidden;
-  max-height: 180px;
+  overflow: auto;
+  flex: 1;
+  text-align: left;
 }
 
 .preloader-progress-bar {
@@ -1780,4 +1783,18 @@ body.preloader-active > *:not(#preloader-overlay) {
   opacity: 0 !important;
   pointer-events: none !important;
   user-select: none !important;
+}
+
+/* 2048 и крестики-нолики: стили для темной темы */
+.dark-theme #game2048-board,
+.dark-theme .game2048-cell {
+  border-color: #444 !important;
+  background: #222 !important;
+  color: #fff !important;
+}
+.dark-theme #tictactoe-board,
+.dark-theme .tictactoe-cell {
+  border-color: #444 !important;
+  background: #222 !important;
+  color: #fff !important;
 }
