@@ -961,6 +961,9 @@ function open3DModelViewer(modelId) {
   // Сохраняем окно в объекте trayWindows
   trayWindows[windowId] = win;
   
+  // --- Добавлено: сразу устанавливаем иконку ---
+  if (win.setIcon) win.setIcon(icon);
+  
   // Активируем окно
   activateWindow(windowId);
   
@@ -1140,6 +1143,9 @@ function openModelGallery(modelId) {
   // Сохраняем окно в объекте trayWindows
   trayWindows[windowId] = win;
   
+  // --- Добавлено: сразу устанавливаем иконку ---
+  if (win.setIcon) win.setIcon(icon);
+  
   // Активируем окно
   activateWindow(windowId);
 }
@@ -1215,6 +1221,9 @@ function openProjectWindow(url) {
   
   // Сохраняем окно в объекте trayWindows
   trayWindows[windowId] = win;
+  
+  // --- Добавлено: сразу устанавливаем иконку ---
+  if (win.setIcon) win.setIcon(icon);
   
   // Активируем окно
   activateWindow(windowId);
@@ -1522,61 +1531,22 @@ function simulateLoadingForElement(progressFill, progressText) {
 function updateTaskbar() {
   const taskbar = document.getElementById('taskbarItems');
   taskbar.innerHTML = '';
-  
   Object.entries(trayWindows).forEach(([type, win]) => {
     const item = document.createElement('div');
     item.className = 'taskbar-item';
-    
-    // Определяем название окна
-    let title;
-    if (type === 'about') title = 'Обо мне';
-    else if (type === 'portfolio') title = 'Портфолио';
-    else if (type === 'portfolio-landing') title = 'Лендинги';
-    else if (type === 'portfolio-shop') title = 'Интернет-магазины';
-    else if (type === 'portfolio-corporate') title = 'Корпоративные сайты';
-    else if (type === 'services') title = 'Услуги';
-    else if (type === 'contacts') title = 'Контакты';
-    else if (type === 'calculator') title = 'Калькулятор услуг';
-    else title = win.title;
-    
-    if (win.minimized) {
-      item.style.opacity = '0.7';
-    }
-    
-    // Определяем иконку
+    let title = win.title || type;
     let iconPath;
     const isDarkTheme = document.body.classList.contains('dark-theme');
-    
-    if (type === 'about') {
-      iconPath = isDarkTheme ? 'icons/about-light.svg' : 'icons/about-dark.svg';
-    }
-    else if (type === 'portfolio') {
-      iconPath = isDarkTheme ? 'icons/portfolio-light.svg' : 'icons/portfolio-dark.svg';
-    }
-    else if (type === 'services') {
-      iconPath = isDarkTheme ? 'icons/services-light.svg' : 'icons/services-dark.svg';
-    }
-    else if (type === 'contacts') {
-      iconPath = isDarkTheme ? 'icons/contacts-light.svg' : 'icons/contacts-dark.svg';
-    }
-    else if (type === 'calculator') {
-      iconPath = isDarkTheme ? 'icons/calculator-light.svg' : 'icons/calculator-dark.svg';
-    }
-    else if (type.startsWith('project-')) {
-      iconPath = isDarkTheme ? 'icons/website-light.svg' : 'icons/website-dark.svg';
-    }
-    else if (type.startsWith('model-') || type.startsWith('gallery-')) {
-      iconPath = isDarkTheme ? 'icons/model3d-light.svg' : 'icons/model3d-dark.svg';
-    }
-    else {
-      iconPath = isDarkTheme ? 'icons/about-light.svg' : 'icons/about-dark.svg';
-    }
-    
-    item.innerHTML = `
-      <img src="${iconPath}">
-      <span class="taskbar-item-title">${title}</span>
-    `;
-    
+    // Корректно определяем иконку
+    if (type === 'about') iconPath = getIconForTheme(windowIcons.about);
+    else if (type === 'portfolio') iconPath = getIconForTheme(windowIcons.portfolio);
+    else if (type === 'services') iconPath = getIconForTheme(windowIcons.services);
+    else if (type === 'contacts') iconPath = getIconForTheme(windowIcons.contacts);
+    else if (type === 'calculator') iconPath = getIconForTheme(windowIcons.calculator);
+    else if (type.startsWith('project-')) iconPath = getIconForTheme(windowIcons.website);
+    else if (type.startsWith('model-') || type.startsWith('gallery-')) iconPath = getIconForTheme(windowIcons.model3d);
+    else iconPath = getIconForTheme(windowIcons.about);
+    item.innerHTML = `<img src="${iconPath}"><span class="taskbar-item-title">${title}</span>`;
     item.onclick = () => {
       if (win.minimized) {
         win.restore();
@@ -1971,7 +1941,7 @@ function initParallax() {
   document.addEventListener('mousemove', function (e) {
     const mouseX = e.clientX / window.innerWidth;
     const mouseY = e.clientY / window.innerHeight;
-    const speed = 20;
+    const speed = 50; // Было 20, стало 50 для большей интенсивности
     targetX = (mouseX - 0.5) * speed;
     targetY = (mouseY - 0.5) * speed;
   });
@@ -2370,8 +2340,17 @@ function initCalculator() {
         }
       });
       
+      const totalPrice = totalPriceElement.textContent.replace(/\s/g, '');
       if (selectedServices.length > 0) {
-        alert('Спасибо за заказ! Выбранные услуги:\n' + selectedServices.join('\n'));
+        // Формируем сообщение для Telegram
+        let message = 'Здравствуйте, хочу приобрести у вас:\n';
+        selectedServices.forEach(service => {
+          message += `- ${service}\n`;
+        });
+        message += `\nИтоговая сумма: ${totalPrice} ₽`;
+        // Открываем Telegram с автосообщением
+        const encoded = encodeURIComponent(message);
+        window.open(`https://t.me/looptoquit?text=${encoded}`, '_blank');
       } else {
         alert('Пожалуйста, выберите хотя бы одну услугу.');
       }
@@ -2695,7 +2674,7 @@ window.openModelGallery = function(modelId) {
   galleryHTML += `
         </div>
       </div>
-      <div class="model-gallery-right" style="flex: 35;">
+      <div class="model-gallery-right" style="flex: 35%;">
         <h2>${model.title}</h2>
         <p class="model-description">${model.description || 'Описание модели отсутствует'}</p>
         
@@ -3186,3 +3165,63 @@ document.addEventListener('DOMContentLoaded', function() {
   const isDark = document.body.classList.contains('dark-theme');
   setWallpaperForTheme(isDark ? 'dark' : 'light');
 });
+
+// --- Прелоадер Hacknet/Bitburner style ---
+(function() {
+  // Создаем overlay для прелоадера
+  const preloader = document.createElement('div');
+  preloader.id = 'preloader-overlay';
+  preloader.innerHTML = `
+    <div class="preloader-console">
+      <div class="preloader-text" id="preloader-text"></div>
+      <div class="preloader-progress-bar">
+        <div class="preloader-progress-fill" id="preloader-progress"></div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(preloader);
+
+  // Текстовые строки для консоли
+  const lines = [
+    'Initializing virtual desktop environment...',
+    'Loading GNOME-like UI modules...',
+    'Connecting to remote repositories...',
+    'Fetching project data...',
+    'Loading 3D models...',
+    'Applying Adwaita theme...',
+    'Optimizing assets...',
+    'Establishing secure connection...',
+    'Finalizing setup...',
+    'Ready.'
+  ];
+
+  let currentLine = 0;
+  let progress = 0;
+  const total = lines.length;
+  const textEl = document.getElementById('preloader-text');
+  const progressEl = document.getElementById('preloader-progress');
+
+  function nextLine() {
+    if (currentLine < lines.length) {
+      const line = lines[currentLine];
+      const span = document.createElement('div');
+      span.textContent = '> ' + line;
+      textEl.appendChild(span);
+      progress = Math.round(((currentLine + 1) / total) * 100);
+      progressEl.style.width = progress + '%';
+      currentLine++;
+      setTimeout(nextLine, 250 + Math.random() * 250);
+    } else {
+      setTimeout(() => {
+        preloader.classList.add('preloader-hide');
+        setTimeout(() => preloader.remove(), 700);
+        // Показываем основной интерфейс (если был скрыт)
+        document.body.classList.remove('preloader-active');
+      }, 600);
+    }
+  }
+
+  // Скрываем основной интерфейс до завершения прелоадера
+  document.body.classList.add('preloader-active');
+  setTimeout(nextLine, 400);
+})();
