@@ -3259,8 +3259,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // --- Окна для игр (заглушки) ---
 function renderMinesweeperContent() {
   return `
-    <div class="minesweeper-gnome">
-      <div class="minesweeper-header">
+    <div class="minesweeper-gnome" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+      <div class="minesweeper-header" style="width:100%;max-width:fit-content;">
         <span>Сапер</span>
         <select id="minesweeper-diff" class="btn" style="margin-left:10px;">
           <option value="9x9x10">Лёгко</option>
@@ -3270,8 +3270,8 @@ function renderMinesweeperContent() {
         <span id="minesweeper-timer" style="margin-left:auto;font-family:monospace;background:#111;color:#0f0;padding:2px 10px;border-radius:6px;">00:00</span>
         <button class="btn" id="minesweeper-restart">⟳</button>
       </div>
-      <div id="minesweeper-board"></div>
-      <div class="minesweeper-footer">
+      <div id="minesweeper-board" style="margin:0 auto;"></div>
+      <div class="minesweeper-footer" style="width:100%;text-align:center;">
         <span id="minesweeper-status"></span>
       </div>
     </div>
@@ -3409,8 +3409,8 @@ function initMinesweeper() {
 // --- Реализация игры 2048 ---
 function render2048Content() {
   return `
-    <div class="game2048-gnome">
-      <div class="game2048-header">
+    <div class="game2048-gnome" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+      <div class="game2048-header" style="width:100%;max-width:fit-content;">
         <span>2048</span>
         <select id="game2048-size" class="btn" style="margin-left:10px;">
           <option value="4">4x4</option>
@@ -3419,12 +3419,12 @@ function render2048Content() {
         </select>
         <button class="btn" id="game2048-restart">⟳</button>
       </div>
-      <div id="game2048-board"></div>
-      <div class="game2048-footer">
+      <div id="game2048-board" style="margin:0 auto;"></div>
+      <div class="game2048-footer" style="width:100%;text-align:center;">
         <span>Счёт: <span id="game2048-score">0</span></span>
       </div>
       <div style="margin-top:8px;font-size:13px;opacity:0.7;">Управление: стрелки или кнопки</div>
-      <div class="game2048-controls">
+      <div class="game2048-controls" style="justify-content:center;">
         <button class="btn" data-move="up">↑</button>
         <button class="btn" data-move="left">←</button>
         <button class="btn" data-move="down">↓</button>
@@ -3552,13 +3552,13 @@ function init2048() {
 // --- Реализация игры Крестики-нолики ---
 function renderTicTacToeContent() {
   return `
-    <div class="tictactoe-gnome">
-      <div class="tictactoe-header">
+    <div class="tictactoe-gnome" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+      <div class="tictactoe-header" style="width:100%;max-width:fit-content;">
         <span>Крестики-нолики</span>
         <button class="btn" id="tictactoe-restart">⟳</button>
       </div>
-      <div id="tictactoe-board"></div>
-      <div class="tictactoe-footer">
+      <div id="tictactoe-board" style="margin:0 auto;"></div>
+      <div class="tictactoe-footer" style="width:100%;text-align:center;">
         <span id="tictactoe-status"></span>
       </div>
     </div>

@@ -830,6 +830,17 @@ body {
   text-align: left;
 }
 
+/* Центрирование содержимого игровых окон */
+.minesweeper-gnome,
+.game2048-gnome,
+.tictactoe-gnome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
 /* Центрирование текста в окне проекта */
 .iframe-error .project-description {
   text-align: center;
@@ -1797,4 +1808,10 @@ body.preloader-active > *:not(#preloader-overlay) {
   border-color: #444 !important;
   background: #222 !important;
   color: #fff !important;
+}
+
+/* Победная линия крестиков-ноликов для темной темы */
+.dark-theme .tictactoe-cell.win {
+  background: #0f0 !important;
+  color: #222 !important;
 }
