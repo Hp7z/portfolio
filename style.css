@@ -72,7 +72,7 @@ body.light-theme {
 body {
   margin: 0;
   overflow: hidden;
-  background: var(--bg-color) url('img/wallpaper.jpg') no-repeat center/cover;
+  background: var(--bg-color) var(--wallpaper) no-repeat center/cover;
   height: 100vh;
   font-family: 'Cantarell', 'Ubuntu', 'DejaVu Sans', sans-serif;
   user-select: none;
@@ -93,7 +93,7 @@ body {
     left: -10px;
     right: -10px;
     bottom: -10px;
-    background: var(--bg-color) url('img/wallpaper.jpg') no-repeat center/cover;
+    background: var(--bg-color) var(--wallpaper) no-repeat center/cover;
     z-index: -1;
     transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
     transition: transform 0.2s ease-out;
@@ -1663,8 +1663,9 @@ body {
 
 .light-theme .light-theme-icon {
   display: block !important;
+  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8)) !important;
 }
-undefined
+
 /* Дополнительные стили для исправления проблемы с иконками ярлыков */
 .shortcut {
   display: flex;

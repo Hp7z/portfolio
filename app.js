@@ -141,22 +141,8 @@ const startMenuItems = {
   ]
 };
 
-// Функция для обновления эффекта параллакса
-function updateParallaxEffect() {
-  document.addEventListener('mousemove', function(e) {
-    const bodyBefore = document.querySelector('body::before');
-    if (!bodyBefore) return;
-    
-    const mouseX = e.clientX / window.innerWidth;
-    const mouseY = e.clientY / window.innerHeight;
-    
-    const moveX = mouseX * 20 - 10;
-    const moveY = mouseY * 20 - 10;
-    
-    document.body.style.setProperty('--parallax-x', moveX + 'px');
-    document.body.style.setProperty('--parallax-y', moveY + 'px');
-  });
-}
+// --- Удаляем старую функцию updateParallaxEffect и её вызовы ---
+// --- Используем только initParallax для плавного параллакса ---
 
 // Функция для инициализации эффектов
 function initEffects() {
@@ -174,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   // Инициализируем эффект параллакса
-  updateParallaxEffect();
+  initParallax();
   
   // Эффект глитча удален
 
@@ -383,6 +369,16 @@ function toggleTheme() {
       win.setBackground('#f6f5f4');
     }
   });
+  
+  // Обновляем иконки
+  updateWindowIcons();
+  
+  // Обновляем таскбар
+  updateTaskbar();
+  
+  // Устанавливаем фон
+  const isDark = document.body.classList.contains('dark-theme');
+  setWallpaperForTheme(isDark ? 'dark' : 'light');
 }
 
 // Функция для отображения календаря
@@ -1189,7 +1185,7 @@ function openProjectWindow(url) {
     background: isDarkTheme ? '#2e3436' : '#f6f5f4',
     border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
     borderRadius: '8px',
-    max: false, // Отключаем автоматическое разворачивание окна
+    max: false, // Отключаем автоматическое разворачивание окна на весь экран
     header: 36, // Устанавливаем высоту заголовка
     index: 9999, // Устанавливаем высокий z-index, чтобы окно было поверх других
     icon: icon, // Добавляем иконку для веб-сайта
@@ -1969,22 +1965,25 @@ function showTooltip(element, message) {
 
 // Функция для инициализации эффекта параллакса
 function initParallax() {
-  // Создаем элемент для параллакса
-  const parallaxBg = document.createElement('div');
-  parallaxBg.className = 'parallax-bg';
-  parallaxBg.style.backgroundImage = 'url("img/wallpaper.jpg")';
-  document.body.insertBefore(parallaxBg, document.body.firstChild);
-  
-  // Добавляем обработчик движения мыши
-  document.addEventListener('mousemove', function(e) {
+  let targetX = 0, targetY = 0;
+  let lastX = 0, lastY = 0;
+
+  document.addEventListener('mousemove', function (e) {
     const mouseX = e.clientX / window.innerWidth;
     const mouseY = e.clientY / window.innerHeight;
-    
-    const moveX = mouseX * 20 - 10; // -10px to 10px
-    const moveY = mouseY * 20 - 10; // -10px to 10px
-    
-    parallaxBg.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    const speed = 20;
+    targetX = (mouseX - 0.5) * speed;
+    targetY = (mouseY - 0.5) * speed;
   });
+
+  function animate() {
+    lastX += (targetX - lastX) * 0.08;
+    lastY += (targetY - lastY) * 0.08;
+    document.body.style.setProperty('--parallax-x', `${lastX}px`);
+    document.body.style.setProperty('--parallax-y', `${lastY}px`);
+    requestAnimationFrame(animate);
+  }
+  animate();
 }
 
 // Функция для инициализации подсказок для новых пользователей
@@ -2136,7 +2135,7 @@ function openModelGallery(modelId) {
   // Создаем HTML для галереи
   let galleryHTML = `
     <div class="model-gallery-container">
-      <div class="model-gallery-left" style="flex: 65;">
+      <div class="model-gallery-left" style="flex: 65%;">
         <div class="model-gallery-main">
           <img src="${model.preview}" alt="${model.title}" id="gallery-main-image">
           <div class="gallery-nav">
@@ -2160,7 +2159,7 @@ function openModelGallery(modelId) {
   galleryHTML += `
         </div>
       </div>
-      <div class="model-gallery-right" style="flex: 35;">
+      <div class="model-gallery-right" style="flex: 35%;">
         <h2>${model.title}</h2>
         <p class="model-description">${model.description || 'Описание модели отсутствует'}</p>
         
@@ -2508,7 +2507,7 @@ window.openProjectWindow = function(url) {
           <div class="progress-container">
             <div class="progress-bar">
               <div class="progress-fill" id="progress-fill-${Date.now()}"></div>
-              <div class="progress-text" id="progress-text-${Date.now()}">0%</div>
+              <div class="progress-text" id="progress-text-${Date.now()}">0%</</div>
             </div>
           </div>
         </div>
@@ -3132,4 +3131,58 @@ document.addEventListener('DOMContentLoaded', function() {
       updateTaskbar();
     });
   }
+});
+
+// Массивы путей к картинкам
+const dayWallpapers = [
+  'img/day/1.jpg',
+  'img/day/2.jpg',
+  'img/day/3.jpg',
+  'img/day/4.jpg'
+];
+const nightWallpapers = [
+  'img/night/1.jpg',
+  'img/night/2.jpg',
+  'img/night/3.jpg',
+  'img/night/4.jpg'
+];
+
+// Получение и установка индекса картинки
+function getWallpaperIndex(theme) {
+  return parseInt(localStorage.getItem(`wallpaperIndex-${theme}`)) || 0;
+}
+function setWallpaperIndex(theme, index) {
+  localStorage.setItem(`wallpaperIndex-${theme}`, index);
+}
+
+// Установка фоновой картинки по теме
+function setWallpaperForTheme(theme) {
+  let wallpapers, index;
+  if (theme === 'dark') {
+    wallpapers = nightWallpapers;
+    index = getWallpaperIndex('night');
+    document.body.style.setProperty('--wallpaper', `url('${wallpapers[index]}')`);
+    index = (index + 1) % wallpapers.length;
+    setWallpaperIndex('night', index);
+  } else {
+    wallpapers = dayWallpapers;
+    index = getWallpaperIndex('day');
+    document.body.style.setProperty('--wallpaper', `url('${wallpapers[index]}')`);
+    index = (index + 1) % wallpapers.length;
+    setWallpaperIndex('day', index);
+  }
+}
+
+// Модифицируем функцию toggleTheme для смены фона
+const originalToggleThemeWallpaper = toggleTheme;
+toggleTheme = function() {
+  originalToggleThemeWallpaper();
+  const isDark = document.body.classList.contains('dark-theme');
+  setWallpaperForTheme(isDark ? 'dark' : 'light');
+};
+
+// Устанавливаем фон при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+  const isDark = document.body.classList.contains('dark-theme');
+  setWallpaperForTheme(isDark ? 'dark' : 'light');
 });
