@@ -807,15 +807,24 @@ function renderContactsContent() {
         <h3>Социальные сети</h3>
         <div class="social-links">
           <a href="https://vk.com/hp7zk" target="_blank" class="social-link vk-link" title="ВКонтакте">
-            <i class="fab fa-vk"></i>
+            <span class="social-link-icon">
+              <img src="icons/vk-dark.svg" class="dark-theme-icon" alt="VK">
+              <img src="icons/vk-light.svg" class="light-theme-icon" alt="VK">
+            </span>
             <span class="social-link-text">ВКонтакте</span>
           </a>
           <a href="https://t.me/looptoquit" target="_blank" class="social-link telegram-link" title="Telegram">
-            <i class="fab fa-telegram-plane"></i>
+            <span class="social-link-icon">
+              <img src="icons/telegram-dark.svg" class="light-theme-icon" alt="Telegram">
+              <img src="icons/telegram-light.svg" class="dark-theme-icon" alt="Telegram">
+            </span>
             <span class="social-link-text">Telegram</span>
           </a>
           <a href="https://github.com/username" target="_blank" class="social-link github-link" title="GitHub">
-            <i class="fab fa-github"></i>
+            <span class="social-link-icon">
+              <img src="icons/github-dark.svg" class="dark-theme-icon" alt="GitHub">
+              <img src="icons/github-light.svg" class="light-theme-icon" alt="GitHub">
+            </span>
             <span class="social-link-text">GitHub</span>
           </a>
         </div>
