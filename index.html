@@ -74,7 +74,19 @@
     <!-- Содержимое меню будет генерироваться динамически -->
   </div>
 
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.module.js",
+        "three/examples/jsm/loaders/GLTFLoader.js": "https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/GLTFLoader.js"
+      }
+    }
+  </script>
   <script src="https://unpkg.com/winbox@0.2.6/dist/winbox.bundle.min.js"></script>
+  <script src="data.js"></script>
+  <script src="renderers.js"></script>
+  <script src="games.js"></script>
+  <script src="threeviewer.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

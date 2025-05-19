@@ -1,26 +1,21 @@
 :root {
-  /* Цвета из GNOME websites framework */
   --gnome-blue: #3584e4;
   --gnome-dark-blue: #1c71d8;
   --gnome-green: #33d17a;
   --gnome-yellow: #f6d32d;
   --gnome-orange: #ff7800;
   --gnome-red: #e01b24;
-  
-  /* Нейтральные цвета */
   --gnome-dark: #241f31;
   --gnome-charcoal: #2e3436;
   --gnome-gray: #9a9996;
   --gnome-light-gray: #deddda;
   --gnome-lighter-gray: #f6f5f4;
-  
-  /* Размеры */
   --gnome-border-radius: 8px;
   --gnome-padding: 12px;
   --gnome-header-height: 36px;
+  --calculator-result-bg: rgba(255,255,255,0.9);
 }
 
-/* Темная тема (по умолчанию) */
 body.dark-theme {
   --bg-color: #1e1e1e;
   --text-color: #ffffff;
@@ -42,9 +37,9 @@ body.dark-theme {
   --input-focus-border: #3584e4;
   --switch-bg: #383838;
   --switch-active-bg: #3584e4;
+  --calculator-result-bg: rgba(46, 52, 54, 0.95);
 }
 
-/* Светлая тема */
 body.light-theme {
   --bg-color: #f6f5f4;
   --text-color: #2e3436;
@@ -66,9 +61,9 @@ body.light-theme {
   --input-focus-border: #3584e4;
   --switch-bg: #8f8f8f;
   --switch-active-bg: #3584e4;
+  --calculator-result-bg: rgba(255,255,255,0.9);
 }
 
-/* По умолчанию используем темную тему */
 body {
   margin: 0;
   overflow: hidden;
@@ -78,36 +73,41 @@ body {
   user-select: none;
   color: var(--text-color);
   position: relative;
+  line-height: 1.6;
+  transition: all 0.3s ease;
 }
 
-/* Эффект параллакса для фона */
-@media (hover: hover) {
-  body {
-    background-attachment: fixed;
-  }
-  
-  body::before {
-    content: "";
-    position: fixed;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    background: var(--bg-color) var(--wallpaper) no-repeat center/cover;
-    z-index: -1;
-    transform: translate3d(var(--parallax-x, 0), var(--parallax-y, 0), 0);
-    transition: transform 0.2s ease-out;
-  }
-  
-  body:hover::before {
-    animation: none;
-  }
-  
-  body:active::before {
-    animation: none;
-  }
+/* Common styles for both themes */
+.dark-theme .color-text,
+.dark-theme #game2048-board,
+.dark-theme .game2048-cell,
+.dark-theme #tictactoe-board,
+.dark-theme .tictactoe-cell {
+  color: #ffffff !important;
 }
 
+.light-theme .color-text {
+  color: #000000 !important;
+}
+
+.color-block-invert .color-text {
+  color: #ffffff;
+}
+
+.color-block-invert .color-block__wave {
+  background: #000;
+}
+
+.color-svg {
+  fill: #fff;
+  transition: fill 0.4s ease;
+}
+
+.color-block-invert .color-svg {
+  fill: #000;
+}
+
+/* Layout components */
 .desktop {
   padding: 20px;
   height: calc(100vh - 56px);
@@ -141,7 +141,39 @@ body {
   transform: translateY(-2px);
 }
 
-/* Панель задач в стиле GNOME */
+.shortcut img,
+.shortcut-icon img,
+.activities-icon img,
+.theme-toggle i,
+.social-link-icon img {
+  display: none !important;
+}
+
+body.dark-theme .dark-theme-icon,
+body.light-theme .light-theme-icon {
+  display: block !important;
+}
+
+.taskbar-item img {
+  display: block !important;
+}
+
+.shortcut-icon {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 5px;
+}
+
+.shortcut-icon img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Taskbar styles */
 .taskbar {
   position: fixed;
   top: 0;
@@ -184,7 +216,6 @@ body {
   width: 16px;
   height: 16px;
   margin-right: 8px;
-  display: block !important;
 }
 
 .taskbar-item-title {
@@ -196,7 +227,7 @@ body {
   max-width: 120px;
 }
 
-/* Увеличенная кнопка "Действия" в стиле GNOME */
+/* Activities button */
 .activities-button {
   display: flex;
   align-items: center;
@@ -245,7 +276,7 @@ body {
   transform: translate(-50%, -50%);
 }
 
-/* Переключатель темы */
+/* Theme toggle */
 .theme-toggle {
   margin: 0 15px;
   width: 50px;
@@ -298,7 +329,7 @@ body {
   left: 6px;
 }
 
-/* Часы и дата */
+/* Clock and calendar */
 .clock-container {
   display: flex;
   flex-direction: column;
@@ -320,7 +351,6 @@ body {
   opacity: 0.8;
 }
 
-/* Календарь */
 .calendar-popup {
   position: absolute;
   top: 40px;
@@ -374,10 +404,10 @@ body {
   visibility: hidden;
 }
 
-/* Меню "Действия" в стиле GNOME */
+/* Start menu */
 .start-menu {
   position: absolute;
-  top: 50px;
+  top: 1px;
   left: 10px;
   width: 300px;
   display: none;
@@ -424,14 +454,13 @@ body {
   margin-right: 10px !important;
 }
 
-/* Стили для WinBox в стиле KDE */
+/* Window styles */
 .adwaita-theme {
   background: var(--window-bg) !important;
   border: 1px solid var(--window-border) !important;
   border-radius: var(--gnome-border-radius) !important;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
+  margin: 0 !important;
   padding: 0 !important;
   z-index: 10 !important;
   transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease !important;
@@ -441,10 +470,8 @@ body {
 .adwaita-theme.active {
   z-index: 100 !important;
   box-shadow: 0 8px 25px rgba(0,0,0,0.4) !important;
-  transform: translateZ(1px);
 }
 
-/* Обводка активного окна с эффектом свечения */
 .dark-theme .adwaita-theme.active {
   border: 2px solid var(--gnome-green) !important;
   box-shadow: 0 0 15px rgba(51, 209, 122, 0.5) !important;
@@ -519,18 +546,16 @@ body {
   z-index: 2 !important;
 }
 
-/* Цвета кнопок управления для темной темы */
 .dark-theme .adwaita-theme .wb-min,
 .dark-theme .adwaita-theme .wb-max,
 .dark-theme .adwaita-theme .wb-close {
-  filter: invert(0) !important; /* Делаем иконки белыми */
+  filter: invert(0) !important;
 }
 
-/* Цвета кнопок управления для светлой темы */
 .light-theme .adwaita-theme .wb-min,
 .light-theme .adwaita-theme .wb-max,
 .light-theme .adwaita-theme .wb-close {
-  filter: invert(1) !important; /* Оставляем иконки черными */
+  filter: invert(1) !important;
 }
 
 .adwaita-theme .wb-full {
@@ -568,6 +593,14 @@ body {
   padding-top: 0 !important;
 }
 
+.adwaita-theme.wb-full {
+  width: calc(100vw - 2px) !important;
+  height: calc(100vh - 38px) !important;
+  top: 36px !important;
+  left: 0 !important;
+}
+
+/* Common UI elements */
 .adwaita-theme .btn {
   background: var(--button-bg);
   color: white;
@@ -667,6 +700,7 @@ body {
   transform: translateX(20px);
 }
 
+/* Tabs */
 .tabs {
   display: flex;
   border-bottom: 1px solid var(--window-border);
@@ -718,7 +752,9 @@ body {
   transform: translateX(0);
 }
 
-.project-container, .model-container {
+/* Project and model containers */
+.project-container,
+.model-container {
   display: flex;
   height: 250px;
   flex-direction: row;
@@ -735,12 +771,14 @@ body {
   overflow: hidden;
 }
 
-.project-container:hover, .model-container:hover {
+.project-container:hover,
+.model-container:hover {
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transform: translateY(-2px);
 }
 
-.project-container::before, .model-container::before {
+.project-container::before,
+.model-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -753,30 +791,36 @@ body {
   pointer-events: none;
 }
 
-.project-container:hover::before, .model-container:hover::before {
+.project-container:hover::before,
+.model-container:hover::before {
   left: 100%;
 }
 
-.project-container.wave-effect::before, .model-container.wave-effect::before {
+.project-container.wave-effect::before,
+.model-container.wave-effect::before {
   left: 100%;
 }
 
-.dark-theme .project-container:hover, .dark-theme .model-container:hover {
+.dark-theme .project-container:hover,
+.dark-theme .model-container:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.light-theme .project-container:hover, .light-theme .model-container:hover {
+.light-theme .project-container:hover,
+.light-theme .model-container:hover {
   background: rgba(0, 0, 0, 0.05);
 }
 
-.project-info, .model-info {
+.project-info,
+.model-info {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.project-title, .model-title {
+.project-title,
+.model-title {
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 10px;
@@ -784,7 +828,8 @@ body {
   text-align: left;
 }
 
-.project-preview, .model-preview {
+.project-preview,
+.model-preview {
   width: 40%;
   max-width: 100%;
   height: inherit;
@@ -795,26 +840,29 @@ body {
   position: relative;
 }
 
-
-.project-preview img, .model-preview img {
+.project-preview img,
+.model-preview img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.3s;
 }
 
-.project-preview:hover img, .model-preview:hover img {
+.project-preview:hover img,
+.model-preview:hover img {
   transform: scale(1.05);
 }
 
-.project-content, .model-content {
-    display: flex;
-    flex-direction: column;
-    width: 60%;
-    margin-right: 25px;
+.project-content,
+.model-content {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  margin-right: 25px;
 }
 
-.project-description, .model-description {
+.project-description,
+.model-description {
   font-size: 14px;
   line-height: 1.5;
   margin-bottom: 15px;
@@ -824,26 +872,9 @@ body {
   width: 100%;
 }
 
-/* Выравнивание текста в окне просмотра модели */
 .model-gallery-container .model-description,
 .model-3d-container .model-description {
   text-align: left;
-}
-
-/* Центрирование содержимого игровых окон */
-.minesweeper-gnome,
-.game2048-gnome,
-.tictactoe-gnome {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-/* Центрирование текста в окне проекта */
-.iframe-error .project-description {
-  text-align: center;
 }
 
 .project-link {
@@ -871,7 +902,8 @@ body {
   box-shadow: 0 0 1px rgba(0,0,0,0.2);
 }
 
-.project-footer, .model-footer {
+.project-footer,
+.model-footer {
   display: flex;
   justify-content: left;
   flex-direction: column;
@@ -879,14 +911,16 @@ body {
   margin-top: 10px;
 }
 
-.project-credits, .model-credits {
+.project-credits,
+.model-credits {
   color: var(--text-color);
   opacity: 0.7;
   font-size: 12px;
   text-align: left;
 }
 
-.project-date, .model-date {
+.project-date,
+.model-date {
   color: var(--text-color);
   opacity: 0.7;
   font-size: 12px;
@@ -894,13 +928,15 @@ body {
 }
 
 .model-info-footer {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: row;
-    width: 100%;
-    margin-top: 10px;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+  width: 100%;
+  margin-top: 10px;
+  align-items: center;
 }
+
+/* Progress bar */
 .progress-container {
   margin: 15px 0;
 }
@@ -932,7 +968,7 @@ body {
   margin-top: 10px;
 }
 
-/* Стили для iframe контейнера */
+/* Iframe containers */
 .iframe-container {
   width: 100%;
   height: 100%;
@@ -944,29 +980,6 @@ body {
   width: 100%;
   height: 100%;
   border: none;
-}
-
-.iframe-container.loaded .progress-container {
-  display: none;
-}
-
-.model-gallery-container {
-  display: flex;
-  height: 100%;
-  width: 100%;
-  flex-wrap: wrap;
-}
-
-.model-gallery-left {
-  flex: 65;
-  padding: 15px;
-  position: relative;
-}
-
-.model-gallery-right {
-  flex: 35;
-  padding: 15px;
-  overflow-y: auto;
 }
 
 .iframe-error {
@@ -987,6 +1000,124 @@ body {
   line-height: 1.5;
 }
 
+/* Model gallery */
+.model-gallery-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.model-gallery-left {
+  flex: 65;
+  padding: 15px;
+  position: relative;
+}
+
+.model-gallery-right {
+  flex: 35;
+  padding: 15px;
+  overflow-y: auto;
+}
+
+.model-gallery-main {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
+  margin-bottom: 15px;
+}
+
+.model-gallery-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.model-gallery-thumbnails {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.model-gallery-thumb {
+  width: 60px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid #ccc;
+  transition: border 0.2s;
+}
+.model-gallery-thumb.active {
+  border: 2px solid #3584e4;
+}
+
+.gallery-nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.model-gallery-main:hover .gallery-nav {
+  opacity: 1;
+}
+
+.gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 10px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.gallery-nav-btn:hover {
+  opacity: 1;
+}
+
+#gallery-prev {
+  left: 10px;
+}
+
+#gallery-next {
+  right: 10px;
+}
+
+.gallery-main-img-wrapper > div {
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  z-index: 3;
+}
+
+/* 3D model viewer */
 .model-3d-container {
   width: 100%;
   height: 400px;
@@ -1184,21 +1315,6 @@ body {
   background: var(--button-hover);
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top: 3px solid white;
-  animation: spin 1s linear infinite;
-  margin-bottom: 15px;
-}
-
 .model-info-overlay {
   position: absolute;
   top: 10px;
@@ -1217,238 +1333,227 @@ body {
   opacity: 1;
 }
 
-/* Стили для полноэкранного режима */
-.adwaita-theme.wb-full {
-  width: calc(100vw - 2px) !important;
-  height: calc(100vh - 38px) !important;
-  top: 36px !important;
-  left: 0 !important;
-}
-
-/* Адаптивность для окон */
-@media (max-width: 768px) {
-  .desktop {
-    padding: 10px;
-  }
-  
-  .shortcut {
-    width: 60px;
-    font-size: 12px;
-  }
-  
-  .taskbar {
-    height: 40px;
-  }
-  
-  .project-container {
-    flex-direction: column;
-  }
-  
-  .project-preview {
-    width: 100%;
-    margin-top: 10px;
-  }
-  
-  .adwaita-theme {
-    width: 90vw !important;
-    height: 80vh !important;
-    left: 5vw !important;
-    top: 50px !important;
-  }
-  
-  .tab {
-    padding: 6px 10px;
-    font-size: 12px;
-    margin-bottom: 5px;
-  }
-  
-  .tabs {
-    margin-bottom: 20px;
-  }
-}
-
-/* Кастомный скроллбар в стиле GNOME */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.5);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 128, 128, 0.7);
-}
-
-.dark-theme ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.dark-theme ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
-/* Анимации для переключения разделов */
-@keyframes slideInRight {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes slideOutRight {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-@keyframes slideOutLeft {
-  from {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  to {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-}
-
-.slide-right {
-  animation: slideInRight 0.3s forwards;
-}
-
-.slide-left {
-  animation: slideInLeft 0.3s forwards;
-}
-
-.slide-out-right {
-  animation: slideOutRight 0.3s forwards;
-}
-
-.slide-out-left {
-  animation: slideOutLeft 0.3s forwards;
-}
-
-/* Стили для галереи статичных моделей */
-.model-gallery-main {
-  position: relative;
-  width: 100%;
-  height: 400px;
-  overflow: hidden;
-  border-radius: var(--gnome-border-radius);
-  border: 1px solid var(--window-border);
-  margin-bottom: 15px;
-}
-
-.model-gallery-main img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.model-gallery-thumbnails {
+/* Games */
+.minesweeper-gnome,
+.game2048-gnome,
+.tictactoe-gnome {
   display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-}
-
-.model-gallery-thumb {
-  width: 80px;
-  height: 60px;
-  border-radius: var(--gnome-border-radius);
-  border: 1px solid var(--window-border);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.model-gallery-thumb.active {
-  border: 2px solid var(--button-bg);
-}
-
-.model-gallery-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.gallery-nav {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  padding: 0 20px;
-  box-sizing: border-box;
-  opacity: 0;
-  transition: opacity 0.3s;
+  justify-content: center;
+  height: 100%;
 }
 
-.model-gallery-main:hover .gallery-nav {
-  opacity: 1;
+.dark-theme #game2048-board,
+.dark-theme .game2048-cell,
+.dark-theme #tictactoe-board,
+.dark-theme .tictactoe-cell {
+  border-color: #444 !important;
+  background: #222 !important;
+  color: #fff !important;
 }
 
-.gallery-nav-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
-  color: #000;
-  font-size: 20px;
+.dark-theme .tictactoe-cell.win {
+  background: #0f0 !important;
+  color: #222 !important;
+}
+
+/* --- Minesweeper styles --- */
+.minesweeper-gnome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+}
+.minesweeper-header {
+  width: 100%;
+  max-width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+#minesweeper-board {
+  display: grid;
+  gap: 2px;
+  background: var(--tab-bg);
+  border-radius: 8px;
+  padding: 6px;
+}
+.minesweeper-cell {
+  width: 32px;
+  height: 32px;
+  background: var(--window-bg);
+  border: 1px solid var(--window-border);
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  user-select: none;
+  transition: background 0.2s;
+  position: relative;
+}
+.minesweeper-cell.open {
+  background: var(--tab-active-bg);
+  cursor: default;
+}
+.minesweeper-cell.mine {
+  color: #e01b24;
+}
+.minesweeper-cell.flag::after {
+  content: '🚩';
+  position: absolute;
+  left: 0; right: 0; top: 0; bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+}
+.minesweeper-cell.num1 { color: #3584e4; }
+.minesweeper-cell.num2 { color: #33d17a; }
+.minesweeper-cell.num3 { color: #f6d32d; }
+.minesweeper-cell.num4 { color: #ff7800; }
+.minesweeper-footer {
+  margin-top: 10px;
+  min-height: 24px;
+  width: 100%;
+  text-align: center;
 }
 
-.dark-theme .gallery-nav-btn {
-  background: rgba(255, 255, 255, 0.7);
-  color: #000;
+/* --- 2048 styles --- */
+.game2048-gnome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+}
+.game2048-header {
+  width: 100%;
+  max-width: fit-content;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#game2048-board {
+  display: grid;
+  gap: 6px;
+  background: var(--tab-bg);
+  border-radius: 8px;
+  padding: 10px;
+  border: 2px solid #222;
+}
+.game2048-cell {
+  width: 56px;
+  height: 56px;
+  background: var(--window-bg);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  transition: background 0.2s, transform 0.2s;
+  border: 1.5px solid #222;
+  box-shadow: 0 1px 4px #0002;
+}
+.game2048-cell[data-v="2"] { background: #e0f7fa; }
+.game2048-cell[data-v="4"] { background: #b2ebf2; }
+.game2048-cell[data-v="8"] { background: #80deea; color: #fff; }
+.game2048-cell[data-v="16"] { background: #4dd0e1; color: #fff; }
+.game2048-cell[data-v="32"] { background: #26c6da; color: #fff; }
+.game2048-cell[data-v="64"] { background: #00bcd4; color: #fff; }
+.game2048-cell[data-v="128"] { background: #0097a7; color: #fff; }
+.game2048-cell[data-v="256"] { background: #00838f; color: #fff; }
+.game2048-cell[data-v="512"] { background: #006064; color: #fff; }
+.game2048-cell[data-v="1024"] { background: #004d40; color: #fff; }
+.game2048-cell[data-v="2048"] { background: #388e3c; color: #fff; }
+.game2048-cell.new { animation: popin2048 0.18s; }
+.game2048-cell.merged { animation: merge2048 0.18s; }
+@keyframes popin2048 { 0%{transform:scale(0.5);} 100%{transform:scale(1);} }
+@keyframes merge2048 { 0%{transform:scale(1.2);} 100%{transform:scale(1);} }
+.game2048-footer {
+  margin-top: 10px;
+  min-height: 24px;
+  width: 100%;
+  text-align: center;
+}
+.game2048-controls {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
 }
 
-.light-theme .gallery-nav-btn {
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
+/* --- TicTacToe styles --- */
+.tictactoe-gnome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+}
+.tictactoe-header {
+  width: 100%;
+  max-width: fit-content;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+#tictactoe-board {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: 6px;
+  background: var(--tab-bg);
+  border-radius: 8px;
+  padding: 10px;
+  border: 2px solid #222;
+}
+.tictactoe-cell {
+  width: 64px;
+  height: 64px;
+  background: var(--window-bg);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: bold;
+  color: #3584e4;
+  cursor: pointer;
+  transition: background 0.2s;
+  border: 1.5px solid #222;
+}
+.tictactoe-cell.x { color: #3584e4; }
+.tictactoe-cell.o { color: #e01b24; }
+.tictactoe-cell.win { background: #33d17a; color: #fff; }
+.tictactoe-footer {
+  margin-top: 10px;
+  min-height: 24px;
+  width: 100%;
+  text-align: center;
+}
+.dark-theme #game2048-board, .dark-theme .game2048-cell,
+.dark-theme #tictactoe-board, .dark-theme .tictactoe-cell {
+  border-color: #444 !important;
+  background: #222 !important;
+  color: #fff !important;
+}
+.dark-theme .tictactoe-cell.win {
+  background: #0f0 !important;
+  color: #222 !important;
 }
 
-.gallery-nav-btn:hover {
-  transform: scale(1.1);
-}
-
-/* Стили для социальных сетей */
+/* Social links */
 .social-links {
   display: flex;
   gap: 25px;
@@ -1509,7 +1614,15 @@ body {
   opacity: 1;
 }
 
-/* Стили для эффекта волны */
+.social-link-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+/* Color block effects */
 .color-block {
   position: relative;
   overflow: hidden !important;
@@ -1552,35 +1665,7 @@ body {
     opacity 1s ease;
 }
 
-.dark-theme .color-text {
-  color: #ffffff !important;
-}
-
-.light-theme .color-text {
-  color: #000000 !important;
-}
-
-.color-block-invert {
-  background-color: #fff;
-}
-
-.color-block-invert .color-text {
-  color: #ffffff;
-}
-
-.color-block-invert .color-block__wave {
-  background: #000;
-}
-
-.color-svg {
-  fill: #fff;
-  transition: fill 0.4s ease;
-}
-
-.color-block-invert .color-svg {
-  fill: #000;
-}
-/* Стили для калькулятора услуг */
+/* Calculator */
 .calculator-section {
   margin-bottom: 20px;
   padding: 15px;
@@ -1596,8 +1681,6 @@ body {
 
 .calculator-item {
   margin-bottom: 10px;
-  display: flex;
-  align-items: center;
 }
 
 .calculator-item input[type="checkbox"] {
@@ -1614,8 +1697,9 @@ body {
 
 .calculator-result {
   margin-top: 30px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.1);
+  padding: 15px 20px;
+  background: var(--calculator-result-bg);
+  justify-content: space-between;
   border-radius: var(--gnome-border-radius);
 }
 
@@ -1647,73 +1731,103 @@ body {
 #order-button:hover {
   background: var(--gnome-blue);
 }
-.shortcut img {
-  width: 48px;
-  height: 48px;
-  margin-bottom: 5px;
-  display: none !important;
+
+/* About section */
+.about-section {
+  padding: 50px 0;
 }
 
-.dark-theme .dark-theme-icon {
-  display: block !important;
+.about-title {
+  text-align: center;
+  font-size: 36px;
+  margin-bottom: 25px;
 }
 
-.light-theme .light-theme-icon {
-  display: block !important;
-  filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.8)) !important;
-}
-
-/* Дополнительные стили для исправления проблемы с иконками ярлыков */
-.shortcut {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.shortcut-icon {
-  position: relative;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 5px;
-}
-
-.shortcut-icon img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: none !important;
-}
-/* Сброс стилей для иконок */
-.shortcut img,
-.shortcut-icon img,
-.activities-icon img,
-.theme-toggle i {
-  display: none !important;
-}
-
-/* Показываем только нужные иконки в зависимости от темы */
-body.dark-theme .dark-theme-icon,
-body.light-theme .light-theme-icon {
-  display: block !important;
-}
-
-/* Исключение для иконок в таскбаре */
-.taskbar-item img {
-  display: block !important;
-}
-
-/* Прелоадер Hacknet/Bitburner style */
-#preloader-overlay {
-  position: fixed;
-  z-index: 99999;
-  inset: 0;
-  background: #000;
+.about-content {
   display: flex;
   align-items: center;
   justify-content: center;
   transition: opacity 0.7s;
   opacity: 1;
+  pointer-events: all;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+.about-img {
+  width: 450px;
+}
+
+/* Features section */
+.features-section {
+  display: grid;
+  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+.feature-card {
+  background: #fff;
+  border-radius: var(--gnome-border-radius);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+}
+
+.feature-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+  fill: #0f0;
+  transition: all 0.4s ease;
+}
+
+.dark-theme .feature-icon {
+  fill: #fff;
+}
+
+/* Skills section */
+.skills-section {
+  display: grid;
+  gap: 25px;
+  grid-template-columns: repeat(auto-fill, minmax(30%, 1fr));
+}
+
+.skill {
+  background: #fff;
+  border-radius: var(--gnome-border-radius);
+  padding: 30px;
+  text-align: center;
+}
+
+.skill-title {
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+
+.skill-meter {
+  height: 10px;
+  background: linear-gradient(90deg, #0f0, transparent);
+}
+
+.skill-bar {
+  height: 100%;
+  background: #ccc;
+}
+
+/* Preloader */
+#preloader-overlay {
+  position: fixed;
+  z-index: 99999;
+  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   pointer-events: all;
 }
 
@@ -1745,8 +1859,11 @@ body.light-theme .light-theme-icon {
   color: #0f0;
   text-shadow: 0 0 4px #0f0a;
   overflow: auto;
-  flex: 1;
-  text-align: left;
+  height: auto;
+  border-radius: var(--gnome-border-radius);
+  max-width: 90vw;
+  background: #111;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .preloader-progress-bar {
@@ -1775,48 +1892,333 @@ body.light-theme .light-theme-icon {
   transition: opacity 0.7s;
 }
 
-/* Скрываем основной интерфейс во время прелоадера */
-body.preloader-active > *:not(#preloader-overlay) {
-  opacity: 0 !important;
-  pointer-events: none !important;
-  user-select: none !important;
+/* Loading spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* 2048 и крестики-нолики: стили для темной темы */
-.dark-theme #game2048-board,
-.dark-theme .game2048-cell {
-  border-color: #444 !important;
-  background: #222 !important;
-  color: #fff !important;
-}
-.dark-theme #tictactoe-board,
-.dark-theme .tictactoe-cell {
-  border-color: #444 !important;
-  background: #222 !important;
-  color: #fff !important;
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top: 3px solid white;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
 }
 
-/* Победная линия крестиков-ноликов для темной темы */
-.dark-theme .tictactoe-cell.win {
-  background: #0f0 !important;
-  color: #222 !important;
+/* Slide animations */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
-/* Стили для новых иконок соцсетей */
-.social-link-icon {
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.slide-right {
+  animation: slideInRight 0.3s forwards;
+}
+
+.slide-left {
+  animation: slideInLeft 0.3s forwards;
+}
+
+.slide-out-right {
+  animation: slideOutRight 0.3s forwards;
+}
+
+.slide-out-left {
+  animation: slideOutLeft 0.3s forwards;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(128, 128, 128, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(128, 128, 128, 0.7);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .desktop {
+    padding: 10px;
+  }
+  
+  .shortcut {
+    width: 60px;
+    font-size: 12px;
+  }
+  
+  .taskbar {
+    height: 40px;
+  }
+  
+  .project-container {
+    flex-direction: column;
+  }
+  
+  .project-preview {
+    width: 100%;
+    margin-top: 10px;
+  }
+  
+  .adwaita-theme {
+    width: 90vw !important;
+    height: 80vh !important;
+    left: 5vw !important;
+    top: 50px !important;
+  }
+  
+  .tab {
+    padding: 6px 10px;
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .tabs {
+    margin-bottom: 20px;
+  }
+}
+
+/* Reset styles */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+header, nav {
+  display: flex;
+  align-items: center;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 25px;
+}
+
+nav li {
+  cursor: pointer;
+}
+
+.main-content {
+  margin: 0 auto;
+  width: var(--screen-width);
+  max-width: 1140px;
+  padding: 30px;
+}
+
+.header .logo {
+  width: 100px;
+  height: auto;
+  cursor: pointer;
+}
+
+/* --- 3D/Галерея/Модель: фиксированная ширина колонок и высота --- */
+.model3d-window-flex, .gallery-window-flex {
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.model3d-viewer-col, .gallery-viewer-col {
+  flex: 0 0 65%;
+  max-width: 65%;
+  min-width: 0;
+  min-height: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
+  height: 100%;
+  box-sizing: border-box;
 }
-.social-link-icon img {
-  width: 30px;
-  height: 30px;
+
+.model3d-info-col, .gallery-info-col {
+  flex: 0 0 35%;
+  max-width: 35%;
+  min-width: 0;
+  min-height: 0;
+  padding: 30px 30px 30px 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+/* 3D-плеер и галерея должны занимать всю высоту и ширину своей колонки */
+.model-3d-viewer {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: #222;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px #0003;
+  overflow: hidden;
+}
+
+/* Галерея: стрелки по бокам картинки, миниатюры снизу */
+.gallery-main-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-main-img {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px #0003;
+  display: block;
+  margin: 0 auto;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 10px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+.gallery-nav-btn:hover {
+  opacity: 1;
+}
+
+#gallery-prev {
+  left: 10px;
+}
+
+#gallery-next {
+  right: 10px;
+}
+
+.gallery-main-img-wrapper > div {
+  position: absolute;
+  bottom: -60px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  z-index: 3;
+}
+
+.model-tools img {
   display: none !important;
-  vertical-align: middle;
 }
-body.dark-theme .dark-theme-icon,
-body.light-theme .light-theme-icon {
-  display: block !important;
+body.dark-theme .model-tools .dark-theme-icon {
+  display: inline-block !important;
+}
+body.light-theme .model-tools .light-theme-icon {
+  display: inline-block !important;
+}
+
+/* Исправлено: стрелки в галерее не смещаются вниз при наведении */
+.gallery-nav-btn {
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  color: inherit;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 10px;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-nav-btn:hover {
+  opacity: 1;
+  /* Убрано: transform: scale(1.1); */
 }
