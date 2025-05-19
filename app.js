@@ -11,16 +11,18 @@ const windowIcons = {
   website: { light: 'icons/website-dark.svg', dark: 'icons/website-light.svg' },
   // --- Добавляем model3d с корректными путями ---
   model3d: { light: 'icons/model3d-dark.svg', dark: 'icons/model3d-light.svg' },
-  game: { light: 'icons/game-dark.svg', dark: 'icons/game-light.svg' }
+  game: { light: 'icons/game-dark.svg', dark: 'icons/game-light.svg' },
+  github: { light: 'icons/github-light.svg', dark: 'icons/github-dark.svg' }
 };
 function getIconForTheme(iconType) {
   const isDarkTheme = document.body.classList.contains('dark-theme');
   return isDarkTheme ? iconType.dark : iconType.light;
 }
-const dayWallpapers = ['img/day/1.jpg'];
-const nightWallpapers = ['img/night/1.jpg'];
+const dayWallpapers = ['img/day/1.jpg', 'img/day/2.jpg'];
+const nightWallpapers = ['img/night/1.jpg', 'img/night/2.jpg'];
 function getWallpaperIndex(theme) {
-  return parseInt(localStorage.getItem(`wallpaperIndex-${theme}`)) || 0;
+  // Используем общий индекс для day/night
+  return parseInt(localStorage.getItem('wallpaperIndex')) || 0;
 }
 function setWallpaperIndex(theme, index) {
   localStorage.setItem(`wallpaperIndex-${theme}`, index);
@@ -31,16 +33,21 @@ function setWallpaperForTheme(theme) {
     wallpapers = nightWallpapers;
     index = getWallpaperIndex('night');
     document.body.style.setProperty('--wallpaper', `url('${wallpapers[index]}')`);
-    index = (index + 1) % wallpapers.length;
-    setWallpaperIndex('night', index);
   } else {
     wallpapers = dayWallpapers;
     index = getWallpaperIndex('day');
     document.body.style.setProperty('--wallpaper', `url('${wallpapers[index]}')`);
-    index = (index + 1) % wallpapers.length;
-    setWallpaperIndex('day', index);
   }
 }
+
+// --- При загрузке страницы: переключаем индекс обоев синхронно для day/night ---
+(function rotateWallpaperIndexes() {
+  let idx = parseInt(localStorage.getItem('wallpaperIndex')) || 0;
+  idx = (idx + 1) % dayWallpapers.length;
+  localStorage.setItem('wallpaperIndex', idx);
+  setWallpaperIndex('day', idx);
+  setWallpaperIndex('night', idx);
+})();
 
 // --- Тема и переключение ---
 function toggleTheme() {
@@ -58,7 +65,6 @@ function toggleTheme() {
 function updateWindowIcons() {
   Object.entries(trayWindows).forEach(([type, win]) => {
     let iconPath;
-    // --- Единая логика для 3D моделей и галерей ---
     if (type.startsWith('model-') || type.startsWith('gallery-')) {
       iconPath = getIconForTheme(windowIcons.model3d);
     } else if (type === 'about') iconPath = getIconForTheme(windowIcons.about);
@@ -66,16 +72,26 @@ function updateWindowIcons() {
     else if (type === 'services') iconPath = getIconForTheme(windowIcons.services);
     else if (type === 'contacts') iconPath = getIconForTheme(windowIcons.contacts);
     else if (type === 'calculator') iconPath = getIconForTheme(windowIcons.calculator);
+    else if (type === 'github') iconPath = getIconForTheme(windowIcons.github);
     else if (type.startsWith('project-')) iconPath = getIconForTheme(windowIcons.website);
     else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') iconPath = getIconForTheme(windowIcons.game);
     else iconPath = getIconForTheme(windowIcons.about);
-    win.setIcon(iconPath);
-    // Принудительно обновить DOM-иконку, если есть
+
+    if (typeof win.setIcon === 'function') {
+      win.setIcon(iconPath);
+    }
+
+    // --- Принудительно обновлять background-image и src для .wb-icon ---
     if (win.dom) {
-      const iconImg = win.dom.querySelector('.wb-icon img');
-      if (iconImg) iconImg.src = iconPath;
       const iconDiv = win.dom.querySelector('.wb-icon');
-      if (iconDiv && !iconImg) iconDiv.style.backgroundImage = `url('${iconPath}')`;
+      if (iconDiv) {
+        iconDiv.style.backgroundImage = '';
+        setTimeout(() => {
+          iconDiv.style.backgroundImage = `url('${iconPath}')`;
+          const iconImg = iconDiv.querySelector('img');
+          if (iconImg) iconImg.src = iconPath;
+        }, 0);
+      }
     }
   });
 }
@@ -194,28 +210,35 @@ function updateTaskbar() {
   taskbar.innerHTML = '';
   Object.entries(trayWindows).forEach(([type, win]) => {
     const item = document.createElement('div');
-    item.className = 'taskbar-item';
+    item.className = 'taskbar-item' + (win.dom?.classList.contains('active') ? ' active' : '');
     let title = win.title || type;
     let iconPath;
+    
+    // Определение иконки как раньше
     const isDarkTheme = document.body.classList.contains('dark-theme');
     if (type === 'about') iconPath = getIconForTheme(windowIcons.about);
     else if (type === 'portfolio') iconPath = getIconForTheme(windowIcons.portfolio);
     else if (type === 'services') iconPath = getIconForTheme(windowIcons.services);
     else if (type === 'contacts') iconPath = getIconForTheme(windowIcons.contacts);
     else if (type === 'calculator') iconPath = getIconForTheme(windowIcons.calculator);
+    else if (type === 'github') iconPath = getIconForTheme(windowIcons.github);
     else if (type.startsWith('project-')) iconPath = getIconForTheme(windowIcons.website);
     else if (type.startsWith('model-') || type.startsWith('gallery-')) iconPath = getIconForTheme(windowIcons.model3d);
     else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') iconPath = getIconForTheme(windowIcons.game);
     else iconPath = getIconForTheme(windowIcons.about);
+
     item.innerHTML = `<img src="${iconPath}"><span class="taskbar-item-title">${title}</span>`;
+
+    // Исправленное поведение: используем только win.minimize()/win.restore()
     item.onclick = () => {
-      if (win.minimized) {
-        win.restore();
-        activateWindow(type);
+      if (win.dom && win.dom.classList.contains('active')) {
+        if (typeof win.minimize === 'function') win.minimize();
       } else {
-        win.minimize();
+        if (typeof win.restore === 'function') win.restore();
+        activateWindow(type);
       }
     };
+
     taskbar.appendChild(item);
   });
 }
@@ -462,6 +485,11 @@ function openWindow(type) {
       content = window.renderTicTacToeContent();
       icon = getIconForTheme(windowIcons.game);
       break;
+    case 'github':
+      title = 'GitHub Stats';
+      content = window.renderGitHubStatsContent ? window.renderGitHubStatsContent() : '<div>GitHub Stats</div>';
+      icon = getIconForTheme(windowIcons.github);
+      break;
     default:
       content = '<p>Содержимое окна</p>';
       icon = getIconForTheme(windowIcons.about);
@@ -488,10 +516,12 @@ function openWindow(type) {
       return false;
     },
     onminimize: () => {
+      if (win.dom) win.dom.style.display = 'none'; // Скрываем окно при сворачивании
       updateTaskbar();
     },
     onrestore: () => {
       win.minimized = false;
+      if (win.dom) win.dom.style.display = ''; // Показываем окно при восстановлении
       activateWindow(type);
     },
     onfocus: () => {
@@ -1041,12 +1071,19 @@ function openProjectWindow(url) {
 }
 
 // --- Автоматическое обновление иконок 3D окон и галерей при смене темы ---
-if (!window._modelGalleryThemeListener) {
-  window._modelGalleryThemeListener = true;
+if (!window._themeChangeObserver) {
+  window._themeChangeObserver = true;
   const observer = new MutationObserver(() => {
     updateWindowIcons();
+    updateTaskbar();
+    // --- Обновлять иконки для окон model- и gallery- при смене темы ---
+    if (window.trayWindows && window.windowIcons && window.getIconForTheme) {
+      Object.entries(window.trayWindows).forEach(([type, win]) => {
+        if ((type.startsWith('model-') || type.startsWith('gallery-')) && typeof win.setIcon === 'function') {
+          win.setIcon(window.getIconForTheme(window.windowIcons.model3d));
+        }
+      });
+    }
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 }
-
-// --- Удалить CSS из renderMinesweeperContent, render2048Content, renderTicTacToeContent ---

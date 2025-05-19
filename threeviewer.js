@@ -127,7 +127,15 @@ window.open3DModelViewer = async function(modelId) {
       }, 10);
     },
     oncreate: function() {
-      if (this.dom) this.dom.setAttribute('data-type', type);
+      if (this.dom) {
+        this.dom.setAttribute('data-type', type);
+        this.dom.classList.add('adwaita-theme');
+        this.dom.id = type; // Добавляем id для корректной работы таскбара и смены иконки
+      }
+      // --- Гарантируем, что setIcon доступен для смены темы ---
+      if (typeof this.setIcon === 'function') {
+        this.setIcon(getIconForTheme(windowIcons.model3d));
+      }
     }
   });
   trayWindows[type] = win;
@@ -274,12 +282,13 @@ window.open3DModelViewer = async function(modelId) {
 // Имя файла (например, mishkaKake.glb) может быть любым, главное чтобы путь был корректен и файл был доступен по этому пути.
 // ---
 
+// --- Обновление иконки дочерних окон при смене темы ---
 if (!window._modelThemeListener) {
   window._modelThemeListener = true;
   const observer = new MutationObserver(() => {
     if (!window.trayWindows || !window.windowIcons || !window.getIconForTheme) return;
     Object.entries(window.trayWindows).forEach(([type, win]) => {
-      if (type.startsWith('model-') && win.setIcon) {
+      if (type.startsWith('model-') && typeof win.setIcon === 'function') {
         win.setIcon(window.getIconForTheme(window.windowIcons.model3d));
       }
     });

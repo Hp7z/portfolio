@@ -8,8 +8,21 @@ window.renderAboutContent = function() {
     
     <div class="tab-content active" id="about-tab">
       <h2>Информация обо мне</h2>
-      <p>Я веб-разработчик с опытом создания современных и функциональных сайтов. Моя цель - помочь вашему бизнесу выделиться в интернете с помощью качественного веб-дизайна и разработки.</p>
-      <p>Я специализируюсь на создании лендингов, интернет-магазинов и корпоративных сайтов, которые не только красиво выглядят, но и эффективно решают бизнес-задачи.</p>
+      <p>
+        Я — веб-разработчик, дизайнер и 3D-художник с глубоким техническим и креативным опытом. 
+        Моя специализация — создание современных, функциональных и эстетичных цифровых продуктов: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов.
+      </p>
+      <p>
+        В своей работе я совмещаю инженерный подход, внимание к деталям и любовь к визуальному стилю. 
+        Для каждого проекта подбираю оптимальный стек технологий, чтобы обеспечить высокую производительность, безопасность и удобство для пользователя.
+      </p>
+      <p>
+        Я активно развиваюсь в области геймдева и 3D-моделирования, создаю уникальные сцены и игровые механики, а также интегрирую 3D-контент в веб-приложения. 
+        Открыт к новым задачам, всегда стремлюсь к совершенству и ценю честный диалог с заказчиком.
+      </p>
+      <p>
+        Если вам нужен сайт, 3D-визуализация или игровой проект — буду рад сотрудничеству!
+      </p>
     </div>
     
     <div class="tab-content" id="skills-tab">
@@ -21,6 +34,8 @@ window.renderAboutContent = function() {
         <li>MongoDB, MySQL</li>
         <li>Figma, Adobe Photoshop</li>
         <li>SEO-оптимизация</li>
+        <li>3D моделирование (Blender, ArmorPaint)</li>
+        <li>Разработка игр (Unity, Unreal Engine, геймдизайн)</li>
       </ul>
     </div>
     
@@ -28,16 +43,31 @@ window.renderAboutContent = function() {
       <h2>Опыт работы</h2>
       <div class="project-container">
         <div class="project-info">
-          <div class="project-title">Веб-разработчик, Компания XYZ</div>
-          <p>2020 - настоящее время</p>
-          <p>Разработка и поддержка веб-сайтов для клиентов из различных отраслей.</p>
+          <div class="project-title">Фрилансер</div>
+          <p>2018 — настоящее время</p>
+          <p>Веб-разработка, дизайн, 3D моделирование, геймдев.<br>
+          Реализация проектов любой сложности: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов. Креативный подход, современный стек, внимание к деталям.</p>
         </div>
       </div>
       <div class="project-container">
         <div class="project-info">
-          <div class="project-title">Фрилансер</div>
-          <p>2018 - 2020</p>
-          <p>Создание сайтов для малого и среднего бизнеса.</p>
+          <div class="project-title">Leria Agency</div>
+          <p>2024 — настоящее время</p>
+          <p>Веб-разработка, администрирование.</p>
+        </div>
+      </div>
+      <div class="project-container">
+        <div class="project-info">
+          <div class="project-title">Лаборатория Касперского</div>
+          <p>2020 — 2021</p>
+          <p>Malware-аналитик. Анализ вредоносного ПО, исследование угроз, участие в разработке средств защиты.</p>
+        </div>
+      </div>
+      <div class="project-container">
+        <div class="project-info">
+          <div class="project-title">Веб-разработчик, компания XYZ</div>
+          <p>2019 — 2020</p>
+          <p>Разработка и поддержка веб-сайтов для клиентов из различных отраслей.</p>
         </div>
       </div>
     </div>
@@ -94,6 +124,8 @@ window.renderServicesContent = function() {
       <div class="tab active" data-tab="web">Разработка сайтов</div>
       <div class="tab" data-tab="design">Дизайн</div>
       <div class="tab" data-tab="seo">SEO-продвижение</div>
+      <div class="tab" data-tab="model3d">3D моделирование</div>
+      <div class="tab" data-tab="gamedev">Разработка игр</div>
     </div>
     
     <div class="tab-content active" id="web-tab">
@@ -121,17 +153,17 @@ window.renderServicesContent = function() {
       <h2>Дизайн</h2>
       <p>Создаю уникальный дизайн для вашего бренда:</p>
       <ul>
-        <li>UI/UX дизайн</li>
+        <li>UI/UX дизайн от 35 000₽</li>
       </ul>
       <p class="service-description">Разработка интерфейсов с фокусом на удобство использования. Включает прототипирование, создание макетов всех экранов, анимации и интерактивные элементы.</p>
       
       <ul>
-        <li>Логотипы и фирменный стиль</li>
+        <li>Логотипы и фирменный стиль от 35 000₽</li>
       </ul>
       <p class="service-description">Создание уникального логотипа и фирменного стиля компании. Включает несколько концепций на выбор, финальные файлы в различных форматах и брендбук.</p>
       
       <ul>
-        <li>Баннеры и рекламные материалы</li>
+        <li>Баннеры и рекламные материалы от 35 000₽</li>
       </ul>
       <p class="service-description">Разработка графических материалов для рекламных кампаний. Включает баннеры для сайтов, социальных сетей, email-рассылок и печатной продукции.</p>
     </div>
@@ -159,6 +191,33 @@ window.renderServicesContent = function() {
       </ul>
       <p class="service-description">Исследование стратегий продвижения конкурентов для выявления эффективных подходов. Включает анализ ключевых слов, ссылочного профиля и контент-стратегии.</p>
     </div>
+
+    <div class="tab-content" id="model3d-tab">
+      <h2>3D моделирование</h2>
+      <p>Создаю 3D-модели и сцены для визуализации, презентаций и веба:</p>
+      <ul>
+        <li>3D-моделирование (Blender, ArmorPaint)</li>
+        <li>Визуализация и рендеринг сцен</li>
+        <li>Интерактивные 3D-приложения (Three.js, WebGL)</li>
+        <li>Интеграция 3D-контента в сайты и приложения</li>
+        <li>Анимация, оптимизация для WebGL</li>
+      </ul>
+      <p>В портфолио представлены примеры 3D-моделей, реализованных с нуля.</p>
+    </div>
+
+    <div class="tab-content" id="gamedev-tab">
+      <h2>Разработка игр</h2>
+      <p>Разрабатываю игровые прототипы и приложения для Web и ПК:</p>
+      <ul>
+        <li>Unity (C#)</li>
+        <li>Unreal Engine (Blueprints, C++)</li>
+        <li>Three.js, WebGL</li>
+        <li>Геймдизайн, создание игровых механик, логики и UI</li>
+        <li>Интеграция 3D-моделей и анимаций</li>
+        <li>Оптимизация и экспорт под разные платформы</li>
+      </ul>
+      <p>Возможна разработка интерактивных презентаций, мини-игр и прототипов под заказ.</p>
+    </div>
   `;
 };
 
@@ -167,30 +226,30 @@ window.renderContactsContent = function() {
     <div class="contacts-container">
       <h2>Мои контакты</h2>
       <h3>Максим Лузан</h3>
-      <p><strong>Email:</strong> example@mail.com</p>
-      <p><strong>Телефон:</strong> +7 (123) 456-78-90</p>
+      <p><strong>Email:</strong> luzan.maksim@mail.ru</p>
+      <p><strong>Телефон:</strong> +7 999 475-95-92</p>
       
       <div class="social-links-container">
         <h3>Социальные сети</h3>
         <div class="social-links">
           <a href="https://vk.com/hp7zk" target="_blank" class="social-link vk-link" title="ВКонтакте">
             <span class="social-link-icon">
-              <img src="icons/vk-dark.svg" class="dark-theme-icon" alt="VK">
-              <img src="icons/vk-light.svg" class="light-theme-icon" alt="VK">
+              <img src="icons/vk-dark.svg" class="dark-theme-icon" alt="VK" style="width:35px;height:35px;">
+              <img src="icons/vk-light.svg" class="light-theme-icon" alt="VK" style="width:35px;height:35px;">
             </span>
             <span class="social-link-text">ВКонтакте</span>
           </a>
           <a href="https://t.me/looptoquit" target="_blank" class="social-link telegram-link" title="Telegram">
             <span class="social-link-icon">
-              <img src="icons/telegram-dark.svg" class="light-theme-icon" alt="Telegram">
-              <img src="icons/telegram-light.svg" class="dark-theme-icon" alt="Telegram">
+              <img src="icons/telegram-dark.svg" class="light-theme-icon" alt="Telegram" style="width:35px;height:35px;">
+              <img src="icons/telegram-light.svg" class="dark-theme-icon" alt="Telegram" style="width:35px;height:35px;">
             </span>
             <span class="social-link-text">Telegram</span>
           </a>
-          <a href="https://github.com/username" target="_blank" class="social-link github-link" title="GitHub">
+          <a href="https://github.com/hp7z" target="_blank" class="social-link github-link" title="GitHub">
             <span class="social-link-icon">
-              <img src="icons/github-dark.svg" class="dark-theme-icon" alt="GitHub">
-              <img src="icons/github-light.svg" class="light-theme-icon" alt="GitHub">
+              <img src="icons/github-dark.svg" class="dark-theme-icon" alt="GitHub" style="width:35px;height:35px;">
+              <img src="icons/github-light.svg" class="light-theme-icon" alt="GitHub" style="width:35px;height:35px;">
             </span>
             <span class="social-link-text">GitHub</span>
           </a>
@@ -285,8 +344,8 @@ window.renderCalculatorContent = function() {
     <div class="calculator-section">
       <h3>Дополнительные услуги</h3>
       <div class="calculator-item">
-        <input type="checkbox" id="design" class="service-checkbox" data-price="15000" data-type="additional">
-        <label for="design">Дизайн (15 000₽)</label>
+        <input type="checkbox" id="design" class="service-checkbox" data-price="35000" data-type="additional">
+        <label for="design">Дизайн (35 000₽)</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="seo" class="service-checkbox" data-price="20000" data-type="additional">
@@ -305,6 +364,9 @@ window.renderCalculatorContent = function() {
     <div class="calculator-result">
       <div class="calculator-note">
         <p>* При заказе разработки сайта на все дополнительные услуги действует скидка 20%</p>
+        <p class="calculator-note-inline" style="font-size:12px;opacity:0.7;margin-top:4px;">
+          * Окончательная цена на дизайн может варьироваться в зависимости от индивидуальных запросов
+        </p>
       </div>
       <div class="calculator-total">
         <h3>Итоговая стоимость: <span id="total-price">0</span> ₽</h3>
@@ -592,7 +654,11 @@ window.openStaticGalleryCollection = function(key) {
       }, 10);
     },
     oncreate: function() {
-      if (this.dom) this.dom.setAttribute('data-type', type);
+      if (this.dom) {
+        this.dom.setAttribute('data-type', type);
+        this.dom.classList.add('adwaita-theme');
+        this.dom.id = type; // Добавляем id для корректной работы таскбара и смены иконки
+      }
     }
   });
   if (window.trayWindows) window.trayWindows[type] = win;
@@ -712,4 +778,104 @@ if (!window._galleryThemeListener) {
     });
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
+// --- GitHub Stats окно ---
+window.renderGitHubStatsContent = function() {
+  // Контейнер для динамического контента
+  setTimeout(loadGitHubStats, 10);
+  return `
+    <div id="github-stats-root" style="display:flex;height:100%;">
+      <div id="github-profile" style="flex:0 0 20%;max-width:20%;background:rgba(0,0,0,0.04);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 10px;">
+        <div class="github-avatar-skeleton" style="width:90px;height:90px;border-radius:50%;background:#ddd;"></div>
+        <div style="margin-top:18px;font-size:18px;font-weight:bold;" id="github-username">hp7z</div>
+        <a href="https://github.com/hp7z" target="_blank" style="color:#3584e4;font-size:13px;word-break:break-all;">github.com/hp7z</a>
+      </div>
+      <div id="github-main" style="flex:1 1 80%;max-width:80%;padding:30px 30px 30px 30px;overflow:auto;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <h2 style="margin:0;">GitHub статистика</h2>
+        </div>
+        <div id="github-stats-summary" style="display:flex;flex-wrap:wrap;gap:30px;margin-bottom:30px;">
+          <div><img id="github-stats-img" src="https://github-readme-stats.vercel.app/api?username=hp7z&show_icons=true&theme=default&hide_title=true" alt="GitHub Stats" style="max-width:340px;width:100%;"></div>
+          <div><img id="github-streak-img" src="https://github-readme-streak-stats.herokuapp.com?user=hp7z&theme=default&hide_border=true" alt="GitHub Streak" style="max-width:340px;width:100%;"></div>
+        </div>
+        <div style="margin-bottom:30px;">
+          <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=hp7z&layout=compact&theme=default&hide_title=true" alt="Top Langs" style="max-width:340px;width:100%;">
+        </div>
+        <div style="margin-bottom:30px;">
+          <h3>Репозитории</h3>
+          <div id="github-repos-list" style="max-height:220px;overflow:auto;"></div>
+        </div>
+        <div>
+          <h3>Последние коммиты</h3>
+          <div id="github-commits-list" style="max-height:220px;overflow:auto;"></div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+function loadGitHubStats() {
+  const user = 'hp7z';
+  // Аватар и имя
+  fetch(`https://api.github.com/users/${user}`)
+    .then(r => r.json())
+    .then(data => {
+      const avatar = document.createElement('img');
+      avatar.src = data.avatar_url;
+      avatar.alt = user;
+      avatar.style.width = '90px';
+      avatar.style.height = '90px';
+      avatar.style.borderRadius = '50%';
+      avatar.style.boxShadow = '0 2px 10px #0002';
+      const profile = document.getElementById('github-profile');
+      if (profile) {
+        const skeleton = profile.querySelector('.github-avatar-skeleton');
+        if (skeleton) skeleton.replaceWith(avatar);
+        const username = profile.querySelector('#github-username');
+        if (username) username.textContent = data.login;
+      }
+    });
+
+  // Репозитории
+  fetch(`https://api.github.com/users/${user}/repos?per_page=100&sort=updated`)
+    .then(r => r.json())
+    .then(repos => {
+      const list = document.getElementById('github-repos-list');
+      if (!list) return;
+      list.innerHTML = repos.slice(0, 10).map(repo => `
+        <div style="margin-bottom:10px;">
+          <a href="${repo.html_url}" target="_blank" style="font-weight:bold;color:#3584e4;">${repo.name}</a>
+          <span style="color:#888;font-size:12px;">${repo.language ? ' • ' + repo.language : ''}</span>
+          <span style="color:#888;font-size:12px;">${repo.description ? ' — ' + repo.description : ''}</span>
+        </div>
+      `).join('');
+    });
+
+  // Последние коммиты (по событиям)
+  fetch(`https://api.github.com/users/${user}/events/public?per_page=30`)
+    .then(r => r.json())
+    .then(events => {
+      const list = document.getElementById('github-commits-list');
+      if (!list) return;
+      let html = '';
+      let count = 0;
+      for (const ev of events) {
+        if (ev.type === 'PushEvent' && ev.payload && ev.payload.commits) {
+          for (const commit of ev.payload.commits) {
+            if (count++ > 10) break;
+            html += `
+              <div style="margin-bottom:8px;">
+                <a href="https://github.com/${ev.repo.name}/commit/${commit.sha}" target="_blank" style="color:#3584e4;">${commit.sha.slice(0,7)}</a>
+                <span style="color:#888;font-size:12px;">${commit.message.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</span>
+                <span style="color:#aaa;font-size:11px;">в <a href="https://github.com/${ev.repo.name}" target="_blank" style="color:#888;">${ev.repo.name}</a></span>
+              </div>
+            `;
+            if (count > 10) break;
+          }
+        }
+        if (count > 10) break;
+      }
+      list.innerHTML = html || '<span style="color:#888;">Нет публичных коммитов за последнее время.</span>';
+    });
 }
