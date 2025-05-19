@@ -796,11 +796,11 @@ window.renderGitHubStatsContent = function() {
           <h2 style="margin:0;">GitHub статистика</h2>
         </div>
         <div id="github-stats-summary" style="display:flex;flex-wrap:wrap;gap:30px;margin-bottom:30px;">
-          <div><img id="github-stats-img" src="https://github-readme-stats.vercel.app/api?username=hp7z&show_icons=true&theme=default&hide_title=true" alt="GitHub Stats" style="max-width:340px;width:100%;"></div>
-          <div><img id="github-streak-img" src="https://github-readme-streak-stats.herokuapp.com?user=hp7z&theme=default&hide_border=true" alt="GitHub Streak" style="max-width:340px;width:100%;"></div>
+          <div><img id="github-stats-img" src="https://github-readme-stats.vercel.app/api?username=hp7z&show_icons=true&theme=default&hide_title=true" alt="GitHub Stats" style="max-width:100%;width:100%;"></div>
+          <div><img id="github-streak-img" src="https://github-readme-streak-stats.herokuapp.com?user=hp7z&theme=default&hide_border=true" alt="GitHub Streak" style="max-width:100%;width:100%;"></div>
         </div>
         <div style="margin-bottom:30px;">
-          <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=hp7z&layout=compact&theme=default&hide_title=true" alt="Top Langs" style="max-width:340px;width:100%;">
+          <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=hp7z&layout=compact&theme=default&hide_title=true" alt="Top Langs" style="max-width:100%;width:100%;">
         </div>
         <div style="margin-bottom:30px;">
           <h3>Репозитории</h3>
