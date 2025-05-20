@@ -66,17 +66,13 @@ window.open3DModelViewer = async function(modelId) {
           ${(model && model.tools ? model.tools : ['Blender', 'ArmorPaint']).map(t => {
             const tool = t.toLowerCase();
             if (tool === 'blender') {
-              return `
-                <img src="icons/blender-light.svg" class="dark-theme-icon" alt="Blender" title="Blender">
-                <img src="icons/blender-dark.svg" class="light-theme-icon" alt="Blender" title="Blender">
-                <span class="tool-label">Blender</span>
-              `;
+              return isDarkTheme
+                ? `<img src="icons/blender-light.svg" alt="Blender" title="Blender"><span class="tool-label">Blender</span>`
+                : `<img src="icons/blender-dark.svg" alt="Blender" title="Blender"><span class="tool-label">Blender</span>`;
             } else if (tool === 'armorpaint') {
-              return `
-                <img src="icons/armoryicon-light.svg" class="dark-theme-icon" alt="ArmorPaint" title="Armor paint">
-                <img src="icons/armoryicon-dark.svg" class="light-theme-icon" alt="ArmorPaint" title="Armor paint">
-                <span class="tool-label">Armor paint</span>
-              `;
+              return isDarkTheme
+                ? `<img src="icons/armoryicon-light.svg" alt="ArmorPaint" title="Armor paint"><span class="tool-label">Armor paint</span>`
+                : `<img src="icons/armoryicon-dark.svg" alt="ArmorPaint" title="Armor paint"><span class="tool-label">Armor paint</span>`;
             }
             return '';
           }).join('')}

@@ -148,17 +148,17 @@ window.renderServicesContent = function() {
       <h2>Дизайн</h2>
       <p>Создаю уникальный дизайн для вашего бренда:</p>
       <ul>
-        <li>UI/UX дизайн от 35 000₽</li>
+        <li>UI/UX дизайн от 18 000₽</li>
       </ul>
       <p class="service-description">Разработка интерфейсов с фокусом на удобство использования. Включает прототипирование, создание макетов всех экранов, анимации и интерактивные элементы.</p>
       
       <ul>
-        <li>Логотипы и фирменный стиль от 35 000₽</li>
+        <li>Логотипы и фирменный стиль от 30 000₽</li>
       </ul>
       <p class="service-description">Создание уникального логотипа и фирменного стиля компании. Включает несколько концепций на выбор, финальные файлы в различных форматах и брендбук.</p>
       
       <ul>
-        <li>Баннеры и рекламные материалы от 35 000₽</li>
+        <li>Баннеры и рекламные материалы от 30 000₽</li>
       </ul>
       <p class="service-description">Разработка графических материалов для рекламных кампаний. Включает баннеры для сайтов, социальных сетей, email-рассылок и печатной продукции.</p>
     </div>
@@ -904,7 +904,7 @@ window.renderKittyGalleryContent = function() {
           </div>
         </div>
       </div>
-      <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box;overflow-y:auto;max-height:100%;">
+      <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:space-around;height:100%;box-sizing:border-box;overflow-y:auto;max-height:100%;">
         <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">Доча: Кошачий напарник</div>
         <div class="model-description" id="kitty-gallery-description" style="margin-bottom:15px;">
           <b>Мяу! Я Даша, но дома меня зовут просто Доча.</b><br>

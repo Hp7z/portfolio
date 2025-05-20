@@ -576,6 +576,27 @@ function openWindow(type) {
         top: 36
       };
     }
+  } else if (type === 'kitty') {
+    // --- Новое: для kitty на десктопе делаем окно шире и выше ---
+    if (w > 992) {
+      winboxOpts = {
+        width: Math.min(700, w - 40),
+        height: Math.min(520, h - 60),
+        x: Math.max(0, Math.floor((w - Math.min(700, w - 40)) / 2)),
+        y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 36
+      };
+    } else if (mobileOpts) {
+      winboxOpts = { ...mobileOpts };
+    } else {
+      winboxOpts = {
+        width: Math.min(700, w - 40),
+        height: Math.min(520, h - 60),
+        x: Math.max(0, Math.floor((w - Math.min(700, w - 40)) / 2)),
+        y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 36
+      };
+    }
   } else if (mobileOpts) {
     winboxOpts = { ...mobileOpts };
   } else {

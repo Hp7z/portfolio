@@ -864,6 +864,12 @@ body.light-theme .light-theme-icon {
   transform: scale(1.05);
 }
 
+.gallery-window-flex{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .project-content,
 .model-content {
   display: flex;
