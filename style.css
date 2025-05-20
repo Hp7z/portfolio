@@ -2201,7 +2201,7 @@ body.light-theme .light-theme-icon {
 .experience-info {
   width: 100%;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: center;
   /* Остальные стили как у .project-info */
 }
