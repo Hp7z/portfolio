@@ -209,6 +209,11 @@ function closeStartMenu() {
 // --- Таскбар ---
 function updateTaskbar() {
   const taskbar = document.getElementById('taskbarItems');
+  // --- Не показывать окна в таскбаре на планшетах и мобилках ---
+  if (window.innerWidth <= 992) {
+    taskbar.innerHTML = '';
+    return;
+  }
   taskbar.innerHTML = '';
   Object.entries(trayWindows).forEach(([type, win]) => {
     const item = document.createElement('div');
@@ -251,13 +256,17 @@ function setupTabs(container) {
   // Главные вкладки
   container.querySelectorAll('.main-tabs .tab').forEach(tab => {
     tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('.main-tabs .tab'));
       const activeTab = container.querySelector('.main-tabs .tab.active');
+      if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
       const activeContent = document.getElementById(`${activeTabId}-tab`);
-      const clickedTabIndex = Array.from(container.querySelectorAll('.main-tabs .tab')).indexOf(this);
-      const activeTabIndex = Array.from(container.querySelectorAll('.main-tabs .tab')).indexOf(activeTab);
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      container.querySelectorAll('.main-tabs .tab').forEach(t => t.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      // Скрыть все tab-content внутри container
+      container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
         setTimeout(() => {
@@ -288,16 +297,22 @@ function setupTabs(container) {
       }
     });
   });
+
   // Подвкладки для веб-сайтов
   container.querySelectorAll('#websites-tab .sub-tabs .tab').forEach(tab => {
     tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('#websites-tab .sub-tabs .tab'));
       const activeTab = container.querySelector('#websites-tab .sub-tabs .tab.active');
+      if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
       const activeContent = document.getElementById(`${activeTabId}-tab`);
-      const clickedTabIndex = Array.from(container.querySelectorAll('#websites-tab .sub-tabs .tab')).indexOf(this);
-      const activeTabIndex = Array.from(container.querySelectorAll('#websites-tab .sub-tabs .tab')).indexOf(activeTab);
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      container.querySelectorAll('#websites-tab .sub-tabs .tab').forEach(t => t.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      // Скрыть все tab-content внутри websites-tab
+      const parent = document.getElementById('websites-tab');
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
         setTimeout(() => {
@@ -328,16 +343,22 @@ function setupTabs(container) {
       }
     });
   });
+
   // Подвкладки для 3D моделей
   container.querySelectorAll('#models3d-tab .sub-tabs .tab').forEach(tab => {
     tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('#models3d-tab .sub-tabs .tab'));
       const activeTab = container.querySelector('#models3d-tab .sub-tabs .tab.active');
+      if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
       const activeContent = document.getElementById(`${activeTabId}-tab`);
-      const clickedTabIndex = Array.from(container.querySelectorAll('#models3d-tab .sub-tabs .tab')).indexOf(this);
-      const activeTabIndex = Array.from(container.querySelectorAll('#models3d-tab .sub-tabs .tab')).indexOf(activeTab);
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      container.querySelectorAll('#models3d-tab .sub-tabs .tab').forEach(t => t.classList.remove('active'));
+      tabs.forEach(t => t.classList.remove('active'));
+      // Скрыть все tab-content внутри models3d-tab
+      const parent = document.getElementById('models3d-tab');
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
         setTimeout(() => {
@@ -368,15 +389,16 @@ function setupTabs(container) {
       }
     });
   });
-  // Для остальных вкладок
-  container.querySelectorAll('.tab:not(.main-tabs .tab):not(.sub-tabs .tab)').forEach(tab => {
+
+  // Для остальных вкладок (обычные .tabs)
+  container.querySelectorAll('.tabs .tab:not(.main-tabs .tab):not(.sub-tabs .tab)').forEach(tab => {
     tab.addEventListener('click', function() {
       const tabsContainer = this.closest('.tabs');
       if (!tabsContainer) return;
       tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      const contentContainer = tabsContainer.parentElement;
-      if (!contentContainer) return;
-      contentContainer.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      // Скрыть все tab-content в родителе .tabs
+      const parent = tabsContainer.parentElement;
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
       const tabId = this.getAttribute('data-tab');
       const tabContent = document.getElementById(`${tabId}-tab`);
@@ -387,6 +409,7 @@ function setupTabs(container) {
       }
     });
   });
+
   // Волна при наведении на проекты и модели
   container.querySelectorAll('.project-container, .model-container, .color-block').forEach(element => {
     element.addEventListener('mouseenter', function() {
@@ -502,14 +525,28 @@ function openWindow(type) {
       content = '<p>Содержимое окна</p>';
       icon = getIconForTheme(windowIcons.about);
   }
+  // --- Определяем размеры окна для мобильных/планшетов ---
+  let winboxOpts = {};
+  const mobileOpts = getMobileWinboxOptions();
+  if (mobileOpts) {
+    winboxOpts = { ...mobileOpts };
+  } else {
+    winboxOpts = {
+      width: 800,
+      height: 600,
+      x: Math.floor(Math.random() * 100),
+      y: Math.floor(Math.random() * 100) + 50,
+      top: 40
+    };
+  }
   const win = new WinBox({
     title: title,
     class: ['adwaita-theme', 'active'],
-    width: 800,
-    height: 600,
-    x: Math.floor(Math.random() * 100),
-    y: Math.floor(Math.random() * 100) + 50,
-    top: 40,
+    width: winboxOpts.width,
+    height: winboxOpts.height,
+    x: winboxOpts.x,
+    y: winboxOpts.y,
+    top: winboxOpts.top,
     background: isDarkTheme ? '#2e3436' : '#f6f5f4',
     border: isDarkTheme ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
     borderRadius: '8px',
@@ -542,6 +579,15 @@ function openWindow(type) {
           if (typeof window.initCalculator === 'function') window.initCalculator();
         }, 10);
       }
+      // --- После создания окна, если мобильник/планшет — растянуть на весь экран ---
+      if (mobileOpts && win.dom) {
+        win.dom.style.left = '0px';
+        win.dom.style.top = '36px';
+        win.dom.style.width = `${winboxOpts.width}px`;
+        win.dom.style.height = `${winboxOpts.height}px`;
+        win.dom.style.maxWidth = '100vw';
+        win.dom.style.maxHeight = `calc(100vh - 36px)`;
+      }
     }
   });
   trayWindows[type] = win;
@@ -554,6 +600,15 @@ function openWindow(type) {
         if (typeof window.initCalculator === 'function') window.initCalculator();
       }, 10);
     }
+  }
+  // --- После вставки DOM, если мобильник/планшет — корректируем размеры ---
+  if (win.dom && mobileOpts) {
+    win.dom.style.left = '0px';
+    win.dom.style.top = '36px';
+    win.dom.style.width = `${winboxOpts.width}px`;
+    win.dom.style.height = `${winboxOpts.height}px`;
+    win.dom.style.maxWidth = '100vw';
+    win.dom.style.maxHeight = `calc(100vh - 36px)`;
   }
   // Вкладки и проекты
   if (type === 'about' || type === 'portfolio' || type === 'services') setupTabs(win.body);
@@ -651,6 +706,21 @@ document.addEventListener('DOMContentLoaded', () => {
   setWallpaperForTheme(isDark ? 'dark' : 'light');
   // Таскбар
   updateTaskbar();
+});
+window.addEventListener('resize', () => {
+  // --- При изменении размера экрана — корректировать размеры всех окон на мобилках/планшетах ---
+  if (window.innerWidth <= 992) {
+    Object.values(trayWindows).forEach(win => {
+      if (win.dom) {
+        win.dom.style.left = '0px';
+        win.dom.style.top = '36px';
+        win.dom.style.width = `${Math.max(window.innerWidth - 8, 320)}px`;
+        win.dom.style.height = `${Math.max(window.innerHeight - 44, 320)}px`;
+        win.dom.style.maxWidth = '100vw';
+        win.dom.style.maxHeight = `calc(100vh - 36px)`;
+      }
+    });
+  }
 });
 
 // --- Остальной код (обработчики, прелоадер, fixWindowActivation и т.д.) ---
@@ -1099,4 +1169,31 @@ if (!window._themeChangeObserver) {
     }
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
+}
+
+// --- Функция для определения размеров окна на мобильных/планшетах ---
+function getMobileWinboxOptions() {
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  if (w <= 600) {
+    // Смартфон
+    return {
+      width: Math.max(w - 8, 320),
+      height: Math.max(h - 44, 320),
+      x: 0,
+      y: 36,
+      top: 36
+    };
+  } else if (w <= 992) {
+    // Планшет
+    return {
+      width: Math.max(w - 32, 480),
+      height: Math.max(h - 52, 400),
+      x: 0,
+      y: 36,
+      top: 36
+    };
+  }
+  // Десктоп — стандартные значения
+  return null;
 }

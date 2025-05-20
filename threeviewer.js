@@ -52,12 +52,13 @@ window.open3DModelViewer = async function(modelId) {
     { name: 'ArmorPaint', icon: 'icons/armorpaint.svg' }
   ];
   // --- Окно как у галереи, но слева 3D-плеер ---
+  const isMobile = window.innerWidth <= 992;
   const html = `
-    <div class="model3d-window-flex">
-      <div class="model3d-viewer-col">
+    <div class="model3d-window-flex" style="display:flex;flex-direction:row;${isMobile ? 'flex-wrap:wrap;' : ''}height:100%;">
+      <div class="model3d-viewer-col" style="flex:0 0 ${isMobile ? '100%' : '65%'};max-width:${isMobile ? '100%' : '65%'};min-width:0;display:flex;align-items:center;justify-content:center;height:100%;box-sizing:border-box;">
         <div id="threejs-viewer-${modelId}" class="model-3d-viewer"></div>
       </div>
-      <div class="model3d-info-col">
+      <div class="model3d-info-col" style="flex:0 0 ${isMobile ? '100%' : '35%'};max-width:${isMobile ? '100%' : '35%'};min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;${isMobile ? 'height:auto;' : 'height:100%;'}box-sizing:border-box;overflow-y:auto;">
         <div class="model-title">${model ? model.title : 'Ошибка'}</div>
         <div class="model-description">${model ? (model.description || '') : errorMsg}</div>
         <div class="model-tools">
@@ -283,12 +284,9 @@ window.open3DModelViewer = async function(modelId) {
             updateCamera();
             prevX = e.clientX; prevY = e.clientY;
           } else if (isPanning) {
-            // --- Панорамирование: двигаем target по осям X/Y ---
             const dx = e.clientX - prevX;
             const dy = e.clientY - prevY;
-            // Коэффициенты чувствительности
             const panSpeed = radius * 0.002;
-            // Получаем вектор вправо и вверх относительно камеры
             const right = new THREE.Vector3();
             camera.getWorldDirection(right);
             right.cross(camera.up).normalize();
@@ -298,6 +296,72 @@ window.open3DModelViewer = async function(modelId) {
             updateCamera();
             prevX = e.clientX; prevY = e.clientY;
           }
+        };
+
+        // --- Touch events for mobile/tablet ---
+        let lastTouchDist = null;
+        let lastTouchCenter = null;
+        container.ontouchstart = function(e) {
+          if (e.touches.length === 1) {
+            isDragging = true;
+            isPanning = false;
+            prevX = e.touches[0].clientX;
+            prevY = e.touches[0].clientY;
+          } else if (e.touches.length === 2) {
+            isDragging = false;
+            isPanning = true;
+            const t0 = e.touches[0], t1 = e.touches[1];
+            lastTouchDist = Math.sqrt(Math.pow(t0.clientX - t1.clientX, 2) + Math.pow(t0.clientY - t1.clientY, 2));
+            lastTouchCenter = {
+              x: (t0.clientX + t1.clientX) / 2,
+              y: (t0.clientY + t1.clientY) / 2
+            };
+          }
+        };
+        container.ontouchmove = function(e) {
+          if (e.touches.length === 1 && isDragging) {
+            const dx = e.touches[0].clientX - prevX;
+            const dy = e.touches[0].clientY - prevY;
+            azimuth -= dx * 0.01;
+            elevation += dy * 0.01;
+            updateCamera();
+            prevX = e.touches[0].clientX;
+            prevY = e.touches[0].clientY;
+          } else if (e.touches.length === 2 && isPanning) {
+            const t0 = e.touches[0], t1 = e.touches[1];
+            // Панорамирование (двумя пальцами)
+            const center = {
+              x: (t0.clientX + t1.clientX) / 2,
+              y: (t0.clientY + t1.clientY) / 2
+            };
+            const dx = center.x - lastTouchCenter.x;
+            const dy = center.y - lastTouchCenter.y;
+            const panSpeed = radius * 0.002;
+            const right = new THREE.Vector3();
+            camera.getWorldDirection(right);
+            right.cross(camera.up).normalize();
+            const up = new THREE.Vector3().copy(camera.up).normalize();
+            target.addScaledVector(right, -dx * panSpeed);
+            target.addScaledVector(up, dy * panSpeed);
+            updateCamera();
+            lastTouchCenter = center;
+            // Зум (pinch)
+            const dist = Math.sqrt(Math.pow(t0.clientX - t1.clientX, 2) + Math.pow(t0.clientY - t1.clientY, 2));
+            if (lastTouchDist) {
+              let delta = dist - lastTouchDist;
+              radius -= delta * 0.03;
+              radius = Math.max(2, Math.min(20, radius));
+              updateCamera();
+            }
+            lastTouchDist = dist;
+          }
+          e.preventDefault();
+        };
+        container.ontouchend = function(e) {
+          isDragging = false;
+          isPanning = false;
+          lastTouchDist = null;
+          lastTouchCenter = null;
         };
 
         // --- Отключить контекстное меню по ПКМ ---

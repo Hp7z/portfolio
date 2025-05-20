@@ -2017,232 +2017,95 @@ body.light-theme .light-theme-icon {
 }
 
 /* Responsive styles */
-@media (max-width: 768px) {
-  .desktop {
-    padding: 10px;
+@media (max-width: 1200px) {
+  .main-content {
+    padding: 15px;
   }
-  
+  .project-content, .model-content {
+    margin-right: 10px;
+  }
+  .model3d-info-col, .gallery-info-col {
+    padding: 20px 10px 20px 10px;
+  }
+}
+
+@media (max-width: 992px) {
+  .desktop {
+    padding: 5px;
+    margin-top: 36px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
   .shortcut {
     width: 60px;
     font-size: 12px;
+    padding: 2px;
   }
-  
-  .taskbar {
-    height: 40px;
+  .shortcut span {
+    font-size: 11px;
   }
-  
-  .project-container {
+  .project-container,
+  .model-container {
+    flex-direction: column !important;
+    height: auto;
+    min-height: 180px;
+    padding-left: 10px;
+    margin-bottom: 18px;
+  }
+  .project-content, .model-content {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 0;
+    order: 1;
+    display: flex;
     flex-direction: column;
   }
-  
-  .project-preview {
+  .project-title, .model-title {
+    order: 1;
+  }
+  .project-description, .model-description {
+    order: 2;
+  }
+  .project-preview, .model-preview {
     width: 100%;
-    margin-top: 10px;
+    height: 140px;
+    min-height: 90px;
+    margin-top: 0;
+    margin-bottom: 10px;
+    order: 3;
   }
-  
-  .adwaita-theme {
-    width: 90vw !important;
-    height: 80vh !important;
-    left: 5vw !important;
-    top: 50px !important;
+  .project-footer, .model-footer {
+    order: 4;
   }
-  
-  .tab {
-    padding: 6px 10px;
-    font-size: 12px;
-    margin-bottom: 5px;
+  .project-link {
+    order: 5;
   }
-  
-  .tabs {
-    margin-bottom: 20px;
+  .model3d-window-flex,
+  .gallery-window-flex,
+  .kitty-gallery-flex {
+    flex-wrap: wrap !important;
+    flex-direction: row !important;
+  }
+  .model3d-viewer-col,
+  .gallery-viewer-col,
+  .kitty-gallery-viewer-col {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: 240px !important;
+    box-sizing: border-box;
+  }
+  .model3d-info-col,
+  .gallery-info-col,
+  .kitty-gallery-info-col {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    box-sizing: border-box;
+    padding: 18px 10px 18px 10px !important;
+    overflow-y: visible !important;
   }
 }
 
-/* Reset styles */
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul, ol {
-  list-style: none;
-}
-
-header, nav {
-  display: flex;
-  align-items: center;
-}
-
-nav ul {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 25px;
-}
-
-nav li {
-  cursor: pointer;
-}
-
-.main-content {
-  margin: 0 auto;
-  width: var(--screen-width);
-  max-width: 1140px;
-  padding: 30px;
-}
-
-.header .logo {
-  width: 100px;
-  height: auto;
-  cursor: pointer;
-}
-
-/* --- 3D/Галерея/Модель: фиксированная ширина колонок и высота --- */
-.model3d-window-flex, .gallery-window-flex {
-  display: flex;
-  flex-direction: row;
-  height: 100%;
-  width: 100%;
-  min-height: 0;
-  min-width: 0;
-}
-
-.model3d-viewer-col, .gallery-viewer-col {
-  flex: 0 0 65%;
-  max-width: 65%;
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.model3d-info-col, .gallery-info-col {
-  flex: 0 0 35%;
-  max-width: 35%;
-  min-width: 0;
-  min-height: 0;
-  padding: 30px 30px 30px 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
-  box-sizing: border-box;
-  overflow-y: auto;
-}
-
-/* 3D-плеер и галерея должны занимать всю высоту и ширину своей колонки */
-.model-3d-viewer {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: #222;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px #0003;
-  overflow: hidden;
-}
-
-/* Галерея: стрелки по бокам картинки, миниатюры снизу */
-.gallery-main-img-wrapper {
-  position: relative;
-  width: 100%;
-  height: 340px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.gallery-main-img {
-  max-width: 100%;
-  max-height: 100%;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px #0003;
-  display: block;
-  margin: 0 auto;
-  z-index: 1;
-  cursor: pointer;
-}
-
-.gallery-nav-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  font-size: 32px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
-  padding: 0 10px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-.gallery-nav-btn:hover {
-  opacity: 1;
-}
-
-#gallery-prev {
-  left: 10px;
-}
-
-#gallery-next {
-  right: 10px;
-}
-
-.gallery-main-img-wrapper > div {
-  position: absolute;
-  bottom: -60px;
-  left: 0;
-  width: 100%;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  z-index: 3;
-}
-
-.model-tools img {
-  display: none !important;
-}
-body.dark-theme .model-tools .dark-theme-icon {
-  display: inline-block !important;
-}
-body.light-theme .model-tools .light-theme-icon {
-  display: inline-block !important;
-}
-
-/* Исправлено: стрелки в галерее не смещаются вниз при наведении */
-.gallery-nav-btn {
-  opacity: 0.7;
-  transition: opacity 0.2s;
-  color: inherit;
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  font-size: 32px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0 10px;
-  width: 48px;
-  height: 48px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.gallery-nav-btn:hover {
-  opacity: 1;
-  /* Убрано: transform: scale(1.1); */
-}
-
-.shortcut[data-window="github"] .shortcut-icon img {
-  width: 48px !important;
-  height: 48px !important;
-}
+/* ...existing code... */

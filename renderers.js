@@ -260,59 +260,123 @@ window.renderContactsContent = function() {
 };
 
 window.renderProjects = function(projects) {
-  return projects.map(project => `
-    <div class="project-container">
-      <div class="project-content">
-        <div class="project-title">${project.title}</div>
-        <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
-        <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
-        <div class="project-footer">
-          <span class="project-credits">${project.credits}</span>
-          <span class="project-date">${project.date || ''}</span>
-        </div>
-      </div>
-      <div class="project-preview">
-        <img src="${project.preview}" alt="${project.title}">
-      </div>
-    </div>
-  `).join('');
-};
-
-window.render3DModels = function(models) {
-  return models.map(model => {
-    if (model.type === 'interactive' && model.modelUrl) {
+  const isMobile = window.innerWidth <= 992;
+  return projects.map(project => {
+    if (isMobile) {
+      // Мобильная структура: заголовок, описание, превью, кнопка, футер
       return `
-        <div class="project-container model-container color-block" onclick="open3DModelViewer('${model.id}')">
-          <div class="model-content">
-            <div class="model-title color-text">${model.title}</div>
-            <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
-            <div class="model-footer">
-              <span class="model-credits color-text">${model.credits}</span>
-              <span class="model-date color-text">${model.date || ''}</span>
+        <div class="project-container">
+          <div class="project-content">
+            <div class="project-title">${project.title}</div>
+            <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
+            <div class="project-preview">
+              <img src="${project.preview}" alt="${project.title}">
             </div>
-          </div>
-          <div class="model-preview static-model-preview">
-            <img src="${model.preview}" alt="${model.title}">
-            <div class="model-play-btn"></div>
+            <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+            <div class="project-footer">
+              <span class="project-credits">${project.credits}</span>
+              <span class="project-date">${project.date || ''}</span>
+            </div>
           </div>
         </div>
       `;
     } else {
+      // ПК-структура: превью слева, контент справа
       return `
-        <div class="project-container model-container color-block" onclick="openModelGallery('${model.id}')">
-          <div class="model-content">
-            <div class="model-title color-text">${model.title}</div>
-            <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
-            <div class="model-footer">
-              <span class="model-credits color-text">${model.credits}</span>
-              <span class="model-date color-text">${model.date || ''}</span>
-            </div>
+        <div class="project-container">
+          <div class="project-preview">
+            <img src="${project.preview}" alt="${project.title}">
           </div>
-          <div class="model-preview static-model-preview">
-            <img src="${model.preview}" alt="${model.title}">
+          <div class="project-content">
+            <div class="project-title">${project.title}</div>
+            <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
+            <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+            <div class="project-footer">
+              <span class="project-credits">${project.credits}</span>
+              <span class="project-date">${project.date || ''}</span>
+            </div>
           </div>
         </div>
       `;
+    }
+  }).join('');
+};
+
+window.render3DModels = function(models) {
+  const isMobile = window.innerWidth <= 992;
+  return models.map(model => {
+    if (isMobile) {
+      // Мобильная структура: заголовок, описание, превью, футер
+      if (model.type === 'interactive' && model.modelUrl) {
+        return `
+          <div class="project-container model-container color-block">
+            <div class="model-content">
+              <div class="model-title color-text">${model.title}</div>
+              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
+                <img src="${model.preview}" alt="${model.title}">
+                <div class="model-play-btn"></div>
+              </div>
+              <div class="model-footer">
+                <span class="model-credits color-text">${model.credits}</span>
+                <span class="model-date color-text">${model.date || ''}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="project-container model-container color-block">
+            <div class="model-content">
+              <div class="model-title color-text">${model.title}</div>
+              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
+                <img src="${model.preview}" alt="${model.title}">
+              </div>
+              <div class="model-footer">
+                <span class="model-credits color-text">${model.credits}</span>
+                <span class="model-date color-text">${model.date || ''}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      // ПК-структура: превью слева, контент справа
+      if (model.type === 'interactive' && model.modelUrl) {
+        return `
+          <div class="project-container model-container color-block">
+            <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
+              <img src="${model.preview}" alt="${model.title}">
+              <div class="model-play-btn"></div>
+            </div>
+            <div class="model-content">
+              <div class="model-title color-text">${model.title}</div>
+              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-footer">
+                <span class="model-credits color-text">${model.credits}</span>
+                <span class="model-date color-text">${model.date || ''}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        return `
+          <div class="project-container model-container color-block">
+            <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
+              <img src="${model.preview}" alt="${model.title}">
+            </div>
+            <div class="model-content">
+              <div class="model-title color-text">${model.title}</div>
+              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-footer">
+                <span class="model-credits color-text">${model.credits}</span>
+                <span class="model-date color-text">${model.date || ''}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
     }
   }).join('');
 };
