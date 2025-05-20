@@ -39,7 +39,7 @@ window.projects = {
     corporate: [
       {
         title: "Larfex STM",
-        url: "https://larfexstm.com/",
+        url: "https://larfexstm.ru/",
         preview: "img/larfexstm.jpg",
         description: "Корпоративный сайт компании с презентацией услуг, портфолио и контактной информацией.",
         credits: "Design by Leria agency",
