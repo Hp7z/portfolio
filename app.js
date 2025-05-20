@@ -577,12 +577,12 @@ function openWindow(type) {
       };
     }
   } else if (type === 'kitty') {
-    // --- Новое: для kitty на десктопе делаем окно шире и выше ---
+    // --- Теперь kitty всегда 900px шириной на десктопе ---
     if (w > 992) {
       winboxOpts = {
-        width: Math.min(700, w - 40),
+        width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
-        x: Math.max(0, Math.floor((w - Math.min(700, w - 40)) / 2)),
+        x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
         y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
         top: 36
       };
@@ -590,9 +590,9 @@ function openWindow(type) {
       winboxOpts = { ...mobileOpts };
     } else {
       winboxOpts = {
-        width: Math.min(700, w - 40),
+        width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
-        x: Math.max(0, Math.floor((w - Math.min(700, w - 40)) / 2)),
+        x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
         y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
         top: 36
       };
