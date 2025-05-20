@@ -27,9 +27,9 @@ window.open3DModelViewer = async function(modelId) {
   }
 
   // --- Исправляем пути к моделям ---
-  if (model && model.id === 'mishkakake') model.modelUrl = "models/mishk9aKake.fbx";
-  if (model && model.id === 'icecream') model.modelUrl = "models/IceCream.fbx";
-  if (model && model.id === 'theemishk') model.modelUrl = "models/mishki.fbx";
+  if (model && model.id === 'mishkakake') model.modelUrl = "models/MIshkaKake.glb";
+  if (model && model.id === 'icecream') model.modelUrl = "models/IceCream.glb";
+  if (model && model.id === 'theemishk') model.modelUrl = "models/mishki.glb";
 
   const trayWindows = window.trayWindows || (window.trayWindows = {});
   // --- Добавляем поддержку иконки для 3D моделей в зависимости от темы ---
@@ -148,126 +148,200 @@ window.open3DModelViewer = async function(modelId) {
 
   setTimeout(async () => {
     try {
-      // --- Исправление: FBXLoader не входит в стандартный importmap three ---
-      // Нужно загрузить FBXLoader через CDN динамически
       const THREE = await import('three');
       const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
-      let FBXLoader;
-      try {
-        // Попробуем импортировать FBXLoader через CDN (jsdelivr)
-        FBXLoader = (await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/FBXLoader.min.js')).FBXLoader;
-      } catch (e) {
-        // Если не удалось, покажем ошибку
-        throw new Error('FBXLoader не загружен');
-      }
+      const { RoomEnvironment } = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/environments/RoomEnvironment.js');
+      // --- Удалено всё, что связано с FBXLoader ---
+
       const container = document.getElementById(`threejs-viewer-${modelId}`);
       if (!container) return;
       container.innerHTML = '';
       const width = container.clientWidth, height = container.clientHeight;
       const scene = new THREE.Scene();
 
-      // --- Фон из модели, если есть ---
-      if (model.background) {
-        if (/^#([0-9a-f]{3,8})$/i.test(model.background)) {
-          scene.background = new THREE.Color(model.background);
-        } else {
-          const loader = new THREE.TextureLoader();
-          loader.load(model.background, texture => {
-            scene.background = texture;
-          });
-        }
-      } else {
-        scene.background = new THREE.Color(isDarkTheme ? 0x222222 : 0xf6f5f4);
-      }
+      // --- Фон всегда #ECD1A2 ---
+      scene.background = new THREE.Color('#ECD1A2');
 
-      // --- Камера: отдалена по умолчанию ---
-      let camPos = [0, 2.5, 12]; // Было 7, стало 12
-      if (Array.isArray(model.cameraPosition) && model.cameraPosition.length === 3) {
-        camPos = model.cameraPosition;
+      // --- Камера: индивидуальные позиции для каждой модели ---
+      let camPos, camTarget;
+      if (model.id === 'mishkakake') {
+        camPos = [-1.2, 1.2, 12];
+        camTarget = [0, 1.2, 0];
+      } else if (model.id === 'icecream') {
+        camPos = [0, 0.5, 12];
+        camTarget = [0, 0.5, 0];
+      } else if (model.id === 'theemishk') {
+        camPos = [0, 2.2, 12];
+        camTarget = [0, 2.2, 0];
+      } else {
+        camPos = [0, 1.2, 12];
+        camTarget = [0, 1.2, 0];
       }
       const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
       camera.position.set(camPos[0], camPos[1], camPos[2]);
+      camera.lookAt(camTarget[0], camTarget[1], camTarget[2]);
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
-      renderer.setSize(width, height);
+      // --- Сделать canvas адаптивным ---
+      renderer.setSize(width, height, false);
+      renderer.domElement.style.width = "100%";
+      renderer.domElement.style.height = "100%";
+      renderer.domElement.style.display = "block";
       container.appendChild(renderer.domElement);
 
-      // --- Полное освещение со всех сторон ---
-      // Гемисферный свет
-      const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
-      hemiLight.position.set(0, 20, 0);
-      scene.add(hemiLight);
-      // Основной направленный свет
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
-      dirLight.position.set(3, 10, 10);
-      scene.add(dirLight);
-      // Дополнительные источники света со всех сторон
-      const lightPositions = [
-        [10, 10, 10], [-10, 10, 10], [10, 10, -10], [-10, 10, -10],
-        [0, -10, 0], [0, 20, 0], [0, 0, 20], [0, 0, -20]
-      ];
-      lightPositions.forEach(pos => {
-        const l = new THREE.DirectionalLight(0xffffff, 0.35);
-        l.position.set(...pos);
-        scene.add(l);
+      // --- Повышаем контраст сцены (делаем цвета сочнее, но не ярче) ---
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.0;
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      // --- Индивидуальная насыщенность для mishki ---
+      if (model.id === 'theemishk') {
+        renderer.domElement.style.filter = "contrast(1.15) saturate(1.40)";
+      } else {
+        renderer.domElement.style.filter = "contrast(1.15) saturate(1.10)";
+      }
+
+      // --- Environment: Room (pmremGenerator на renderer) ---
+      const pmremGenerator = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmremGenerator.fromScene(new RoomEnvironment()).texture;
+      pmremGenerator.dispose();
+
+      // --- Удалены все источники света ---
+
+      // --- Загрузка модели: только glb/gltf через GLTFLoader ---
+      const loader = new GLTFLoader();
+      loader.load(model.modelUrl, function(gltf) {
+        const obj = gltf.scene;
+        obj.position.set(0, 0, 0);
+        obj.rotation.y = Math.PI;
+        scene.add(obj);
+
+        // --- Billboard для PlaneXXX ---
+        function updateBillboards() {
+          scene.traverse(child => {
+            if (
+              child.isMesh &&
+              child.geometry &&
+              child.geometry.type === 'PlaneGeometry' &&
+              typeof child.name === 'string' &&
+              /Plane\d{3,}$/.test(child.name)
+            ) {
+              child.lookAt(camera.position);
+            }
+          });
+        }
+
+        // --- Управление камерой как в Sketchfab + ПКМ для панорамирования (движение target) ---
+        let isDragging = false, prevX = 0, prevY = 0;
+        let azimuth = 0, elevation = 0, radius = 12;
+        let target = new THREE.Vector3(...camTarget);
+
+        // Инициализация углов по начальному положению камеры
+        function getSphericalFromCamera() {
+          const offset = new THREE.Vector3().subVectors(camera.position, target);
+          radius = offset.length();
+          azimuth = Math.atan2(offset.x, offset.z);
+          elevation = Math.asin(offset.y / radius);
+        }
+        getSphericalFromCamera();
+
+        function updateCamera() {
+          // Ограничения на elevation (угол вверх/вниз)
+          const minElev = -Math.PI / 2 + 0.1;
+          const maxElev = Math.PI / 2 - 0.1;
+          elevation = Math.max(minElev, Math.min(maxElev, elevation));
+          // Пересчёт позиции камеры по азимуту/углу/радиусу
+          camera.position.x = target.x + radius * Math.sin(azimuth) * Math.cos(elevation);
+          camera.position.y = target.y + radius * Math.sin(elevation);
+          camera.position.z = target.z + radius * Math.cos(azimuth) * Math.cos(elevation);
+          camera.lookAt(target);
+        }
+
+        // --- Drag мышью: вращение вокруг центра (ЛКМ) ---
+        container.onmousedown = e => {
+          if (e.button === 2) { // ПКМ — панорамирование
+            isDragging = false;
+            isPanning = true;
+            prevX = e.clientX;
+            prevY = e.clientY;
+          } else if (e.button === 0 && !e.shiftKey) { // ЛКМ — вращение
+            isDragging = true;
+            isPanning = false;
+            prevX = e.clientX;
+            prevY = e.clientY;
+          }
+        };
+        container.onmouseup = () => { isDragging = false; isPanning = false; };
+        container.onmouseleave = () => { isDragging = false; isPanning = false; };
+
+        let isPanning = false;
+        container.onmousemove = e => {
+          if (isDragging) {
+            const dx = e.clientX - prevX;
+            const dy = e.clientY - prevY;
+            azimuth -= dx * 0.01;
+            elevation += dy * 0.01;
+            updateCamera();
+            prevX = e.clientX; prevY = e.clientY;
+          } else if (isPanning) {
+            // --- Панорамирование: двигаем target по осям X/Y ---
+            const dx = e.clientX - prevX;
+            const dy = e.clientY - prevY;
+            // Коэффициенты чувствительности
+            const panSpeed = radius * 0.002;
+            // Получаем вектор вправо и вверх относительно камеры
+            const right = new THREE.Vector3();
+            camera.getWorldDirection(right);
+            right.cross(camera.up).normalize();
+            const up = new THREE.Vector3().copy(camera.up).normalize();
+            target.addScaledVector(right, -dx * panSpeed);
+            target.addScaledVector(up, dy * panSpeed);
+            updateCamera();
+            prevX = e.clientX; prevY = e.clientY;
+          }
+        };
+
+        // --- Отключить контекстное меню по ПКМ ---
+        container.oncontextmenu = e => e.preventDefault();
+
+        // --- Zoom колесом мыши ---
+        container.onwheel = e => {
+          e.preventDefault();
+          radius += e.deltaY * 0.01;
+          radius = Math.max(2, Math.min(20, radius));
+          updateCamera();
+        };
+
+        // --- Resize обработчик для canvas и камеры ---
+        function handleResize() {
+          const w = container.clientWidth;
+          const h = container.clientHeight;
+          renderer.setSize(w, h, false);
+          camera.aspect = w / h;
+          camera.updateProjectionMatrix();
+        }
+        window.addEventListener('resize', handleResize);
+        let parentWin = container.closest('.adwaita-theme');
+        if (parentWin) {
+          new ResizeObserver(handleResize).observe(parentWin);
+        }
+        setTimeout(handleResize, 100);
+
+        function animate() {
+          updateBillboards();
+          renderer.render(scene, camera);
+          requestAnimationFrame(animate);
+        }
+        animate();
+      }, undefined, function(error) {
+        container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D модели</div>';
       });
 
-      // --- Загрузка модели: glb/gltf через GLTFLoader, fbx через FBXLoader ---
-      let loader, ext = model.modelUrl.split('.').pop().toLowerCase();
-      if (ext === 'fbx') {
-        loader = new FBXLoader();
-        loader.load(model.modelUrl, function(obj) {
-          obj.position.set(0, 0, 0);
-          obj.rotation.y = Math.PI;
-          scene.add(obj);
-          animate();
-        }, undefined, function(error) {
-          container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D модели (FBX)</div>';
-        });
-      } else {
-        loader = new GLTFLoader();
-        loader.load(model.modelUrl, function(gltf) {
-          const obj = gltf.scene;
-          obj.position.set(0, 0, 0);
-          obj.rotation.y = Math.PI;
-          scene.add(obj);
-          animate();
-        }, undefined, function(error) {
-          container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D модели</div>';
-        });
-      }
-
-      // --- Управление мышью: вращение и zoom колесом ---
-      let isDragging = false, prevX = 0, prevY = 0;
-      let targetRotationX = 0, targetRotationY = 0;
-      let distance = camera.position.z;
-      const minDistance = 2, maxDistance = 20;
-
-      container.onmousedown = e => { isDragging = true; prevX = e.clientX; prevY = e.clientY; };
-      container.onmouseup = () => { isDragging = false; };
-      container.onmouseleave = () => { isDragging = false; };
-      container.onmousemove = e => {
-        if (!isDragging) return;
-        const dx = e.clientX - prevX;
-        const dy = e.clientY - prevY;
-        targetRotationY += dx * 0.01;
-        targetRotationX += dy * 0.01;
-        scene.rotation.y = targetRotationY;
-        scene.rotation.x = targetRotationX;
-        prevX = e.clientX; prevY = e.clientY;
-      };
-      // Zoom колесом мыши
-      container.onwheel = e => {
-        e.preventDefault();
-        distance += e.deltaY * 0.01;
-        distance = Math.max(minDistance, Math.min(maxDistance, distance));
-        camera.position.z = distance;
-      };
-
-      function animate() {
-        renderer.render(scene, camera);
-        requestAnimationFrame(animate);
-      }
+      // --- Если модель FBX, то billboard не нужен (оставляем animate как было) ---
+      // function animate() {
+      //   renderer.render(scene, camera);
+      //   requestAnimationFrame(animate);
+      // }
+      // animate();
     } catch (e) {
       const container = document.getElementById(`threejs-viewer-${modelId}`);
       if (container) container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D-плеера</div>';
