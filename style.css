@@ -2106,6 +2106,102 @@ body.light-theme .light-theme-icon {
     padding: 18px 10px 18px 10px !important;
     overflow-y: visible !important;
   }
+  #kitty-gallery-description {
+    margin-top: 18px !important;
+  }
+  .kitty-gallery-viewer-col {
+    height: 100% !important;
+    max-height: 100% !important;
+  }
+  .kitty-gallery-info-col {
+    overflow-y: auto !important;
+    max-height: 320px !important;
+  }
+  .gallery-info-col .model-description {
+    margin-bottom: 38px !important;
+  }
 }
 
-/* ...existing code... */
+/* Исправление: стиль для текста опыта работы */
+.experience-text {
+  transform: none !important;
+  writing-mode: initial !important;
+  direction: ltr !important;
+  text-align: left;
+}
+
+/* Исправление: дочерние окна галерей и 3D моделей не выходят за экран */
+@media (max-width: 992px) {
+  .adwaita-theme,
+  .adwaita-theme .wb-body,
+  .model3d-window-flex,
+  .gallery-window-flex,
+  .kitty-gallery-flex {
+    max-width: 100vw !important;
+    max-height: calc(100vh - 36px) !important;
+    width: 100vw !important;
+    height: calc(100vh - 36px) !important;
+    left: 0 !important;
+    top: 36px !important;
+    overflow: hidden !important;
+  }
+}
+
+/* Для .model-3d-viewer: position relative и высота побольше на мобилках/планшетах */
+.model-3d-viewer {
+  position: relative !important;
+  width: 100% !important;
+  height: 400px;
+}
+@media (max-width: 992px) {
+  .model-3d-viewer {
+    height: 350px !important;
+  }
+}
+@media (max-width: 600px) {
+  .model-3d-viewer {
+    height: 500px !important;
+  }
+}
+
+/* --- Исправление: .gallery-viewer-col --- */
+.gallery-viewer-col {
+  flex: 0 0 65%;
+  max-width: 65%;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 420px; /* увеличено с 340px/250px */
+}
+
+/* --- Исправление: .gallery-main-img-wrapper и .gallery-main-img --- */
+.gallery-main-img-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gallery-main-img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px #0003;
+  display: block;
+  margin: 0 auto;
+}
+
+/* --- Новый класс для опыта работы: .experience-info --- */
+.experience-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  /* Остальные стили как у .project-info */
+}

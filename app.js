@@ -253,6 +253,11 @@ function updateTaskbar() {
 
 // --- Вкладки ---
 function setupTabs(container) {
+  // Сбросить старые обработчики
+  container.querySelectorAll('.tab').forEach(tab => {
+    tab.replaceWith(tab.cloneNode(true));
+  });
+
   // Главные вкладки
   container.querySelectorAll('.main-tabs .tab').forEach(tab => {
     tab.addEventListener('click', function() {
@@ -260,12 +265,11 @@ function setupTabs(container) {
       const activeTab = container.querySelector('.main-tabs .tab.active');
       if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
-      const activeContent = document.getElementById(`${activeTabId}-tab`);
+      const activeContent = container.querySelector(`#${activeTabId}-tab`);
       const clickedTabIndex = tabs.indexOf(this);
       const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
       tabs.forEach(t => t.classList.remove('active'));
-      // Скрыть все tab-content внутри container
       container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
@@ -274,28 +278,51 @@ function setupTabs(container) {
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
           this.classList.add('active');
           const tabId = this.getAttribute('data-tab');
-          const newContent = document.getElementById(`${tabId}-tab`);
+          const newContent = container.querySelector(`#${tabId}-tab`);
           if (newContent) {
             newContent.classList.add(`slide-${direction}`);
             newContent.classList.add('active');
             setTimeout(() => {
               newContent.classList.remove(`slide-${direction}`);
             }, 10);
+            // --- Исправление: активируем первую подвкладку и её контент ---
+            const subTabs = newContent.querySelectorAll('.sub-tabs .tab');
+            if (subTabs.length) {
+              subTabs.forEach(t => t.classList.remove('active'));
+              const firstSubTab = subTabs[0];
+              firstSubTab.classList.add('active');
+              // Показать соответствующий контент
+              const subTabId = firstSubTab.getAttribute('data-tab');
+              newContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+              const subTabContent = newContent.querySelector(`#${subTabId}-tab`);
+              if (subTabContent) subTabContent.classList.add('active');
+            }
           }
         }, 300);
       } else {
         this.classList.add('active');
         const tabId = this.getAttribute('data-tab');
-        const newContent = document.getElementById(`${tabId}-tab`);
+        const newContent = container.querySelector(`#${tabId}-tab`);
         if (newContent) {
           newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
           setTimeout(() => {
             newContent.classList.remove(`slide-${direction}`);
           }, 10);
+          // --- Исправление: активируем первую подвкладку и её контент ---
+          const subTabs = newContent.querySelectorAll('.sub-tabs .tab');
+          if (subTabs.length) {
+            subTabs.forEach(t => t.classList.remove('active'));
+            const firstSubTab = subTabs[0];
+            firstSubTab.classList.add('active');
+            const subTabId = firstSubTab.getAttribute('data-tab');
+            newContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            const subTabContent = newContent.querySelector(`#${subTabId}-tab`);
+            if (subTabContent) subTabContent.classList.add('active');
+          }
         }
       }
-    });
+    }, { passive: false });
   });
 
   // Подвкладки для веб-сайтов
@@ -305,13 +332,12 @@ function setupTabs(container) {
       const activeTab = container.querySelector('#websites-tab .sub-tabs .tab.active');
       if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
-      const activeContent = document.getElementById(`${activeTabId}-tab`);
+      const parent = container.querySelector('#websites-tab');
+      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
       const clickedTabIndex = tabs.indexOf(this);
       const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
       tabs.forEach(t => t.classList.remove('active'));
-      // Скрыть все tab-content внутри websites-tab
-      const parent = document.getElementById('websites-tab');
       if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
@@ -320,7 +346,7 @@ function setupTabs(container) {
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
           this.classList.add('active');
           const tabId = this.getAttribute('data-tab');
-          const newContent = document.getElementById(`${tabId}-tab`);
+          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
           if (newContent) {
             newContent.classList.add(`slide-${direction}`);
             newContent.classList.add('active');
@@ -332,7 +358,7 @@ function setupTabs(container) {
       } else {
         this.classList.add('active');
         const tabId = this.getAttribute('data-tab');
-        const newContent = document.getElementById(`${tabId}-tab`);
+        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
         if (newContent) {
           newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
@@ -341,7 +367,7 @@ function setupTabs(container) {
           }, 10);
         }
       }
-    });
+    }, { passive: false });
   });
 
   // Подвкладки для 3D моделей
@@ -351,13 +377,12 @@ function setupTabs(container) {
       const activeTab = container.querySelector('#models3d-tab .sub-tabs .tab.active');
       if (activeTab === this) return;
       const activeTabId = activeTab.getAttribute('data-tab');
-      const activeContent = document.getElementById(`${activeTabId}-tab`);
+      const parent = container.querySelector('#models3d-tab');
+      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
       const clickedTabIndex = tabs.indexOf(this);
       const activeTabIndex = tabs.indexOf(activeTab);
       const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
       tabs.forEach(t => t.classList.remove('active'));
-      // Скрыть все tab-content внутри models3d-tab
-      const parent = document.getElementById('models3d-tab');
       if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       if (activeContent) {
         activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
@@ -366,7 +391,7 @@ function setupTabs(container) {
           activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
           this.classList.add('active');
           const tabId = this.getAttribute('data-tab');
-          const newContent = document.getElementById(`${tabId}-tab`);
+          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
           if (newContent) {
             newContent.classList.add(`slide-${direction}`);
             newContent.classList.add('active');
@@ -378,7 +403,7 @@ function setupTabs(container) {
       } else {
         this.classList.add('active');
         const tabId = this.getAttribute('data-tab');
-        const newContent = document.getElementById(`${tabId}-tab`);
+        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
         if (newContent) {
           newContent.classList.add(`slide-${direction}`);
           newContent.classList.add('active');
@@ -387,7 +412,7 @@ function setupTabs(container) {
           }, 10);
         }
       }
-    });
+    }, { passive: false });
   });
 
   // Для остальных вкладок (обычные .tabs)
@@ -396,18 +421,17 @@ function setupTabs(container) {
       const tabsContainer = this.closest('.tabs');
       if (!tabsContainer) return;
       tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      // Скрыть все tab-content в родителе .tabs
       const parent = tabsContainer.parentElement;
       if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       this.classList.add('active');
       const tabId = this.getAttribute('data-tab');
-      const tabContent = document.getElementById(`${tabId}-tab`);
+      const tabContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
       if (tabContent) {
         setTimeout(() => {
           tabContent.classList.add('active');
         }, 50);
       }
-    });
+    }, { passive: false });
   });
 
   // Волна при наведении на проекты и модели
@@ -525,21 +549,91 @@ function openWindow(type) {
       content = '<p>Содержимое окна</p>';
       icon = getIconForTheme(windowIcons.about);
   }
-  // --- Определяем размеры окна для мобильных/планшетов ---
+  // --- Определяем размеры окна для мобильных/планшетах ---
   let winboxOpts = {};
+  const w = window.innerWidth, h = window.innerHeight;
   const mobileOpts = getMobileWinboxOptions();
-  if (mobileOpts) {
+  // --- Исправление: для дочерних окон 3D моделей и галерей ---
+  if (
+    type.startsWith('model-') ||
+    type.startsWith('gallery-') ||
+    type.startsWith('gallery-static-')
+  ) {
+    if (w <= 992) {
+      winboxOpts = {
+        width: w,
+        height: h - 36,
+        x: 0,
+        y: 36,
+        top: 36
+      };
+    } else {
+      winboxOpts = {
+        width: Math.min(900, w - 40),
+        height: Math.min(540, h - 60),
+        x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
+        y: Math.max(36, Math.floor((h - Math.min(540, h - 60)) / 2)),
+        top: 36
+      };
+    }
+  } else if (mobileOpts) {
     winboxOpts = { ...mobileOpts };
   } else {
     winboxOpts = {
-      width: 800,
-      height: 600,
-      x: Math.floor(Math.random() * 100),
-      y: Math.floor(Math.random() * 100) + 50,
-      top: 40
+      width: Math.min(900, w - 40),
+      height: Math.min(540, h - 60),
+      x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
+      y: Math.max(36, Math.floor((h - Math.min(540, h - 60)) / 2)),
+      top: 36
     };
   }
-  const win = new WinBox({
+
+  // --- oncreate вынесен в отдельную функцию ниже ---
+  let win;
+  function winOnCreate() {
+    // this === WinBox instance
+    // Для калькулятора: инициализация после вставки DOM
+    if (type === 'calculator') {
+      setTimeout(() => {
+        if (typeof window.initCalculator === 'function') window.initCalculator();
+      }, 10);
+    }
+    // --- После создания окна, если мобильник/планшет — растянуть на весь экран ---
+    if (mobileOpts && this.dom) {
+      this.dom.style.left = '0px';
+      this.dom.style.top = '36px';
+      this.dom.style.width = `${winboxOpts.width}px`;
+      this.dom.style.height = `${winboxOpts.height}px`;
+      this.dom.style.maxWidth = '100vw';
+      this.dom.style.maxHeight = `calc(100vh - 36px)`;
+    }
+    // Для kitty: добавить отступ описанию на мобилке/планшете
+    if (type === 'kitty' && this.body) {
+      if (window.innerWidth <= 992) {
+        const desc = this.body.querySelector('#kitty-gallery-description');
+        if (desc) desc.style.marginTop = '18px';
+      }
+    }
+    // Пересоздать обработчики вкладок после рендера (для мобильных)
+    if (type === 'about' || type === 'portfolio' || type === 'services') {
+      setupTabs(this.body);
+    }
+    // --- Исправление: для портфолио сразу показывать 3D модели ---
+    if (type === 'portfolio') {
+      // Активировать первую main-tab и первую sub-tab, если не активны
+      const mainTab = this.body.querySelector('.main-tabs .tab.active');
+      if (mainTab) mainTab.click();
+      // Активировать первую sub-tab в текущем main-tab
+      const activeMainTabId = mainTab ? mainTab.getAttribute('data-tab') : null;
+      if (activeMainTabId) {
+        const subTabs = this.body.querySelectorAll(`#${activeMainTabId}-tab .sub-tabs .tab`);
+        const activeSubTab = Array.from(subTabs).find(tab => tab.classList.contains('active'));
+        if (activeSubTab) activeSubTab.click();
+      }
+    }
+  }
+
+  win = new WinBox({
     title: title,
     class: ['adwaita-theme', 'active'],
     width: winboxOpts.width,
@@ -561,35 +655,20 @@ function openWindow(type) {
       return false;
     },
     onminimize: () => {
-      if (win.dom) win.dom.style.display = 'none'; // Скрываем окно при сворачивании
+      if (win.dom) win.dom.style.display = 'none';
       updateTaskbar();
     },
     onrestore: () => {
       win.minimized = false;
-      if (win.dom) win.dom.style.display = ''; // Показываем окно при восстановлении
+      if (win.dom) win.dom.style.display = '';
       activateWindow(type);
     },
     onfocus: () => {
       activateWindow(type);
     },
-    // Добавим вызов инициализации калькулятора после рендера окна
-    oncreate: () => {
-      if (type === 'calculator') {
-        setTimeout(() => {
-          if (typeof window.initCalculator === 'function') window.initCalculator();
-        }, 10);
-      }
-      // --- После создания окна, если мобильник/планшет — растянуть на весь экран ---
-      if (mobileOpts && win.dom) {
-        win.dom.style.left = '0px';
-        win.dom.style.top = '36px';
-        win.dom.style.width = `${winboxOpts.width}px`;
-        win.dom.style.height = `${winboxOpts.height}px`;
-        win.dom.style.maxWidth = '100vw';
-        win.dom.style.maxHeight = `calc(100vh - 36px)`;
-      }
-    }
+    oncreate: winOnCreate
   });
+
   trayWindows[type] = win;
   activateWindow(type);
   if (win.dom) {
@@ -611,7 +690,7 @@ function openWindow(type) {
     win.dom.style.maxHeight = `calc(100vh - 36px)`;
   }
   // Вкладки и проекты
-  if (type === 'about' || type === 'portfolio' || type === 'services') setupTabs(win.body);
+  // setupTabs теперь вызывается только в oncreate
   if (type === 'portfolio') {
     win.body.querySelectorAll('.project-link').forEach(link => {
       link.addEventListener('click', function(e) {
@@ -620,8 +699,6 @@ function openWindow(type) {
         openProjectWindow(url);
       });
     });
-    // Удаляем вызов init3DModels();
-    // if (typeof init3DModels === 'function') init3DModels();
   }
   // Игры
   if (type === 'minesweeper') setTimeout(() => {
@@ -636,6 +713,11 @@ function openWindow(type) {
   if (type === 'kitty') {
     setTimeout(() => {
       if (typeof window.initKittyGallery === 'function') window.initKittyGallery();
+      // Для kitty: добавить отступ описанию на мобилке/планшете
+      if (win.body && window.innerWidth <= 992) {
+        const desc = win.body.querySelector('#kitty-gallery-description');
+        if (desc) desc.style.marginTop = '18px';
+      }
     }, 10);
   }
   updateTaskbar();
@@ -791,7 +873,7 @@ function toggleCalendar() {
 // Но! Нужно убедиться, что функция window.open3DModelViewer действительно определена к моменту использования.
 // Для этого threeviewer.js должен быть подключён до app.js в index.html (это уже так).
 
-// --- Галерея в окне: стрелки правильного цвета ---
+// --- Галерея в окне: стрелки правильного цвета + свайп и drag ---
 function openModelGallery(modelId) {
   const type = 'gallery-' + modelId;
   if (trayWindows[type]) {
@@ -815,7 +897,7 @@ function openModelGallery(modelId) {
         <div class="gallery-viewer-col" style="flex:0 0 65%;min-width:0;display:flex;align-items:center;justify-content:center;height:100%;">
           <div class="gallery-main-img-wrapper" style="position:relative;width:100%;height:340px;display:flex;align-items:center;justify-content:center;">
             <button class="gallery-nav-btn" id="gallery-prev" style="left:10px;">&#8592;</button>
-            <img src="${images[current]}" id="gallery-main-img" style="max-width:100%;max-height:340px;border-radius:12px;box-shadow:0 2px 10px #0003;display:block;margin:0 auto;">
+            <img src="${images[current]}" id="gallery-main-img" style="max-width:100%;max-height:340px;border-radius:12px;box-shadow:0 2px 10px #0003;display:block;margin:0 auto;touch-action:pan-y;">
             <button class="gallery-nav-btn" id="gallery-next" style="right:10px;">&#8594;</button>
             <div style="position:absolute;bottom:-60px;left:0;width:100%;display:flex;gap:10px;justify-content:center;">
               ${images.map((img, i) => `<img src="${img}" class="model-gallery-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
@@ -854,6 +936,57 @@ function openModelGallery(modelId) {
     // Полноэкранный просмотр
     win.body.querySelector('#gallery-main-img').onclick = () => {
       openFullscreenGallery(images, current, model);
+    };
+
+    // --- Свайп и drag для переключения изображений ---
+    const img = win.body.querySelector('#gallery-main-img');
+    let startX = null, dragging = false;
+    // Touch events
+    img.ontouchstart = function(e) {
+      if (e.touches.length === 1) startX = e.touches[0].clientX;
+    };
+    img.ontouchmove = function(e) {
+      if (startX !== null && e.touches.length === 1) {
+        const dx = e.touches[0].clientX - startX;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0) { // swipe left
+            current = (current + 1) % images.length;
+          } else { // swipe right
+            current = (current - 1 + images.length) % images.length;
+          }
+          startX = null;
+          renderGallery(win);
+        }
+      }
+    };
+    img.ontouchend = function() { startX = null; };
+
+    // Mouse drag
+    img.onmousedown = function(e) {
+      dragging = true;
+      startX = e.clientX;
+      document.body.style.userSelect = 'none';
+    };
+    img.onmousemove = function(e) {
+      if (dragging && startX !== null) {
+        const dx = e.clientX - startX;
+        if (Math.abs(dx) > 40) {
+          if (dx < 0) {
+            current = (current + 1) % images.length;
+          } else {
+            current = (current - 1 + images.length) % images.length;
+          }
+          dragging = false;
+          startX = null;
+          document.body.style.userSelect = '';
+          renderGallery(win);
+        }
+      }
+    };
+    img.onmouseup = img.onmouseleave = function() {
+      dragging = false;
+      startX = null;
+      document.body.style.userSelect = '';
     };
   }
   const win = new WinBox({

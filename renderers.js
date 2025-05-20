@@ -41,30 +41,30 @@ window.renderAboutContent = function() {
     
     <div class="tab-content" id="experience-tab">
       <h2>Опыт работы</h2>
-      <div class="project-container">
-        <div class="project-info">
+      <div class="project-container experience-text">
+        <div class="experience-info">
           <div class="project-title">Фрилансер</div>
           <p>2018 — настоящее время</p>
           <p>Веб-разработка, дизайн, 3D моделирование, геймдев.<br>
           Реализация проектов любой сложности: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов. Креативный подход, современный стек, внимание к деталям.</p>
         </div>
       </div>
-      <div class="project-container">
-        <div class="project-info">
+      <div class="project-container experience-text">
+        <div class="experience-info">
           <div class="project-title">Leria Agency</div>
           <p>2024 — настоящее время</p>
           <p>Веб-разработка, администрирование.</p>
         </div>
       </div>
-      <div class="project-container">
-        <div class="project-info">
+      <div class="project-container experience-text">
+        <div class="experience-info">
           <div class="project-title">Лаборатория Касперского</div>
           <p>2020 — 2021</p>
           <p>Malware-аналитик. Анализ вредоносного ПО, исследование угроз, участие в разработке средств защиты.</p>
         </div>
       </div>
-      <div class="project-container">
-        <div class="project-info">
+      <div class="project-container experience-text">
+        <div class="experience-info">
           <div class="project-title">Веб-разработчик, компания XYZ</div>
           <p>2019 — 2020</p>
           <p>Разработка и поддержка веб-сайтов для клиентов из различных отраслей.</p>
@@ -87,15 +87,12 @@ window.renderPortfolioContent = function() {
         <div class="tab" data-tab="shop">Магазин</div>
         <div class="tab" data-tab="corporate">Корпоративный</div>
       </div>
-      
       <div class="tab-content active" id="landing-tab">
         ${window.renderProjects(window.projects.websites.landing)}
       </div>
-      
       <div class="tab-content" id="shop-tab">
         ${window.renderProjects(window.projects.websites.shop)}
       </div>
-      
       <div class="tab-content" id="corporate-tab">
         ${window.renderProjects(window.projects.websites.corporate)}
       </div>
@@ -106,11 +103,9 @@ window.renderPortfolioContent = function() {
         <div class="tab active" data-tab="interactive">Интерактивные</div>
         <div class="tab" data-tab="static">Статичные</div>
       </div>
-      
       <div class="tab-content active" id="interactive-tab">
         ${window.render3DModels(window.projects.models3d.interactive)}
       </div>
-      
       <div class="tab-content" id="static-tab">
         ${renderStaticModelCollections()}
       </div>
@@ -281,12 +276,9 @@ window.renderProjects = function(projects) {
         </div>
       `;
     } else {
-      // ПК-структура: превью слева, контент справа
+      // ПК-структура: контент слева, превью справа
       return `
         <div class="project-container">
-          <div class="project-preview">
-            <img src="${project.preview}" alt="${project.title}">
-          </div>
           <div class="project-content">
             <div class="project-title">${project.title}</div>
             <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
@@ -295,6 +287,9 @@ window.renderProjects = function(projects) {
               <span class="project-credits">${project.credits}</span>
               <span class="project-date">${project.date || ''}</span>
             </div>
+          </div>
+          <div class="project-preview">
+            <img src="${project.preview}" alt="${project.title}">
           </div>
         </div>
       `;
@@ -342,14 +337,10 @@ window.render3DModels = function(models) {
         `;
       }
     } else {
-      // ПК-структура: превью слева, контент справа
+      // ПК-структура: контент слева, превью справа
       if (model.type === 'interactive' && model.modelUrl) {
         return `
           <div class="project-container model-container color-block">
-            <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
-              <img src="${model.preview}" alt="${model.title}">
-              <div class="model-play-btn"></div>
-            </div>
             <div class="model-content">
               <div class="model-title color-text">${model.title}</div>
               <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
@@ -357,15 +348,16 @@ window.render3DModels = function(models) {
                 <span class="model-credits color-text">${model.credits}</span>
                 <span class="model-date color-text">${model.date || ''}</span>
               </div>
+            </div>
+            <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
+              <img src="${model.preview}" alt="${model.title}">
+              <div class="model-play-btn"></div>
             </div>
           </div>
         `;
       } else {
         return `
           <div class="project-container model-container color-block">
-            <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
-              <img src="${model.preview}" alt="${model.title}">
-            </div>
             <div class="model-content">
               <div class="model-title color-text">${model.title}</div>
               <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
@@ -373,6 +365,9 @@ window.render3DModels = function(models) {
                 <span class="model-credits color-text">${model.credits}</span>
                 <span class="model-date color-text">${model.date || ''}</span>
               </div>
+            </div>
+            <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
+              <img src="${model.preview}" alt="${model.title}">
             </div>
           </div>
         `;
@@ -440,80 +435,78 @@ window.renderCalculatorContent = function() {
   `;
 };
 
-// --- Галереи статичных моделей по папкам ---
-function renderStaticModelCollections() {
-  const collections = [
-    {
-      key: 'favourite',
-      title: 'My Favourite',
-      folder: 'My_favourite', 
-      description: 'Атмосферные и любимые сцены с особым настроением.',
-      images: [
-        { file: 'amlet.jpg', title: 'Завтрак', description: 'Уютная сцена с французским завтраком в неоновом освещении.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-01-10' },
-        { file: 'bottle.jpg', title: 'Бутылочка', description: 'Стеклянная бутылка с жидкостью и подсветкой.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
-        { file: 'cake-with-cat.png', title: 'Кото-торт', description: 'Милый торт в виде спящего котика.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
-        { file: 'Mango.png', title: 'Манго', description: 'Реалистичное манго со свежими каплями воды.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' }
-      ]
-    },
-    {
-      key: 'start',
-      title: 'Start Modeling',
-      folder: 'Start_modeling',
-      description: 'Первые шаги в мире 3D моделирования.',
-      images: [
-        { file: 'beach_cave.jpg', title: 'Пляжная пещера', description: 'Живописный вид на пещеру у моря.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-01' },
-        { file: 'bird.jpg', title: 'Птица', description: 'Модель птицы.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
-        { file: 'cattendo.jpg', title: 'Кити-приставка', description: 'Игровая приставка в стиле кошки.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
-        { file: 'cofee brake.jpg', title: 'Кофе-брейк', description: 'Сцена с кофе.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-01' },
-        { file: 'coffee murshmallow.jpg', title: 'Кофе с маршмеллоу', description: 'Уютная сцена с горячим напитком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-05' },
-        { file: 'first cake.jpg', title: 'Первый торт', description: 'Первая модель торта.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-10' },
-        { file: 'lesson 1.jpg', title: 'Урок 1', description: 'Результат первого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-01' },
-        { file: 'lesson 2.jpg', title: 'Урок 2', description: 'Результат второго урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-15' },
-        { file: 'soke.jpg', title: 'Сок', description: 'Модель стакана с соком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-20' },
-        { file: 'toast cat.jpg', title: 'Кот-тост', description: 'Милый кот в виде тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-01' },
-        { file: 'toast.jpg', title: 'Тост', description: 'Модель тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-05' },
-        { file: 'tv day.jpg', title: 'Телевизор днём', description: 'Сцена с телевизором в дневное время.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-10' },
-        { file: 'tv night.jpg', title: 'Телевизор ночью', description: 'Атмосферная сцена с телевизором ночью.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-15' }
-      ]
-    },
-    {
-      key: 'middle',
-      title: 'Middle Modeling', 
-      folder: 'Middle_modeling',
-      description: 'Более сложные работы со вниманием к деталям.',
-      images: [
-        { file: 'carty.jpg', title: 'Тележка', description: 'Модель тележки.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-05-20' },
-        { file: 'cave fantasy.jpg', title: 'Фантастическая пещера', description: 'Фэнтезийная сцена в пещере.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-01' },
-        { file: 'compic.jpg', title: 'Компьютер', description: 'Модель компьютера.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-15' },
-        { file: 'comso ship.jpg', title: 'Космический корабль', description: 'Модель космического корабля.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-01' },
-        { file: 'lesson 3.jpg', title: 'Урок 3', description: 'Результат третьего урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-15' },
-        { file: 'lesson 4.jpg', title: 'Урок 4', description: 'Результат четвёртого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-01' },
-        { file: 'mountain.jpg', title: 'Горы', description: 'Горный пейзаж.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-15' },
-        { file: 'planet.jpg', title: 'Планета', description: 'Модель планеты.', tools: ['Blender'], credits: 'Hp7z', date: '2023-09-01' }
-      ]
-    }
-  ];
+// --- Вынести объект collections ОДИН РАЗ ВНЕ функций ---
+const staticModelCollections = {
+  favourite: {
+    title: 'My Favourite',
+    folder: 'My_favourite',
+    description: 'Атмосферные и любимые сцены с особым настроением.',
+    images: [
+      { file: 'amlet.jpg', title: 'Завтрак', description: 'Уютная сцена с французским завтраком в неоновом освещении.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-01-10' },
+      { file: 'bottle.jpg', title: 'Бутылочка', description: 'Стеклянная бутылка с жидкостью и подсветкой.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
+      { file: 'cake-with-cat.png', title: 'Кото-торт', description: 'Милый торт в виде спящего котика.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
+      { file: 'Mango.png', title: 'Манго', description: 'Реалистичное манго со свежими каплями воды.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' }
+    ]
+  },
+  start: {
+    title: 'Start Modeling',
+    folder: 'Start_modeling',
+    description: 'Первые шаги в мире 3D моделирования.',
+    images: [
+      { file: 'beach_cave.jpg', title: 'Пляжная пещера', description: 'Живописный вид на пещеру у моря.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-01' },
+      { file: 'bird.jpg', title: 'Птица', description: 'Модель птицы.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
+      { file: 'cattendo.jpg', title: 'Кити-приставка', description: 'Игровая приставка в стиле кошки.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
+      { file: 'cofee brake.jpg', title: 'Кофе-брейк', description: 'Сцена с кофе.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-01' },
+      { file: 'coffee murshmallow.jpg', title: 'Кофе с маршмеллоу', description: 'Уютная сцена с горячим напитком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-05' },
+      { file: 'first cake.jpg', title: 'Первый торт', description: 'Первая модель торта.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-10' },
+      { file: 'lesson 1.jpg', title: 'Урок 1', description: 'Результат первого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-01' },
+      { file: 'lesson 2.jpg', title: 'Урок 2', description: 'Результат второго урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-15' },
+      { file: 'soke.jpg', title: 'Сок', description: 'Модель стакана с соком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-20' },
+      { file: 'toast cat.jpg', title: 'Кот-тост', description: 'Милый кот в виде тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-01' },
+      { file: 'toast.jpg', title: 'Тост', description: 'Модель тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-05' },
+      { file: 'tv day.jpg', title: 'Телевизор днём', description: 'Сцена с телевизором в дневное время.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-10' },
+      { file: 'tv night.jpg', title: 'Телевизор ночью', description: 'Атмосферная сцена с телевизором ночью.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-15' }
+    ]
+  },
+  middle: {
+    title: 'Middle Modeling',
+    folder: 'Middle_modeling',
+    description: 'Более сложные работы со вниманием к деталям.',
+    images: [
+      { file: 'carty.jpg', title: 'Тележка', description: 'Модель тележки.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-05-20' },
+      { file: 'cave fantasy.jpg', title: 'Фантастическая пещера', description: 'Фэнтезийная сцена в пещере.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-01' },
+      { file: 'compic.jpg', title: 'Компьютер', description: 'Модель компьютера.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-15' },
+      { file: 'comso ship.jpg', title: 'Космический корабль', description: 'Модель космического корабля.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-01' },
+      { file: 'lesson 3.jpg', title: 'Урок 3', description: 'Результат третьего урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-15' },
+      { file: 'lesson 4.jpg', title: 'Урок 4', description: 'Результат четвёртого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-01' },
+      { file: 'mountain.jpg', title: 'Горы', description: 'Горный пейзаж.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-15' },
+      { file: 'planet.jpg', title: 'Планета', description: 'Модель планеты.', tools: ['Blender'], credits: 'Hp7z', date: '2023-09-01' }
+    ]
+  }
+};
 
+// --- renderStaticModelCollections теперь использует staticModelCollections ---
+function renderStaticModelCollections() {
   if (!window._staticGalleryPreviewIndexes) window._staticGalleryPreviewIndexes = {};
   const previewIndexes = window._staticGalleryPreviewIndexes;
   if (!window._staticGalleryPreviewTimers) window._staticGalleryPreviewTimers = {};
   const previewTimers = window._staticGalleryPreviewTimers;
 
   let html = '';
-  collections.forEach(col => {
+  Object.entries(staticModelCollections).forEach(([key, col]) => {
     if (!col.images.length) return;
 
-    if (typeof previewIndexes[col.key] !== 'number') {
-      previewIndexes[col.key] = Math.floor(Math.random() * col.images.length);
+    if (typeof previewIndexes[key] !== 'number') {
+      previewIndexes[key] = Math.floor(Math.random() * col.images.length);
     }
-    const previewIdx = previewIndexes[col.key];
+    const previewIdx = previewIndexes[key];
     const previewUrl = `models/preview/${col.folder}/${col.images[previewIdx].file}`;
 
-    if (previewTimers[col.key]) clearInterval(previewTimers[col.key]);
-    previewTimers[col.key] = setInterval(() => {
-      previewIndexes[col.key] = (previewIndexes[col.key] + 1) % col.images.length;
-      const imgEl = document.querySelector(`.static-model-preview-img[data-key="${col.key}"]`);
-      if (imgEl) imgEl.src = `models/preview/${col.folder}/${col.images[previewIndexes[col.key]].file}`;
+    if (previewTimers[key]) clearInterval(previewTimers[key]);
+    previewTimers[key] = setInterval(() => {
+      previewIndexes[key] = (previewIndexes[key] + 1) % col.images.length;
+      const imgEl = document.querySelector(`.static-model-preview-img[data-key="${key}"]`);
+      if (imgEl) imgEl.src = `models/preview/${col.folder}/${col.images[previewIndexes[key]].file}`;
     }, 2000);
 
     html += `
@@ -521,12 +514,12 @@ function renderStaticModelCollections() {
         <div class="model-content">
           <div class="model-title color-text">${col.title}</div>
           <div class="model-description color-text">${col.description}</div>
-          <a href="#" class="project-link" onclick="event.preventDefault(); openStaticGalleryCollection('${col.key}');">
+          <a href="#" class="project-link" onclick="event.preventDefault(); openStaticGalleryCollection('${key}');">
             Открыть галерею
           </a>
         </div>
-        <div class="model-preview static-model-preview" onclick="openStaticGalleryCollection('${col.key}')">
-          <img src="${previewUrl}" data-key="${col.key}" class="static-model-preview-img" alt="${col.title}">
+        <div class="model-preview static-model-preview" onclick="openStaticGalleryCollection('${key}')">
+          <img src="${previewUrl}" data-key="${key}" class="static-model-preview-img" alt="${col.title}">
         </div>
       </div>
     `;
@@ -534,54 +527,9 @@ function renderStaticModelCollections() {
   return html;
 }
 
+// --- openStaticGalleryCollection теперь использует staticModelCollections ---
 window.openStaticGalleryCollection = function(key) {
-  const collections = {
-    favourite: {
-      title: 'My Favourite',
-      folder: 'My_favourite',
-      images: [
-        { file: 'amlet.jpg', title: 'Завтрак', description: 'Уютная сцена с французским завтраком в неоновом освещении.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-01-10' },
-        { file: 'bottle.jpg', title: 'Бутылочка', description: 'Стеклянная бутылка с жидкостью и подсветкой.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
-        { file: 'cake-with-cat.png', title: 'Кото-торт', description: 'Милый торт в виде спящего котика.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' },
-        { file: 'Mango.png', title: 'Манго', description: 'Реалистичное манго со свежими каплями воды.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-02-14' }
-      ]
-    },
-    start: {
-      title: 'Start Modeling',
-      folder: 'Start_modeling',
-      images: [
-        { file: 'beach_cave.jpg', title: 'Пляжная пещера', description: 'Живописный вид на пещеру у моря.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-01' },
-        { file: 'bird.jpg', title: 'Птица', description: 'Модель птицы.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
-        { file: 'cattendo.jpg', title: 'Кити-приставка', description: 'Игровая приставка в стиле кошки.', tools: ['Blender'], credits: 'Hp7z', date: '2022-10-15' },
-        { file: 'cofee brake.jpg', title: 'Кофе-брейк', description: 'Сцена с кофе.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-01' },
-        { file: 'coffee murshmallow.jpg', title: 'Кофе с маршмеллоу', description: 'Уютная сцена с горячим напитком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-05' },
-        { file: 'first cake.jpg', title: 'Первый торт', description: 'Первая модель торта.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-10' },
-        { file: 'lesson 1.jpg', title: 'Урок 1', description: 'Результат первого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-01' },
-        { file: 'lesson 2.jpg', title: 'Урок 2', description: 'Результат второго урока.', tools: ['Blender'], credits: 'Hp7z', date: '2022-09-15' },
-        { file: 'soke.jpg', title: 'Сок', description: 'Модель стакана с соком.', tools: ['Blender'], credits: 'Hp7z', date: '2022-11-20' },
-        { file: 'toast cat.jpg', title: 'Кот-тост', description: 'Милый кот в виде тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-01' },
-        { file: 'toast.jpg', title: 'Тост', description: 'Модель тоста.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-05' },
-        { file: 'tv day.jpg', title: 'Телевизор днём', description: 'Сцена с телевизором в дневное время.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-10' },
-        { file: 'tv night.jpg', title: 'Телевизор ночью', description: 'Атмосферная сцена с телевизором ночью.', tools: ['Blender'], credits: 'Hp7z', date: '2022-12-15' }
-      ]
-    },
-    middle: {
-      title: 'Middle Modeling',
-      folder: 'Middle_modeling',
-      images: [
-        { file: 'carty.jpg', title: 'Карты, деньги, без ствола', description: 'Ну тут хз.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-05-20' },
-        { file: 'cave fantasy.jpg', title: 'Фантастическая пещера', description: 'Фэнтезийная сцена в пещере.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-01' },
-        { file: 'compic.jpg', title: 'Компьютер', description: 'Модель компьютера.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-15' },
-        { file: 'comso ship.jpg', title: 'Космический корабль', description: 'Модель космического корабля.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-01' },
-        { file: 'lesson 3.jpg', title: 'Урок 3', description: 'Результат третьего урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-15' },
-        { file: 'lesson 4.jpg', title: 'Урок 4', description: 'Результат четвёртого урока.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-01' },
-        { file: 'mountain.jpg', title: 'Горы', description: 'Горный пейзаж.', tools: ['Blender'], credits: 'Hp7z', date: '2023-08-15' },
-        { file: 'planet.jpg', title: 'Планета', description: 'Модель планеты.', tools: ['Blender'], credits: 'Hp7z', date: '2023-09-01' }
-      ]
-    }
-  };
-
-  const col = collections[key];
+  const col = staticModelCollections[key];
   if (!col) return;
 
   let current = 0;
@@ -616,26 +564,10 @@ window.openStaticGalleryCollection = function(key) {
         </div>
         <div class="gallery-info-col">
           <div class="model-title">${currentImage.title}</div>
-          <div class="model-description">${currentImage.description}</div>
+          <div class="model-description" style="margin-bottom:18px;">${currentImage.description}</div>
           <div class="model-tools">
             <b>Инструменты:</b>
-            ${(currentImage.tools || []).map(t => {
-              const tool = t.toLowerCase();
-              if (tool === 'blender') {
-                return `
-                  <img src="icons/blender-light.svg" class="dark-theme-icon" alt="Blender" title="Blender">
-                  <img src="icons/blender-dark.svg" class="light-theme-icon" alt="Blender" title="Blender">
-                  <span class="tool-label">Blender</span>
-                `;
-              } else if (tool === 'armorpaint') {
-                return `
-                  <img src="icons/armoryicon-light.svg" class="dark-theme-icon" alt="ArmorPaint" title="Armor paint">
-                  <img src="icons/armoryicon-dark.svg" class="light-theme-icon" alt="ArmorPaint" title="Armor paint">
-                  <span class="tool-label">Armor paint</span>
-                `;
-              }
-              return '';
-            }).join('')}
+            <span class="tool-icons"></span>
           </div>
           <div class="model-footer">
             <div class="model-credits"><b>Автор:</b> ${currentImage.credits}</div>
@@ -644,6 +576,20 @@ window.openStaticGalleryCollection = function(key) {
         </div>
       </div>
     `;
+    // Показываем только одну иконку инструмента по теме
+    const toolIcons = win.body.querySelector('.tool-icons');
+    if (toolIcons && currentImage.tools) {
+      const isDark = document.body.classList.contains('dark-theme');
+      toolIcons.innerHTML = currentImage.tools.map(t => {
+        const tool = t.toLowerCase();
+        if (tool === 'blender') {
+          return `<img src="icons/blender-${isDark ? 'light' : 'dark'}.svg" alt="Blender" title="Blender" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;">`;
+        } else if (tool === 'armorpaint') {
+          return `<img src="icons/armoryicon-${isDark ? 'light' : 'dark'}.svg" alt="ArmorPaint" title="Armor paint" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;">`;
+        }
+        return '';
+      }).join('');
+    }
 
     win.body.querySelector('#gallery-prev').onclick = () => {
       current = (current - 1 + col.images.length) % col.images.length;
@@ -958,7 +904,7 @@ window.renderKittyGalleryContent = function() {
           </div>
         </div>
       </div>
-      <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box;overflow-y:auto;">
+      <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box;overflow-y:auto;max-height:100%;">
         <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">Доча: Кошачий напарник</div>
         <div class="model-description" id="kitty-gallery-description" style="margin-bottom:15px;">
           <b>Мяу! Я Даша, но дома меня зовут просто Доча.</b><br>
@@ -1088,4 +1034,181 @@ function openKittyFullscreenGallery(images, startIdx) {
       document.removeEventListener('keydown', escHandler);
     }
   });
+}
+
+// --- Исправленный setupTabs: ищет tab-content только внутри текущего окна/контейнера ---
+function setupTabs(container) {
+  // Главные вкладки
+  container.querySelectorAll('.main-tabs .tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('.main-tabs .tab'));
+      const activeTab = container.querySelector('.main-tabs .tab.active');
+      if (activeTab === this) return;
+      const activeTabId = activeTab.getAttribute('data-tab');
+      // Ищем только внутри container!
+      const activeContent = container.querySelector(`#${activeTabId}-tab`);
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
+      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
+      tabs.forEach(t => t.classList.remove('active'));
+      // Скрыть все tab-content только внутри container
+      container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      if (activeContent) {
+        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+        setTimeout(() => {
+          activeContent.classList.remove('active');
+          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = container.querySelector(`#${tabId}-tab`);
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
+        }, 300);
+      } else {
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = container.querySelector(`#${tabId}-tab`);
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
+          newContent.classList.add('active');
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
+      }
+    });
+  });
+
+  // Подвкладки для веб-сайтов
+  container.querySelectorAll('#websites-tab .sub-tabs .tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('#websites-tab .sub-tabs .tab'));
+      const activeTab = container.querySelector('#websites-tab .sub-tabs .tab.active');
+      if (activeTab === this) return;
+      const activeTabId = activeTab.getAttribute('data-tab');
+      // Только внутри websites-tab
+      const parent = container.querySelector('#websites-tab');
+      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
+      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
+      tabs.forEach(t => t.classList.remove('active'));
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      if (activeContent) {
+        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+        setTimeout(() => {
+          activeContent.classList.remove('active');
+          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
+        }, 300);
+      } else {
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
+          newContent.classList.add('active');
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
+      }
+    });
+  });
+
+  // Подвкладки для 3D моделей
+  container.querySelectorAll('#models3d-tab .sub-tabs .tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const tabs = Array.from(container.querySelectorAll('#models3d-tab .sub-tabs .tab'));
+      const activeTab = container.querySelector('#models3d-tab .sub-tabs .tab.active');
+      if (activeTab === this) return;
+      const activeTabId = activeTab.getAttribute('data-tab');
+      const parent = container.querySelector('#models3d-tab');
+      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
+      const clickedTabIndex = tabs.indexOf(this);
+      const activeTabIndex = tabs.indexOf(activeTab);
+      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
+      tabs.forEach(t => t.classList.remove('active'));
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      if (activeContent) {
+        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+        setTimeout(() => {
+          activeContent.classList.remove('active');
+          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
+          this.classList.add('active');
+          const tabId = this.getAttribute('data-tab');
+          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
+          if (newContent) {
+            newContent.classList.add(`slide-${direction}`);
+            newContent.classList.add('active');
+            setTimeout(() => {
+              newContent.classList.remove(`slide-${direction}`);
+            }, 10);
+          }
+        }, 300);
+      } else {
+        this.classList.add('active');
+        const tabId = this.getAttribute('data-tab');
+        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
+        if (newContent) {
+          newContent.classList.add(`slide-${direction}`);
+          newContent.classList.add('active');
+          setTimeout(() => {
+            newContent.classList.remove(`slide-${direction}`);
+          }, 10);
+        }
+      }
+    });
+  });
+
+  // Для остальных вкладок (обычные .tabs)
+  container.querySelectorAll('.tabs .tab:not(.main-tabs .tab):not(.sub-tabs .tab)').forEach(tab => {
+    tab.addEventListener('click', function() {
+      const tabsContainer = this.closest('.tabs');
+      if (!tabsContainer) return;
+      tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      // Скрыть все tab-content только внутри родителя .tabs
+      const parent = tabsContainer.parentElement;
+      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      this.classList.add('active');
+      const tabId = this.getAttribute('data-tab');
+      const tabContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
+      if (tabContent) {
+        setTimeout(() => {
+          tabContent.classList.add('active');
+        }, 50);
+      }
+    });
+  });
+
+  // Волна при наведении на проекты и модели
+  container.querySelectorAll('.project-container, .model-container, .color-block').forEach(element => {
+    element.addEventListener('mouseenter', function() {
+      this.classList.add('wave-effect');
+    });
+    element.addEventListener('mouseleave', function() {
+      this.classList.remove('wave-effect');
+    });
+  });
+
+  // --- Исправление: для мобильных устройств добавить отступ описанию в галерее ---
+  if (window.innerWidth <= 992) {
+    container.querySelectorAll('.gallery-info-col .model-description').forEach(desc => {
+      desc.style.marginBottom = '38px';
+    });
+  }
 }

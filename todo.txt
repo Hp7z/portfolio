@@ -1,0 +1,3 @@
+Middle_modeling{
+    portfolio/models/preview/Middle_modeling/carty.jpg portfolio/models/preview/Middle_modeling/cave fantasy.jpg portfolio/models/preview/Middle_modeling/compic.jpg portfolio/models/preview/Middle_modeling/comso ship.jpg portfolio/models/preview/Middle_modeling/lesson 3.jpg portfolio/models/preview/Middle_modeling/lesson 4.jpg portfolio/models/preview/Middle_modeling/mountain.jpg portfolio/models/preview/Middle_modeling/planet.jpg
+}
