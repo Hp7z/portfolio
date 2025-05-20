@@ -12,7 +12,8 @@ const windowIcons = {
   // --- Добавляем model3d с корректными путями ---
   model3d: { light: 'icons/model3d-dark.svg', dark: 'icons/model3d-light.svg' },
   game: { light: 'icons/game-dark.svg', dark: 'icons/game-light.svg' },
-  github: { light: 'icons/github-light.svg', dark: 'icons/github-dark.svg' }
+  github: { light: 'icons/github-light.svg', dark: 'icons/github-dark.svg' },
+  kitty: { dark: 'icons/kitty-light.svg', light: 'icons/kitty-dark.svg' }
 };
 function getIconForTheme(iconType) {
   const isDarkTheme = document.body.classList.contains('dark-theme');
@@ -75,6 +76,7 @@ function updateWindowIcons() {
     else if (type === 'github') iconPath = getIconForTheme(windowIcons.github);
     else if (type.startsWith('project-')) iconPath = getIconForTheme(windowIcons.website);
     else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') iconPath = getIconForTheme(windowIcons.game);
+    else if (type === 'kitty') iconPath = getIconForTheme(windowIcons.kitty);
     else iconPath = getIconForTheme(windowIcons.about);
 
     if (typeof win.setIcon === 'function') {
@@ -225,6 +227,7 @@ function updateTaskbar() {
     else if (type.startsWith('project-')) iconPath = getIconForTheme(windowIcons.website);
     else if (type.startsWith('model-') || type.startsWith('gallery-')) iconPath = getIconForTheme(windowIcons.model3d);
     else if (type === 'minesweeper' || type === 'game2048' || type === 'tictactoe') iconPath = getIconForTheme(windowIcons.game);
+    else if (type === 'kitty') iconPath = getIconForTheme(windowIcons.kitty);
     else iconPath = getIconForTheme(windowIcons.about);
 
     item.innerHTML = `<img src="${iconPath}"><span class="taskbar-item-title">${title}</span>`;
@@ -490,6 +493,11 @@ function openWindow(type) {
       content = window.renderGitHubStatsContent ? window.renderGitHubStatsContent() : '<div>GitHub Stats</div>';
       icon = getIconForTheme(windowIcons.github);
       break;
+    case 'kitty':
+      title = 'Лучший компаньон';
+      content = window.renderKittyGalleryContent();
+      icon = getIconForTheme(windowIcons.kitty);
+      break;
     default:
       content = '<p>Содержимое окна</p>';
       icon = getIconForTheme(windowIcons.about);
@@ -570,6 +578,11 @@ function openWindow(type) {
   if (type === 'tictactoe') setTimeout(() => {
     if (document.getElementById('tictactoe-board')) window.initTicTacToe();
   }, 100);
+  if (type === 'kitty') {
+    setTimeout(() => {
+      if (typeof window.initKittyGallery === 'function') window.initKittyGallery();
+    }, 10);
+  }
   updateTaskbar();
 }
 

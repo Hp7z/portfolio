@@ -505,7 +505,7 @@ window.openStaticGalleryCollection = function(key) {
       title: 'Middle Modeling',
       folder: 'Middle_modeling',
       images: [
-        { file: 'carty.jpg', title: 'Тележка', description: 'Модель тележки.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-05-20' },
+        { file: 'carty.jpg', title: 'Карты, деньги, без ствола', description: 'Ну тут хз.', tools: ['Blender', 'ArmorPaint'], credits: 'Hp7z', date: '2023-05-20' },
         { file: 'cave fantasy.jpg', title: 'Фантастическая пещера', description: 'Фэнтезийная сцена в пещере.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-01' },
         { file: 'compic.jpg', title: 'Компьютер', description: 'Модель компьютера.', tools: ['Blender'], credits: 'Hp7z', date: '2023-06-15' },
         { file: 'comso ship.jpg', title: 'Космический корабль', description: 'Модель космического корабля.', tools: ['Blender'], credits: 'Hp7z', date: '2023-07-01' },
@@ -695,6 +695,7 @@ function openFullscreenGalleryStatic(col, startIdx) {
         <div style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;">
           ${images.map((img, i) => `<img src="models/preview/${col.folder}/${img.file}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
         </div>
+        <div style="color:#fff;font-size:16px;margin-top:10px;"><b>Дата:</b> ${images[current].date}</div>
       </div>
       <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-left:20px;color:${arrowColor};">&#8594;</button>
     </div>
@@ -878,4 +879,149 @@ function loadGitHubStats() {
       }
       list.innerHTML = html || '<span style="color:#888;">Нет публичных коммитов за последнее время.</span>';
     });
+}
+
+window.renderKittyGalleryContent = function() {
+  return `
+    <div class="kitty-gallery-flex" style="display:flex;flex-direction:row;height:100%;">
+      <div class="kitty-gallery-viewer-col" style="flex:0 0 65%;max-width:65%;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;height:100%;box-sizing:border-box;">
+        <div class="kitty-gallery-main-img-wrapper gallery-main-img-wrapper" style="position:relative;width:100%;height:70%;display:flex;align-items:center;justify-content:center;">
+          <button class="gallery-nav-btn" id="kitty-gallery-prev" style="left:10px;position:absolute;top:50%;transform:translateY(-50%);">&#8592;</button>
+          <img src="img/kitty/1.jpg" id="kitty-gallery-main-img" class="gallery-main-img" style="max-width:100%;max-height:100%;border-radius:12px;box-shadow:0 2px 10px #0003;display:block;margin:0 auto;">
+          <button class="gallery-nav-btn" id="kitty-gallery-next" style="right:10px;position:absolute;top:50%;transform:translateY(-50%);">&#8594;</button>
+          <div style="position:absolute;bottom:-60px;left:0;width:100%;display:flex;gap:10px;justify-content:center;">
+            ${[1,2,3,4,5,6,7,8,9].map(i => `<img src="img/kitty/${i}.jpg" class="kitty-gallery-thumb${i===1?' active':''}" data-idx="${i-1}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i===1?'#3584e4':'#ccc'};">`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;height:100%;box-sizing:border-box;overflow-y:auto;">
+        <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">Доча: Кошачий напарник</div>
+        <div class="model-description" id="kitty-gallery-description" style="margin-bottom:15px;">
+          <b>Мяу! Я Даша, но дома меня зовут просто Доча.</b><br>
+          Я — пушистая хозяйка этого дома. Люблю спать на клавиатуре, ловить курсор, требовать вкусняшки и, конечно, позировать для фотосессий.<br>
+          <br>
+          <i>“Если ты устал — просто посмотри на меня, и настроение сразу станет лучше! Я всегда рядом, чтобы согреть тебя своим мурчанием.”</i><br>
+          <br>
+          <b>Мои любимые занятия:</b> валяться на солнышке, наблюдать за птицами из окна, и напоминать, что без меня тут было бы скучно.<br>
+          <br>
+          <b>Автор:</b> Даша (Доча)
+        </div>
+        <div class="model-footer">
+          <div class="model-credits"><b>Автор:</b> Даша</div>
+          <div class="model-date" id="kitty-gallery-date"><b>Дата:</b> 01.10.2023</div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+window.initKittyGallery = function() {
+  const images = [
+    { file: '1.jpg', date: '01.10.2023' },
+    { file: '2.jpg', date: '15.10.2023' },
+    { file: '3.jpg', date: '01.11.2023' },
+    { file: '4.jpg', date: '20.11.2023' },
+    { file: '5.jpg', date: '05.12.2023' },
+    { file: '6.jpg', date: '25.12.2023' },
+    { file: '7.jpg', date: '10.01.2024' },
+    { file: '8.jpg', date: '14.02.2024' },
+    { file: '9.jpg', date: '01.03.2024' }
+  ];
+  let current = 0;
+  const mainImg = document.getElementById('kitty-gallery-main-img');
+  const thumbs = document.querySelectorAll('.kitty-gallery-thumb');
+  const dateEl = document.getElementById('kitty-gallery-date');
+  function updateGallery() {
+    mainImg.src = `img/kitty/${images[current].file}`;
+    thumbs.forEach((thumb, i) => {
+      thumb.classList.toggle('active', i === current);
+      thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
+    });
+    dateEl.innerHTML = `<b>Дата:</b> ${images[current].date}`;
+  }
+  document.getElementById('kitty-gallery-prev').onclick = () => {
+    current = (current - 1 + images.length) % images.length;
+    updateGallery();
+  };
+  document.getElementById('kitty-gallery-next').onclick = () => {
+    current = (current + 1) % images.length;
+    updateGallery();
+  };
+  thumbs.forEach((thumb, i) => {
+    thumb.onclick = () => {
+      current = i;
+      updateGallery();
+    };
+  });
+  mainImg.onclick = () => {
+    openKittyFullscreenGallery(images, current);
+  };
+  updateGallery();
+};
+
+function openKittyFullscreenGallery(images, startIdx) {
+  let current = startIdx;
+  const isDarkTheme = document.body.classList.contains('dark-theme');
+  const arrowColor = isDarkTheme ? '#fff' : '#000';
+  let overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.background = 'rgba(0,0,0,0.97)';
+  overlay.style.zIndex = 99999;
+  overlay.style.display = 'flex';
+  overlay.style.flexDirection = 'column';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.innerHTML = `
+    <button id="fullscreen-close" style="position:absolute;top:30px;right:40px;z-index:2;font-size:32px;color:${arrowColor};background:none;border:none;cursor:pointer;">&times;</button>
+    <div style="display:flex;align-items:center;justify-content:center;width:100vw;position:relative;">
+      <button id="fullscreen-prev" style="position:relative;left:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-right:20px;color:${arrowColor};">&#8592;</button>
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <img id="fullscreen-img" src="img/kitty/${images[current].file}" style="max-width:80vw;max-height:80vh;border-radius:12px;box-shadow:0 2px 20px #000a;display:block;">
+        <div style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;">
+          ${images.map((img, i) => `<img src="img/kitty/${img.file}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
+        </div>
+      </div>
+      <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-left:20px;color:${arrowColor};">&#8594;</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  function updateFullscreen() {
+    overlay.querySelector('#fullscreen-img').src = `img/kitty/${images[current].file}`;
+    overlay.querySelectorAll('.fullscreen-thumb').forEach((thumb, i) => {
+      thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
+    });
+  }
+  overlay.querySelector('#fullscreen-prev').onclick = (e) => {
+    e.stopPropagation();
+    current = (current - 1 + images.length) % images.length;
+    updateFullscreen();
+  };
+  overlay.querySelector('#fullscreen-next').onclick = (e) => {
+    e.stopPropagation();
+    current = (current + 1) % images.length;
+    updateFullscreen();
+  };
+  overlay.querySelectorAll('.fullscreen-thumb').forEach(thumb => {
+    thumb.onclick = (e) => {
+      e.stopPropagation();
+      current = parseInt(thumb.dataset.idx);
+      updateFullscreen();
+    };
+  });
+  overlay.querySelector('#fullscreen-close').onclick = () => {
+    overlay.remove();
+  };
+  overlay.onclick = (e) => {
+    if (e.target === overlay) overlay.remove();
+  };
+  document.addEventListener('keydown', function escHandler(e) {
+    if (e.key === 'Escape') {
+      overlay.remove();
+      document.removeEventListener('keydown', escHandler);
+    }
+  });
 }
