@@ -1,73 +1,52 @@
 window.renderAboutContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="tabs">
-      <div class="tab active" data-tab="about">Обо мне</div>
-      <div class="tab" data-tab="skills">Навыки</div>
-      <div class="tab" data-tab="experience">Опыт</div>
+      <div class="tab active" data-tab="about">${t.aboutTabs[0]}</div>
+      <div class="tab" data-tab="skills">${t.aboutTabs[1]}</div>
+      <div class="tab" data-tab="experience">${t.aboutTabs[2]}</div>
     </div>
-    
     <div class="tab-content active" id="about-tab">
-      <h2>Информация обо мне</h2>
-      <p>
-        Я — веб-разработчик, дизайнер и 3D-художник с глубоким техническим и креативным опытом. 
-        Моя специализация — создание современных, функциональных и эстетичных цифровых продуктов: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов.
-      </p>
-      <p>
-        В своей работе я совмещаю инженерный подход, внимание к деталям и любовь к визуальному стилю. 
-        Для каждого проекта подбираю оптимальный стек технологий, чтобы обеспечить высокую производительность, безопасность и удобство для пользователя.
-      </p>
-      <p>
-        Я активно развиваюсь в области геймдева и 3D-моделирования, создаю уникальные сцены и игровые механики, а также интегрирую 3D-контент в веб-приложения. 
-        Открыт к новым задачам, всегда стремлюсь к совершенству и ценю честный диалог с заказчиком.
-      </p>
-      <p>
-        Если вам нужен сайт, 3D-визуализация или игровой проект — буду рад сотрудничеству!
-      </p>
+      <h2>${t.aboutTitle}</h2>
+      <p>${t.aboutText1}</p>
+      <p>${t.aboutText2}</p>
+      <p>${t.aboutText3}</p>
+      <p>${t.aboutText4}</p>
     </div>
-    
     <div class="tab-content" id="skills-tab">
-      <h2>Мои навыки</h2>
+      <h2>${t.skillsTitle}</h2>
       <ul>
-        <li>HTML5, CSS3, JavaScript</li>
-        <li>React, Vue.js</li>
-        <li>Node.js, Express</li>
-        <li>MongoDB, MySQL</li>
-        <li>Figma, Adobe Photoshop</li>
-        <li>SEO-оптимизация</li>
-        <li>3D моделирование (Blender, ArmorPaint)</li>
-        <li>Разработка игр (Unity, Unreal Engine, геймдизайн)</li>
+        ${t.skillsList.map(skill => `<li>${skill}</li>`).join('')}
       </ul>
     </div>
-    
     <div class="tab-content" id="experience-tab">
-      <h2>Опыт работы</h2>
+      <h2>${t.experienceTitle}</h2>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Фрилансер</div>
-          <p>2018 — настоящее время</p>
-          <p>Веб-разработка, дизайн, 3D моделирование, геймдев.<br>
-          Реализация проектов любой сложности: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов. Креативный подход, современный стек, внимание к деталям.</p>
+          <div class="project-title">Freelancer</div>
+          <p>2018 — present</p>
+          <p>${t.freelancerDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
           <div class="project-title">Leria Agency</div>
-          <p>2024 — настоящее время</p>
-          <p>Веб-разработка, администрирование.</p>
+          <p>2024 — present</p>
+          <p>${t.leriaAgencyDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Лаборатория Касперского</div>
+          <div class="project-title">Kaspersky Lab</div>
           <p>2020 — 2021</p>
-          <p>Malware-аналитик. Анализ вредоносного ПО, исследование угроз, участие в разработке средств защиты.</p>
+          <p>${t.kasperskyLabDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Веб-разработчик, компания XYZ</div>
+          <div class="project-title">Web Developer, XYZ company</div>
           <p>2019 — 2020</p>
-          <p>Разработка и поддержка веб-сайтов для клиентов из различных отраслей.</p>
+          <p>${t.xyzCompanyDescription}</p>
         </div>
       </div>
     </div>
@@ -75,17 +54,17 @@ window.renderAboutContent = function() {
 };
 
 window.renderPortfolioContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="tabs main-tabs">
-      <div class="tab active" data-tab="websites">Веб-сайты</div>
-      <div class="tab" data-tab="models3d">3D Модели</div>
+      <div class="tab active" data-tab="websites">${t.portfolio || 'Веб-сайты'}</div>
+      <div class="tab" data-tab="models3d">3D ${t.models3d || (window.currentLang === 'en' ? 'Models' : 'Модели')}</div>
     </div>
-    
     <div class="tab-content active" id="websites-tab">
       <div class="tabs sub-tabs">
-        <div class="tab active" data-tab="landing">Лендинг</div>
-        <div class="tab" data-tab="shop">Магазин</div>
-        <div class="tab" data-tab="corporate">Корпоративный</div>
+        <div class="tab active" data-tab="landing">${t.calculatorLanding ? t.calculatorLanding.split('(')[0].trim() : (window.currentLang === 'en' ? 'Landing' : 'Лендинг')}</div>
+        <div class="tab" data-tab="shop">${t.calculatorShop ? t.calculatorShop.split('(')[0].trim() : (window.currentLang === 'en' ? 'Online store' : 'Магазин')}</div>
+        <div class="tab" data-tab="corporate">${t.calculatorCorp ? t.calculatorCorp.split('(')[0].trim() : (window.currentLang === 'en' ? 'Corporate' : 'Корпоративный')}</div>
       </div>
       <div class="tab-content active" id="landing-tab">
         ${window.renderProjects(window.projects.websites.landing)}
@@ -97,11 +76,10 @@ window.renderPortfolioContent = function() {
         ${window.renderProjects(window.projects.websites.corporate)}
       </div>
     </div>
-    
     <div class="tab-content" id="models3d-tab">
       <div class="tabs sub-tabs">
-        <div class="tab active" data-tab="interactive">Интерактивные</div>
-        <div class="tab" data-tab="static">Статичные</div>
+        <div class="tab active" data-tab="interactive">${t.interactive || (window.currentLang === 'en' ? 'Interactive' : 'Интерактивные')}</div>
+        <div class="tab" data-tab="static">${t.static || (window.currentLang === 'en' ? 'Static' : 'Статичные')}</div>
       </div>
       <div class="tab-content active" id="interactive-tab">
         ${window.render3DModels(window.projects.models3d.interactive)}
@@ -114,139 +92,127 @@ window.renderPortfolioContent = function() {
 };
 
 window.renderServicesContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="tabs">
-      <div class="tab active" data-tab="web">Разработка сайтов</div>
-      <div class="tab" data-tab="design">Дизайн</div>
-      <div class="tab" data-tab="seo">SEO-продвижение</div>
-      <div class="tab" data-tab="model3d">3D моделирование</div>
-      <div class="tab" data-tab="gamedev">Разработка игр</div>
+      <div class="tab active" data-tab="web">${t.servicesWeb}</div>
+      <div class="tab" data-tab="design">${t.servicesDesign}</div>
+      <div class="tab" data-tab="seo">${t.servicesSeo}</div>
+      <div class="tab" data-tab="model3d">${t.services3d}</div>
+      <div class="tab" data-tab="gamedev">${t.servicesGamedev}</div>
     </div>
-    
     <div class="tab-content active" id="web-tab">
-      <h2>Разработка сайтов</h2>
-      <p>Я предлагаю полный цикл разработки веб-сайтов:</p>
+      <h2>${t.servicesWeb}</h2>
+      <p>${t.servicesWebDesc}</p>
       <ul>
-        <li>Лендинги от 20 000₽</li>
+        <li>${t.calculatorLanding}</li>
       </ul>
-      <p class="service-description">Одностраничный сайт для презентации товара, услуги или события. Включает современный дизайн, адаптивную верстку, формы обратной связи и интеграцию с аналитикой.</p>
-      
+      <p class="service-description">${t.servicesLandingDesc}</p>
       <ul>
-        <li>Интернет-магазины от 50 000₽</li>
+        <li>${t.calculatorShop}</li>
       </ul>
-      <p class="service-description">Полноценный онлайн-магазин с каталогом товаров, корзиной, личным кабинетом и системой оплаты. Включает настройку CMS, фильтры товаров, SEO-оптимизацию и мобильную версию.</p>
-      
+      <p class="service-description">${t.servicesShopDesc}</p>
       <ul>
-        <li>Корпоративные сайты от 80 000₽</li>
+        <li>${t.calculatorCorp}</li>
       </ul>
-      <p class="service-description">Многостраничный сайт для представления компании в интернете. Включает уникальный дизайн, структурированную информацию о компании, блог, интеграцию с CRM и социальными сетями.</p>
-      
-      <p>Все сайты адаптивны, оптимизированы для поисковых систем и имеют удобную панель управления.</p>
+      <p class="service-description">${t.servicesCorpDesc}</p>
+      <p>${t.servicesWebNote}</p>
     </div>
-    
     <div class="tab-content" id="design-tab">
-      <h2>Дизайн</h2>
-      <p>Создаю уникальный дизайн для вашего бренда:</p>
+      <h2>${t.servicesDesign}</h2>
+      <p>${t.servicesDesignDesc}</p>
       <ul>
-        <li>UI/UX дизайн от 18 000₽</li>
+        <li>${t.servicesUiux}</li>
       </ul>
-      <p class="service-description">Разработка интерфейсов с фокусом на удобство использования. Включает прототипирование, создание макетов всех экранов, анимации и интерактивные элементы.</p>
-      
+      <p class="service-description">${t.servicesUiuxDesc}</p>
       <ul>
-        <li>Логотипы и фирменный стиль от 30 000₽</li>
+        <li>${t.servicesLogo}</li>
       </ul>
-      <p class="service-description">Создание уникального логотипа и фирменного стиля компании. Включает несколько концепций на выбор, финальные файлы в различных форматах и брендбук.</p>
-      
+      <p class="service-description">${t.servicesLogoDesc}</p>
       <ul>
-        <li>Баннеры и рекламные материалы от 30 000₽</li>
+        <li>${t.servicesBanner}</li>
       </ul>
-      <p class="service-description">Разработка графических материалов для рекламных кампаний. Включает баннеры для сайтов, социальных сетей, email-рассылок и печатной продукции.</p>
+      <p class="service-description">${t.servicesBannerDesc}</p>
     </div>
-    
     <div class="tab-content" id="seo-tab">
-      <h2>SEO-продвижение</h2>
-      <p>Помогу вашему сайту занять высокие позиции в поисковых системах:</p>
+      <h2>${t.servicesSeo}</h2>
+      <p>${t.servicesSeoDesc}</p>
       <ul>
-        <li>Аудит сайта</li>
+        <li>${t.servicesAudit}</li>
       </ul>
-      <p class="service-description">Комплексный анализ сайта для выявления технических ошибок и SEO-проблем. Включает проверку скорости загрузки, мобильной версии, структуры URL и метатегов.</p>
-      
+      <p class="service-description">${t.servicesAuditDesc}</p>
       <ul>
-        <li>Оптимизация контента</li>
+        <li>${t.servicesContent}</li>
       </ul>
-      <p class="service-description">Создание и оптимизация текстов для повышения релевантности поисковым запросам. Включает подбор ключевых слов, написание SEO-текстов и оптимизацию существующего контента.</p>
-      
+      <p class="service-description">${t.servicesContentDesc}</p>
       <ul>
-        <li>Техническое SEO</li>
+        <li>${t.servicesTechSeo}</li>
       </ul>
-      <p class="service-description">Устранение технических проблем, влияющих на индексацию сайта. Включает настройку robots.txt, XML-карты сайта, микроразметки и ускорение загрузки страниц.</p>
-      
+      <p class="service-description">${t.servicesTechSeoDesc}</p>
       <ul>
-        <li>Анализ конкурентов</li>
+        <li>${t.servicesCompetitors}</li>
       </ul>
-      <p class="service-description">Исследование стратегий продвижения конкурентов для выявления эффективных подходов. Включает анализ ключевых слов, ссылочного профиля и контент-стратегии.</p>
+      <p class="service-description">${t.servicesCompetitorsDesc}</p>
     </div>
-
     <div class="tab-content" id="model3d-tab">
-      <h2>3D моделирование</h2>
-      <p>Создаю 3D-модели и сцены для визуализации, презентаций и веба:</p>
+      <h2>${t.services3d}</h2>
+      <p>${t.services3dDesc}</p>
       <ul>
-        <li>3D-моделирование (Blender, ArmorPaint)</li>
-        <li>Визуализация и рендеринг сцен</li>
-        <li>Интерактивные 3D-приложения (Three.js, WebGL)</li>
-        <li>Интеграция 3D-контента в сайты и приложения</li>
-        <li>Анимация, оптимизация для WebGL</li>
+        <li>${t.services3dModeling}</li>
+        <li>${t.services3dRender}</li>
+        <li>${t.services3dInteractive}</li>
+        <li>${t.services3dIntegration}</li>
+        <li>${t.services3dAnimation}</li>
       </ul>
-      <p>В портфолио представлены примеры 3D-моделей, реализованных с нуля.</p>
+      <p>${t.services3dNote}</p>
     </div>
-
     <div class="tab-content" id="gamedev-tab">
-      <h2>Разработка игр</h2>
-      <p>Разрабатываю игровые прототипы и приложения для Web и ПК:</p>
+      <h2>${t.servicesGamedev}</h2>
+      <p>${t.servicesGamedevDesc}</p>
       <ul>
-        <li>Unity (C#)</li>
-        <li>Unreal Engine (Blueprints, C++)</li>
-        <li>Three.js, WebGL</li>
-        <li>Геймдизайн, создание игровых механик, логики и UI</li>
-        <li>Интеграция 3D-моделей и анимаций</li>
-        <li>Оптимизация и экспорт под разные платформы</li>
+        <li>${t.servicesGamedevUnity}</li>
+        <li>${t.servicesGamedevUnreal}</li>
+        <li>${t.servicesGamedevWeb}</li>
+        <li>${t.servicesGamedevDesign}</li>
+        <li>${t.servicesGamedevIntegration}</li>
+        <li>${t.servicesGamedevOptimization}</li>
       </ul>
-      <p>Возможна разработка интерактивных презентаций, мини-игр и прототипов под заказ.</p>
+      <p>${t.servicesGamedevNote}</p>
     </div>
   `;
 };
 
 window.renderContactsContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="contacts-container">
-      <h2>Мои контакты</h2>
-      <h3>Максим Лузан</h3>
-      <p><strong>Email:</strong> luzan.maksim@mail.ru</p>
-      <p><strong>Телефон:</strong> +7 999 475-95-92</p>
-      
+      <h2>${t.contactsTitle}</h2>
+      <h3>${t.contactsName}</h3>
+      <p><strong>${t.contactsEmailLabel}:</strong> luzan.maksim@mail.ru</p>
+      <p><strong>${t.contactsPhoneLabel}:</strong> +7 999 475-95-92</p>
       <div class="social-links-container">
-        <h3>Социальные сети</h3>
+        <h3>${t.contactsSocials}</h3>
         <div class="social-links">
           <a href="https://vk.com/hp7zk" target="_blank" class="social-link vk-link" title="ВКонтакте">
             <span class="social-link-icon">
               <img src="icons/vk-dark.svg" class="dark-theme-icon" alt="VK" style="width:35px;height:35px;">
               <img src="icons/vk-light.svg" class="light-theme-icon" alt="VK" style="width:35px;height:35px;">
             </span>
-            <span class="social-link-text">ВКонтакте</span>
+            <span class="social-link-text">${t.contactsVk}</span>
           </a>
           <a href="https://t.me/looptoquit" target="_blank" class="social-link telegram-link" title="Telegram">
             <span class="social-link-icon">
               <img src="icons/telegram-dark.svg" class="light-theme-icon" alt="Telegram" style="width:35px;height:35px;">
               <img src="icons/telegram-light.svg" class="dark-theme-icon" alt="Telegram" style="width:35px;height:35px;">
             </span>
-            <span class="social-link-text">Telegram</span>
+            <span class="social-link-text">${t.contactsTelegram}</span>
           </a>
           <a href="https://github.com/hp7z" target="_blank" class="social-link github-link" title="GitHub">
             <span class="social-link-icon">
               <img src="icons/github-dark.svg" class="dark-theme-icon" alt="GitHub" style="width:35px;height:35px;">
               <img src="icons/github-light.svg" class="light-theme-icon" alt="GitHub" style="width:35px;height:35px;">
             </span>
-            <span class="social-link-text">GitHub</span>
+            <span class="social-link-text">${t.contactsGitHub}</span>
           </a>
         </div>
       </div>
@@ -256,40 +222,59 @@ window.renderContactsContent = function() {
 
 window.renderProjects = function(projects) {
   const isMobile = window.innerWidth <= 992;
+  const lang = window.currentLang;
+  const t = window.locales[lang];
   return projects.map(project => {
+    const title = lang === 'en' && project.title_en ? project.title_en : project.title;
+    const description = lang === 'en' && project.description_en ? project.description_en : (project.description || '');
+    // Локализуем дату
+    let date = project.date;
+    if (date && t.dateFormat && lang === 'en') {
+      // Попробуем распознать русскую дату и перевести
+      const match = date.match(/^(\d{1,2})\s([а-яА-ЯёЁ]+)\s(\d{4})$/);
+      if (match) {
+        const months = [
+          "января", "февраля", "марта", "апреля", "мая", "июня",
+          "июля", "августа", "сентября", "октября", "ноября", "декабря"
+        ];
+        const mIdx = months.indexOf(match[2].toLowerCase());
+        if (mIdx >= 0) {
+          const d = new Date(+match[3], mIdx, +match[1]);
+          date = d.toLocaleDateString(t.dateFormat, { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+      }
+    }
     if (isMobile) {
-      // Мобильная структура: заголовок, описание, превью, кнопка, футер
       return `
         <div class="project-container">
           <div class="project-content">
-            <div class="project-title">${project.title}</div>
-            <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
+            <div class="project-title">${title}</div>
+            <p class="project-description">${description || getLocaleString('noProjectDescription')}</p>
             <div class="project-preview">
-              <img src="${project.preview}" alt="${project.title}">
+              <img src="${project.preview}" alt="${title}">
             </div>
-            <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+            <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
             <div class="project-footer">
               <span class="project-credits">${project.credits}</span>
-              <span class="project-date">${project.date || ''}</span>
+              <span class="project-date">${date || ''}</span>
             </div>
           </div>
         </div>
       `;
     } else {
-      // ПК-структура: контент слева, превью справа
       return `
         <div class="project-container">
           <div class="project-content">
-            <div class="project-title">${project.title}</div>
-            <p class="project-description">${project.description || 'Описание проекта отсутствует'}</p>
-            <a href="#" class="project-link" data-url="${project.url}">Открыть проект</a>
+            <div class="project-title">${title}</div>
+            <p class="project-description">${description || getLocaleString('noProjectDescription')}</p>
+            <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
             <div class="project-footer">
               <span class="project-credits">${project.credits}</span>
-              <span class="project-date">${project.date || ''}</span>
+              <span class="project-date">${date || ''}</span>
             </div>
           </div>
           <div class="project-preview">
-            <img src="${project.preview}" alt="${project.title}">
+            <img src="${project.preview}" alt="${title}">
           </div>
         </div>
       `;
@@ -299,17 +284,36 @@ window.renderProjects = function(projects) {
 
 window.render3DModels = function(models) {
   const isMobile = window.innerWidth <= 992;
+  const lang = window.currentLang;
+  const t = window.locales[lang];
   return models.map(model => {
+    const title = lang === 'en' && model.title_en ? model.title_en : model.title;
+    const description = lang === 'en' && model.description_en ? model.description_en : (model.description || '');
+    let date = model.date;
+    if (date && t.dateFormat && lang === 'en') {
+      const match = date.match(/^(\d{1,2})\s([а-яА-ЯёЁ]+)\s(\d{4})$/);
+      if (match) {
+        const months = [
+          "января", "февраля", "марта", "апреля", "мая", "июня",
+          "июля", "августа", "сентября", "октября", "ноября", "декабря"
+        ];
+        const mIdx = months.indexOf(match[2].toLowerCase());
+        if (mIdx >= 0) {
+          const d = new Date(+match[3], mIdx, +match[1]);
+          date = d.toLocaleDateString(t.dateFormat, { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+      }
+    }
     if (isMobile) {
       // Мобильная структура: заголовок, описание, превью, футер
       if (model.type === 'interactive' && model.modelUrl) {
         return `
           <div class="project-container model-container color-block">
             <div class="model-content">
-              <div class="model-title color-text">${model.title}</div>
-              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-title color-text">${title}</div>
+              <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
               <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
-                <img src="${model.preview}" alt="${model.title}">
+                <img src="${model.preview}" alt="${title}">
                 <div class="model-play-btn"></div>
               </div>
               <div class="model-footer">
@@ -323,10 +327,10 @@ window.render3DModels = function(models) {
         return `
           <div class="project-container model-container color-block">
             <div class="model-content">
-              <div class="model-title color-text">${model.title}</div>
-              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-title color-text">${title}</div>
+              <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
               <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
-                <img src="${model.preview}" alt="${model.title}">
+                <img src="${model.preview}" alt="${title}">
               </div>
               <div class="model-footer">
                 <span class="model-credits color-text">${model.credits}</span>
@@ -342,15 +346,15 @@ window.render3DModels = function(models) {
         return `
           <div class="project-container model-container color-block">
             <div class="model-content">
-              <div class="model-title color-text">${model.title}</div>
-              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-title color-text">${title}</div>
+              <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
               <div class="model-footer">
                 <span class="model-credits color-text">${model.credits}</span>
                 <span class="model-date color-text">${model.date || ''}</span>
               </div>
             </div>
             <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
-              <img src="${model.preview}" alt="${model.title}">
+              <img src="${model.preview}" alt="${title}">
               <div class="model-play-btn"></div>
             </div>
           </div>
@@ -359,15 +363,15 @@ window.render3DModels = function(models) {
         return `
           <div class="project-container model-container color-block">
             <div class="model-content">
-              <div class="model-title color-text">${model.title}</div>
-              <p class="model-description color-text">${model.description || 'Описание модели отсутствует'}</p>
+              <div class="model-title color-text">${title}</div>
+              <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
               <div class="model-footer">
                 <span class="model-credits color-text">${model.credits}</span>
                 <span class="model-date color-text">${model.date || ''}</span>
               </div>
             </div>
             <div class="model-preview static-model-preview" onclick="openModelGallery('${model.id}')">
-              <img src="${model.preview}" alt="${model.title}">
+              <img src="${model.preview}" alt="${title}">
             </div>
           </div>
         `;
@@ -380,57 +384,55 @@ window.render3DModels = function(models) {
 // Оставьте функцию как есть, чтобы калькулятор корректно отображался и работал.
 // Вот правильный блок:
 window.renderCalculatorContent = function() {
+  const t = window.locales[window.currentLang];
   return `
-    <h2>Калькулятор услуг</h2>
-    <p>Выберите необходимые услуги для расчета стоимости:</p>
-    
+    <h2>${t.calculator}</h2>
+    <p>${t.calculatorDesc}</p>
     <div class="calculator-section">
-      <h3>Разработка сайта</h3>
+      <h3>${t.calculatorWeb}</h3>
       <div class="calculator-item">
         <input type="checkbox" id="landing" class="service-checkbox" data-price="20000" data-type="website">
-        <label for="landing">Лендинг (20 000₽)</label>
+        <label for="landing">${t.calculatorLanding}</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="shop" class="service-checkbox" data-price="50000" data-type="website">
-        <label for="shop">Интернет-магазин (50 000₽)</label>
+        <label for="shop">${t.calculatorShop}</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="corporate" class="service-checkbox" data-price="80000" data-type="website">
-        <label for="corporate">Корпоративный сайт (80 000₽)</label>
+        <label for="corporate">${t.calculatorCorp}</label>
       </div>
     </div>
-    
     <div class="calculator-section">
-      <h3>Дополнительные услуги</h3>
+      <h3>${t.calculatorAdd}</h3>
       <div class="calculator-item">
         <input type="checkbox" id="design" class="service-checkbox" data-price="35000" data-type="additional">
-        <label for="design">Дизайн (35 000₽)</label>
+        <label for="design">${t.calculatorDesign}</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="seo" class="service-checkbox" data-price="20000" data-type="additional">
-        <label for="seo">SEO-продвижение (20 000₽)</label>
+        <label for="seo">${t.calculatorSeo}</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="content" class="service-checkbox" data-price="10000" data-type="additional">
-        <label for="content">Наполнение контентом (10 000₽)</label>
+        <label for="content">${t.calculatorContent}</label>
       </div>
       <div class="calculator-item">
         <input type="checkbox" id="hosting" class="service-checkbox" data-price="5000" data-type="additional">
-        <label for="hosting">Хостинг на 1 год (5 000₽)</label>
+        <label for="hosting">${t.calculatorHosting}</label>
       </div>
     </div>
-    
     <div class="calculator-result">
       <div class="calculator-note">
-        <p>* При заказе разработки сайта на все дополнительные услуги действует скидка 20%</p>
+        <p>${t.calculatorDiscountNote}</p>
         <p class="calculator-note-inline" style="font-size:12px;opacity:0.7;margin-top:4px;">
-          * Окончательная цена на дизайн может варьироваться в зависимости от индивидуальных запросов
+          ${t.calculatorDesignNote}
         </p>
       </div>
       <div class="calculator-total">
-        <h3>Итоговая стоимость: <span id="total-price">0</span> ₽</h3>
+        <h3>${t.calculatorTotal}: <span id="total-price">0</span> ₽</h3>
       </div>
-      <button class="btn" id="order-button">Заказать</button>
+      <button class="btn" id="order-button">${t.calculatorOrder}</button>
     </div>
   `;
 };
@@ -487,6 +489,7 @@ const staticModelCollections = {
 
 // --- renderStaticModelCollections теперь использует staticModelCollections ---
 function renderStaticModelCollections() {
+  const t = window.locales[window.currentLang];
   if (!window._staticGalleryPreviewIndexes) window._staticGalleryPreviewIndexes = {};
   const previewIndexes = window._staticGalleryPreviewIndexes;
   if (!window._staticGalleryPreviewTimers) window._staticGalleryPreviewTimers = {};
@@ -515,7 +518,7 @@ function renderStaticModelCollections() {
           <div class="model-title color-text">${col.title}</div>
           <div class="model-description color-text">${col.description}</div>
           <a href="#" class="project-link" onclick="event.preventDefault(); openStaticGalleryCollection('${key}');">
-            Открыть галерею
+            ${t.openGallery}
           </a>
         </div>
         <div class="model-preview static-model-preview" onclick="openStaticGalleryCollection('${key}')">
@@ -529,6 +532,7 @@ function renderStaticModelCollections() {
 
 // --- openStaticGalleryCollection теперь использует staticModelCollections ---
 window.openStaticGalleryCollection = function(key) {
+  const t = window.locales[window.currentLang];
   const col = staticModelCollections[key];
   if (!col) return;
 
@@ -566,12 +570,12 @@ window.openStaticGalleryCollection = function(key) {
           <div class="model-title">${currentImage.title}</div>
           <div class="model-description" style="margin-bottom:18px;">${currentImage.description}</div>
           <div class="model-tools">
-            <b>Инструменты:</b>
+            <b>${t.tools}:</b>
             <span class="tool-icons"></span>
           </div>
           <div class="model-footer">
-            <div class="model-credits"><b>Автор:</b> ${currentImage.credits}</div>
-            <div class="model-date"><b>Дата:</b> ${currentImage.date}</div>
+            <div class="model-credits"><b>${t.author}:</b> ${currentImage.credits}</div>
+            <div class="model-date"><b>${t.date}:</b> ${currentImage.date}</div>
           </div>
         </div>
       </div>
@@ -705,7 +709,7 @@ function openFullscreenGalleryStatic(col, startIdx) {
         <div style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;">
           ${images.map((img, i) => `<img src="models/preview/${col.folder}/${img.file}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
         </div>
-        <div style="color:#fff;font-size:16px;margin-top:10px;"><b>Дата:</b> ${images[current].date}</div>
+        <div style="color:#fff;font-size:16px;margin-top:10px;"><b>${t.date}:</b> ${images[current].date}</div>
       </div>
       <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-left:20px;color:${arrowColor};">&#8594;</button>
     </div>
@@ -793,7 +797,7 @@ if (!window._galleryThemeListener) {
 
 // --- GitHub Stats окно ---
 window.renderGitHubStatsContent = function() {
-  // Контейнер для динамического контента
+  const t = window.locales[window.currentLang];
   setTimeout(loadGitHubStats, 10);
   return `
     <div id="github-stats-root" style="display:flex;height:100%;">
@@ -804,7 +808,7 @@ window.renderGitHubStatsContent = function() {
       </div>
       <div id="github-main" style="flex:1 1 80%;max-width:80%;padding:30px 30px 30px 30px;overflow:auto;">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-          <h2 style="margin:0;">GitHub статистика</h2>
+          <h2 style="margin:0;">${t.githubStatsTitle}</h2>
         </div>
         <div id="github-stats-summary" style="display:flex;flex-wrap:wrap;gap:30px;margin-bottom:30px;">
           <div><img id="github-stats-img" src="https://github-readme-stats.vercel.app/api?username=hp7z&show_icons=true&theme=default&hide_title=true" alt="GitHub Stats" style="max-width:100%;width:100%;"></div>
@@ -814,11 +818,11 @@ window.renderGitHubStatsContent = function() {
           <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=hp7z&layout=compact&theme=default&hide_title=true" alt="Top Langs" style="max-width:100%;width:100%;">
         </div>
         <div style="margin-bottom:30px;">
-          <h3>Репозитории</h3>
+          <h3>${t.githubRepos}</h3>
           <div id="github-repos-list" style="max-height:220px;overflow:auto;"></div>
         </div>
         <div>
-          <h3>Последние коммиты</h3>
+          <h3>${t.githubCommits}</h3>
           <div id="github-commits-list" style="max-height:220px;overflow:auto;"></div>
         </div>
       </div>
@@ -827,6 +831,7 @@ window.renderGitHubStatsContent = function() {
 };
 
 function loadGitHubStats() {
+  const t = window.locales[window.currentLang];
   const user = 'hp7z';
   // Аватар и имя
   fetch(`https://api.github.com/users/${user}`)
@@ -887,11 +892,12 @@ function loadGitHubStats() {
         }
         if (count > 10) break;
       }
-      list.innerHTML = html || '<span style="color:#888;">Нет публичных коммитов за последнее время.</span>';
+      list.innerHTML = html || `<span style="color:#888;">${t.githubNoCommits}</span>`;
     });
 }
 
 window.renderKittyGalleryContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="kitty-gallery-flex" style="display:flex;flex-direction:row;height:100%;">
       <div class="kitty-gallery-viewer-col" style="flex:0 0 65%;max-width:65%;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;height:100%;box-sizing:border-box;">
@@ -905,20 +911,13 @@ window.renderKittyGalleryContent = function() {
         </div>
       </div>
       <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:space-around;height:100%;box-sizing:border-box;overflow-y:auto;max-height:100%;">
-        <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">Доча: Кошачий напарник</div>
+        <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">${t.kittyTitle}</div>
         <div class="model-description" id="kitty-gallery-description" style="margin-bottom:15px;">
-          <b>Мяу! Я Даша, но дома меня зовут просто Доча.</b><br>
-          Я — пушистая хозяйка этого дома. Люблю спать на клавиатуре, ловить курсор, требовать вкусняшки и, конечно, позировать для фотосессий.<br>
-          <br>
-          <i>“Если ты устал — просто посмотри на меня, и настроение сразу станет лучше! Я всегда рядом, чтобы согреть тебя своим мурчанием.”</i><br>
-          <br>
-          <b>Мои любимые занятия:</b> валяться на солнышке, наблюдать за птицами из окна, и напоминать, что без меня тут было бы скучно.<br>
-          <br>
-          <b>Автор:</b> Даша (Доча)
+          ${t.kittyDesc}
         </div>
         <div class="model-footer">
-          <div class="model-credits"><b>Автор:</b> Даша</div>
-          <div class="model-date" id="kitty-gallery-date"><b>Дата:</b> 01.10.2023</div>
+          <div class="model-credits"><b>${t.author}:</b> ${t.kittyAuthor}</div>
+          <div class="model-date" id="kitty-gallery-date"><b>${t.date}:</b> 01.10.2023</div>
         </div>
       </div>
     </div>
@@ -926,6 +925,7 @@ window.renderKittyGalleryContent = function() {
 };
 
 window.initKittyGallery = function() {
+  const t = window.locales[window.currentLang];
   const images = [
     { file: '1.jpg', date: '01.10.2023' },
     { file: '2.jpg', date: '15.10.2023' },
@@ -947,7 +947,7 @@ window.initKittyGallery = function() {
       thumb.classList.toggle('active', i === current);
       thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
     });
-    dateEl.innerHTML = `<b>Дата:</b> ${images[current].date}`;
+    dateEl.innerHTML = `<b>${t.date}:</b> ${images[current].date}`;
   }
   document.getElementById('kitty-gallery-prev').onclick = () => {
     current = (current - 1 + images.length) % images.length;
@@ -970,6 +970,7 @@ window.initKittyGallery = function() {
 };
 
 function openKittyFullscreenGallery(images, startIdx) {
+  const t = window.locales[window.currentLang];
   let current = startIdx;
   const isDarkTheme = document.body.classList.contains('dark-theme');
   const arrowColor = isDarkTheme ? '#fff' : '#000';

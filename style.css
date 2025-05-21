@@ -2212,3 +2212,31 @@ body.light-theme .light-theme-icon {
   align-items: center;
   /* Остальные стили как у .project-info */
 }
+
+.lang-toggle {
+  width: 44px;
+  height: 30px;
+  border-radius: 15px;
+  background: rgba(0,0,0,0.15);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cantarell', 'Ubuntu', sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  margin-left: 0;
+  margin-right: 10px;
+  transition: background 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+.lang-toggle:hover {
+  background: var(--button-hover-bg);
+}
+
+/* --- Белая обводка для svg-иконок ярлыков в светлой теме --- */
+body.light-theme .shortcut-icon img.light-theme-icon {
+  /* Для SVG-иконок: белая обводка */
+  filter: drop-shadow(0 0 0.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 2.5px #fff);
+}

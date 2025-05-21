@@ -1,5 +1,9 @@
-// --- Старт: переменные и утилиты ---
+// --- Глобальные переменные ---
 const trayWindows = {};
+
+// --- Локализация ---
+// locales.js должен быть подключён до app.js
+// Используйте window.getLocaleString(key) для всех текстов
 
 // --- Тема, иконки, обои ---
 const windowIcons = {
@@ -106,12 +110,16 @@ function generateCalendar(year, month) {
   const calendar = document.getElementById('calendar');
   if (!calendar) return;
   let now = new Date();
+  const t = window.locales[window.currentLang];
   if (typeof year !== 'number') year = now.getFullYear();
   if (typeof month !== 'number') month = now.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
-  const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+  const monthNames = t.calendarMonths || [
+    "Январь", "Февраль", "Март", "Апрель", "Май", "Июнь",
+    "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
+  ];
+  const weekdayNames = t.calendarWeekdays || ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
   const daysInMonth = new Date(year, month + 1, 0).getDate();
-  // Цвет стрелок всегда актуальный
   const getArrowColor = () => document.body.classList.contains('dark-theme') ? '#fff' : '#000';
   let calendarHTML = `
     <div class="calendar-header" style="display:flex;align-items:center;justify-content:space-between;">
@@ -120,13 +128,7 @@ function generateCalendar(year, month) {
       <button id="calendar-next" style="background:none;border:none;font-size:22px;cursor:pointer;color:${getArrowColor()};padding:0 10px;">&#8594;</button>
     </div>
     <div class="calendar-grid">
-      <div class="day-name">Пн</div>
-      <div class="day-name">Вт</div>
-      <div class="day-name">Ср</div>
-      <div class="day-name">Чт</div>
-      <div class="day-name">Пт</div>
-      <div class="day-name">Сб</div>
-      <div class="day-name">Вс</div>
+      ${weekdayNames.map(w => `<div class="day-name">${w}</div>`).join('')}
   `;
   let dayIndex = firstDay === 0 ? 6 : firstDay - 1;
   for (let i = 0; i < dayIndex; i++) calendarHTML += `<div class="day empty"></div>`;
@@ -136,11 +138,9 @@ function generateCalendar(year, month) {
   }
   calendarHTML += `</div>`;
   calendar.innerHTML = calendarHTML;
-  // Не закрываем календарь при переключении месяца
   calendar.querySelector('#calendar-prev').onclick = (e) => {
     e.stopPropagation();
     generateCalendar(month === 0 ? year - 1 : year, month === 0 ? 11 : month - 1);
-    // Обновить цвет стрелок после рендера
     updateCalendarArrowColors();
   };
   calendar.querySelector('#calendar-next').onclick = (e) => {
@@ -148,7 +148,6 @@ function generateCalendar(year, month) {
     generateCalendar(month === 11 ? year + 1 : year, month === 11 ? 0 : month + 1);
     updateCalendarArrowColors();
   };
-  // При смене темы обновлять цвет стрелок
   updateCalendarArrowColors();
 }
 function updateCalendarArrowColors() {
@@ -173,10 +172,12 @@ function renderStartMenu() {
   const isDarkTheme = document.body.classList.contains('dark-theme');
   window.startMenuItems.main.forEach(item => {
     const iconPath = isDarkTheme ? item.icon : (item.iconLight || item.icon);
+    // Локализуем title
+    const title = getLocaleString(item.action) || item.title;
     menuHTML += `
       <div class="menu-item" data-window="${item.action}">
-        <img src="${iconPath}" alt="${item.title}">
-        <span>${item.title}</span>
+        <img src="${iconPath}" alt="${title}">
+        <span>${title}</span>
       </div>
     `;
   });
@@ -218,10 +219,9 @@ function updateTaskbar() {
   Object.entries(trayWindows).forEach(([type, win]) => {
     const item = document.createElement('div');
     item.className = 'taskbar-item' + (win.dom?.classList.contains('active') ? ' active' : '');
-    let title = win.title || type;
+    // --- Локализуем title для таскбара ---
+    let title = getLocaleString(type) || win.title || type;
     let iconPath;
-    
-    // Определение иконки как раньше
     const isDarkTheme = document.body.classList.contains('dark-theme');
     if (type === 'about') iconPath = getIconForTheme(windowIcons.about);
     else if (type === 'portfolio') iconPath = getIconForTheme(windowIcons.portfolio);
@@ -496,52 +496,52 @@ function openWindow(type) {
   let title, content, icon;
   switch(type) {
     case 'about':
-      title = 'Обо мне';
+      title = getLocaleString('about');
       content = window.renderAboutContent();
       icon = getIconForTheme(windowIcons.about);
       break;
     case 'portfolio':
-      title = 'Портфолио';
+      title = getLocaleString('portfolio');
       content = window.renderPortfolioContent();
       icon = getIconForTheme(windowIcons.portfolio);
       break;
     case 'services':
-      title = 'Услуги';
+      title = getLocaleString('services');
       content = window.renderServicesContent();
       icon = getIconForTheme(windowIcons.services);
       break;
     case 'contacts':
-      title = 'Контакты';
+      title = getLocaleString('contacts');
       content = window.renderContactsContent();
       icon = getIconForTheme(windowIcons.contacts);
       break;
     case 'calculator':
-      title = 'Калькулятор услуг';
+      title = getLocaleString('calculator');
       content = window.renderCalculatorContent();
       icon = getIconForTheme(windowIcons.calculator);
       break;
     case 'minesweeper':
-      title = 'Сапер';
+      title = getLocaleString('minesweeper');
       content = window.renderMinesweeperContent();
       icon = getIconForTheme(windowIcons.game);
       break;
     case 'game2048':
-      title = '2048';
+      title = getLocaleString('game2048');
       content = window.render2048Content();
       icon = getIconForTheme(windowIcons.game);
       break;
     case 'tictactoe':
-      title = 'Крестики-нолики';
+      title = getLocaleString('tictactoe');
       content = window.renderTicTacToeContent();
       icon = getIconForTheme(windowIcons.game);
       break;
     case 'github':
-      title = 'GitHub Stats';
+      title = getLocaleString('github');
       content = window.renderGitHubStatsContent ? window.renderGitHubStatsContent() : '<div>GitHub Stats</div>';
       icon = getIconForTheme(windowIcons.github);
       break;
     case 'kitty':
-      title = 'Лучший компаньон';
+      title = getLocaleString('kitty');
       content = window.renderKittyGalleryContent();
       icon = getIconForTheme(windowIcons.kitty);
       break;
@@ -760,15 +760,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateElement = document.getElementById('date');
     if (!clockElement || !dateElement) return;
     const now = new Date();
+    // --- Часы ---
     const hours = now.getHours().toString().padStart(2, '0');
     const minutes = now.getMinutes().toString().padStart(2, '0');
     clockElement.textContent = `${hours}:${minutes}`;
+    // --- Локализованная дата ---
+    const t = window.locales[window.currentLang];
+    const locale = t.dateFormat || 'ru-RU';
     const options = { weekday: 'short', day: 'numeric', month: 'long' };
-    const dateString = now.toLocaleDateString('ru-RU', options);
+    let dateString = now.toLocaleDateString(locale, options);
+    dateString = dateString.charAt(0).toUpperCase() + dateString.slice(1);
     dateElement.textContent = dateString;
   }
   updateClock();
   setInterval(updateClock, 60000);
+
+  // --- Локализация даты под часами при смене языка ---
+  window.addEventListener('languagechange', updateClock);
+
   // Меню Пуск
   renderStartMenu();
   // Ярлыки
@@ -882,11 +891,16 @@ window.addEventListener('resize', () => {
   setTimeout(nextLine, 400);
 })();
 
-// --- Календарь: исправить открытие (делать display: block) ---
+// --- Календарь: исправить открытие (делать display: block) и локализацию при каждом открытии ---
 function toggleCalendar() {
   const calendar = document.getElementById('calendar');
   if (!calendar) return;
-  calendar.style.display = (calendar.style.display === 'block') ? 'none' : 'block';
+  if (calendar.style.display === 'block') {
+    calendar.style.display = 'none';
+  } else {
+    calendar.style.display = 'block';
+    generateCalendar(); // всегда перерисовываем календарь по текущей локали
+  }
 }
 
 // --- Окна просмотра 3D моделей и галерей ---
@@ -907,7 +921,7 @@ function openModelGallery(modelId) {
   if (!model) return;
   const images = [model.preview].concat(model.gallery || []);
   let current = 0;
-  // Инструменты и логотипы
+  // Инструменты и логотипи
   const tools = [
     { name: 'Blender', icon: 'icons/blender.svg' },
     { name: 'ArmorPaint', icon: 'icons/armorpaint.svg' }
@@ -1045,200 +1059,6 @@ window.openModelGallery = openModelGallery;
 // --- Полноэкранная галерея для статичных моделей ---
 function openFullscreenGallery(images, startIdx, model) {
   let current = startIdx;
-  const isDarkTheme = document.body.classList.contains('dark-theme');
-  const arrowColor = isDarkTheme ? '#fff' : '#000';
-  let overlay = document.createElement('div');
-  overlay.style.position = 'fixed';
-  overlay.style.top = 0;
-  overlay.style.left = 0;
-  overlay.style.width = '100vw';
-  overlay.style.height = '100vh';
-  overlay.style.background = 'rgba(0,0,0,0.97)';
-  overlay.style.zIndex = 99999;
-  overlay.style.display = 'flex';
-  overlay.style.flexDirection = 'column';
-  overlay.style.justifyContent = 'center';
-  overlay.style.alignItems = 'center';
-  overlay.innerHTML = `
-    <button id="fullscreen-close" style="position:absolute;top:30px;right:40px;z-index:2;font-size:32px;color:${arrowColor};background:none;border:none;cursor:pointer;">&times;</button>
-    <div style="display:flex;align-items:center;justify-content:center;width:100vw;position:relative;">
-      <button id="fullscreen-prev" style="position:relative;left:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-right:20px;color:${arrowColor};">&#8592;</button>
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <img id="fullscreen-img" src="${images[current]}" style="max-width:80vw;max-height:80vh;border-radius:12px;box-shadow:0 2px 20px #000a;display:block;">
-        <div style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;">
-          ${images.map((img, i) => `<img src="${img}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
-        </div>
-      </div>
-      <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;background:none;border:none;cursor:pointer;margin-left:20px;color:${arrowColor};">&#8594;</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-  function updateFullscreen() {
-    overlay.querySelector('#fullscreen-img').src = images[current];
-    overlay.querySelectorAll('.fullscreen-thumb').forEach((thumb, i) => {
-      thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
-    });
-  }
-  overlay.querySelector('#fullscreen-prev').onclick = (e) => {
-    e.stopPropagation();
-    current = (current - 1 + images.length) % images.length;
-    updateFullscreen();
-  };
-  overlay.querySelector('#fullscreen-next').onclick = (e) => {
-    e.stopPropagation();
-    current = (current + 1) % images.length;
-    updateFullscreen();
-  };
-  overlay.querySelectorAll('.fullscreen-thumb').forEach(thumb => {
-    thumb.onclick = (e) => {
-      e.stopPropagation();
-      current = parseInt(thumb.dataset.idx);
-      updateFullscreen();
-    };
-  });
-  overlay.querySelector('#fullscreen-close').onclick = () => {
-    overlay.remove();
-  };
-  overlay.onclick = (e) => {
-    if (e.target === overlay) overlay.remove();
-  };
-  document.addEventListener('keydown', function escHandler(e) {
-    if (e.key === 'Escape') {
-      overlay.remove();
-      document.removeEventListener('keydown', escHandler);
-    }
-  });
-}
-
-// --- WinBox header: не уходит за taskbar при максимизации ---
-(function patchWinBoxHeader() {
-  const origWinBox = window.WinBox;
-  if (!origWinBox || origWinBox._patchedForTaskbar) return;
-  window.WinBox = function(options) {
-    // --- Исправление: для project/model3d/gallery окон ---
-    const type = options && options.title && typeof options.title === 'string'
-      ? options.title.toLowerCase()
-      : '';
-    const isGalleryOrModel =
-      (options && options.icon && (
-        options.icon.includes('model3d') ||
-        options.icon.includes('gallery')
-      )) ||
-      (type.includes('галерея') || type.includes('gallery') || type.includes('3d') || type.includes('модель'));
-    if (options && options.class && options.class.includes('adwaita-theme')) {
-      const origOnMaximize = options.onmaximize;
-      options.onmaximize = function() {
-        const win = this;
-        setTimeout(() => {
-          if (win.dom) {
-            win.dom.style.top = '36px';
-            win.dom.style.height = 'calc(100% - 36px)';
-          }
-        }, 10);
-        if (origOnMaximize) origOnMaximize.call(this);
-      };
-      const origOnRestore = options.onrestore;
-      options.onrestore = function() {
-        const win = this;
-        setTimeout(() => {
-          if (win.dom) {
-            win.dom.style.top = '';
-            win.dom.style.height = '';
-          }
-        }, 10);
-        if (origOnRestore) origOnRestore.call(this);
-      };
-    }
-    return new origWinBox(options);
-  };
-  Object.assign(window.WinBox, origWinBox);
-  window.WinBox._patchedForTaskbar = true;
-})();
-
-// --- Калькулятор: исправить расчет итоговой стоимости и работу кнопки ---
-window.initCalculator = function() {
-  const checkboxes = Array.from(document.querySelectorAll('.service-checkbox'));
-  const totalPriceElement = document.getElementById('total-price');
-  const orderButton = document.getElementById('order-button');
-  if (!checkboxes.length || !totalPriceElement || !orderButton) return;
-
-  // --- Новое: динамически обновлять лейблы доп. услуг со скидкой ---
-  function updateAdditionalLabels(hasWebsite) {
-    checkboxes.forEach(checkbox => {
-      if (checkbox.dataset.type === 'additional') {
-        const label = checkbox.nextElementSibling;
-        const basePrice = parseInt(checkbox.dataset.price, 10) || 0;
-        if (hasWebsite) {
-          const discounted = Math.round(basePrice * 0.8);
-          label.innerHTML = label.textContent.replace(/\(.+\)/, '') + `(<span style="color:#33d17a;">${discounted.toLocaleString('ru-RU')}₽ со скидкой</span>)`;
-        } else {
-          label.innerHTML = label.textContent.replace(/\(.+\)/, '') + `(${basePrice.toLocaleString('ru-RU')}₽)`;
-        }
-      }
-    });
-  }
-
-  function calculateTotal() {
-    let websiteSum = 0;
-    let additionalSum = 0;
-    let hasWebsite = false;
-    checkboxes.forEach(checkbox => {
-      if (checkbox.checked && checkbox.dataset.type === 'website') {
-        hasWebsite = true;
-        websiteSum += parseInt(checkbox.dataset.price, 10) || 0;
-      }
-    });
-    // Обновить лейблы доп. услуг при каждом пересчёте
-    updateAdditionalLabels(hasWebsite);
-
-    checkboxes.forEach(checkbox => {
-      if (checkbox.checked && checkbox.dataset.type === 'additional') {
-        let price = parseInt(checkbox.dataset.price, 10) || 0;
-        if (hasWebsite) {
-          additionalSum += Math.round(price * 0.8);
-        } else {
-          additionalSum += price;
-        }
-      }
-    });
-    const total = websiteSum + additionalSum;
-    totalPriceElement.textContent = total.toLocaleString('ru-RU');
-  }
-
-  checkboxes.forEach(checkbox => {
-    checkbox.onchange = null;
-    checkbox.removeEventListener('change', calculateTotal);
-    checkbox.addEventListener('change', calculateTotal);
-  });
-
-  orderButton.onclick = null;
-  orderButton.addEventListener('click', function() {
-    const selectedServices = [];
-    checkboxes.forEach(checkbox => {
-      if (checkbox.checked) {
-        selectedServices.push(checkbox.nextElementSibling.textContent);
-      }
-    });
-    const totalPrice = totalPriceElement.textContent.replace(/\s/g, '');
-    if (selectedServices.length > 0) {
-      let message = 'Здравствуйте, хочу приобрести у вас:\n';
-      selectedServices.forEach(service => {
-        message += `- ${service}\n`;
-      });
-      message += `\nИтоговая сумма: ${totalPrice} ₽`;
-      const encoded = encodeURIComponent(message);
-      window.open(`https://t.me/looptoquit?text=${encoded}`, '_blank');
-    } else {
-      alert('Пожалуйста, выберите хотя бы одну услугу.');
-    }
-  });
-
-  calculateTotal();
-};
-
-// --- Полноэкранная галерея для статичных моделей: миниатюры сразу под картинкой, стрелки вне картинки ---
-function openFullscreenGallery(images, startIdx, model) {
-  let current = startIdx;
   let overlay = document.createElement('div');
   overlay.style.position = 'fixed';
   overlay.style.top = 0;
@@ -1351,3 +1171,124 @@ function getMobileWinboxOptions() {
   // Десктоп — стандартные значения
   return null;
 }
+
+// --- Локализация: инициализация языка и переключение ---
+window.currentLang = localStorage.getItem('lang') || 'ru';
+
+function getLocaleString(key) {
+  return (window.locales[window.currentLang] && window.locales[window.currentLang][key]) || key;
+}
+
+// --- Переключение языка ---
+function toggleLang() {
+  window.currentLang = window.currentLang === 'ru' ? 'en' : 'ru';
+  localStorage.setItem('lang', window.currentLang);
+  // Обновить label на кнопке
+  const label = document.getElementById('lang-toggle-label');
+  if (label) label.textContent = getLocaleString('langLabel');
+  // Локализация ярлыков на рабочем столе
+  document.querySelectorAll('.shortcut').forEach(shortcut => {
+    const type = shortcut.getAttribute('data-window');
+    if (type && window.getLocaleString) {
+      const span = shortcut.querySelector('span');
+      if (span) {
+        span.textContent = getLocaleString(type) || span.textContent;
+      }
+    }
+  });
+  // Перерисовать все открытые окна без их закрытия/открытия
+  Object.entries(trayWindows).forEach(([type, win]) => {
+    if (win && win.body && typeof win.setTitle === 'function') {
+      let newTitle = getLocaleString(type);
+      if (!newTitle || newTitle === type) {
+        newTitle = win.title;
+      }
+      win.setTitle(newTitle);
+    }
+    if (win && win.body) {
+      let content = '';
+      switch (type) {
+        case 'about':
+          content = window.renderAboutContent();
+          break;
+        case 'portfolio':
+          content = window.renderPortfolioContent();
+          break;
+        case 'services':
+          content = window.renderServicesContent();
+          break;
+        case 'contacts':
+          content = window.renderContactsContent();
+          break;
+        case 'calculator':
+          content = window.renderCalculatorContent();
+          break;
+        case 'minesweeper':
+          content = window.renderMinesweeperContent();
+          break;
+        case 'game2048':
+          content = window.render2048Content();
+          break;
+        case 'tictactoe':
+          content = window.renderTicTacToeContent();
+          break;
+        case 'github':
+          content = window.renderGitHubStatsContent ? window.renderGitHubStatsContent() : '<div>GitHub Stats</div>';
+          break;
+        case 'kitty':
+          content = window.renderKittyGalleryContent();
+          break;
+        default:
+          break;
+      }
+      if (content) {
+        win.body.innerHTML = content;
+        if (['about', 'portfolio', 'services'].includes(type)) {
+          setupTabs(win.body);
+        }
+        if (type === 'calculator' && typeof window.initCalculator === 'function') {
+          setTimeout(window.initCalculator, 10);
+        }
+        if (type === 'kitty' && typeof window.initKittyGallery === 'function') {
+          setTimeout(window.initKittyGallery, 10);
+        }
+        if (type === 'minesweeper' && typeof window.initMinesweeper === 'function') {
+          setTimeout(window.initMinesweeper, 100);
+        }
+        if (type === 'game2048' && typeof window.init2048 === 'function') {
+          setTimeout(window.init2048, 100);
+        }
+        if (type === 'tictactoe' && typeof window.initTicTacToe === 'function') {
+          setTimeout(window.initTicTacToe, 100);
+        }
+      }
+    }
+  });
+  // Обновить меню Пуск
+  renderStartMenu();
+  // Обновить таскбар (локализация заголовков)
+  updateTaskbar();
+  // Обновить дату/часы (вызывает updateClock через languagechange)
+  if (typeof Event === "function") {
+    window.dispatchEvent(new Event('languagechange'));
+  }
+  // --- Обновить календарь при смене языка ---
+  generateCalendar();
+}
+
+// --- При загрузке страницы: выставить язык и label ---
+document.addEventListener('DOMContentLoaded', () => {
+  // Язык
+  const label = document.getElementById('lang-toggle-label');
+  if (label) label.textContent = getLocaleString('langLabel');
+  // Локализация ярлыков на рабочем столе
+  document.querySelectorAll('.shortcut').forEach(shortcut => {
+    const type = shortcut.getAttribute('data-window');
+    if (type && window.getLocaleString) {
+      const span = shortcut.querySelector('span');
+      if (span) {
+        span.textContent = getLocaleString(type) || span.textContent;
+      }
+    }
+  });
+});

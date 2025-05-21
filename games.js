@@ -1,15 +1,16 @@
 window.renderMinesweeperContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="minesweeper-gnome">
       <div class="minesweeper-header">
-        <span>Сапер</span>
+        <span>${t.minesweeper}</span>
         <select id="minesweeper-diff" class="btn">
-          <option value="9x9x10">Лёгко</option>
-          <option value="16x16x40">Средне</option>
-          <option value="30x16x99">Сложно</option>
+          <option value="9x9x10">${t.minesweeperEasy}</option>
+          <option value="16x16x40">${t.minesweeperMedium}</option>
+          <option value="30x16x99">${t.minesweeperHard}</option>
         </select>
         <span id="minesweeper-timer">00:00</span>
-        <button class="btn" id="minesweeper-restart">⟳</button>
+        <button class="btn" id="minesweeper-restart">${t.minesweeperRestart}</button>
       </div>
       <div id="minesweeper-board"></div>
       <div class="minesweeper-footer">
@@ -135,22 +136,23 @@ window.initMinesweeper = function() {
 };
 
 window.render2048Content = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="game2048-gnome">
       <div class="game2048-header">
-        <span>2048</span>
+        <span>${t.game2048}</span>
         <select id="game2048-size" class="btn">
           <option value="4">4x4</option>
           <option value="5">5x5</option>
           <option value="6">6x6</option>
         </select>
-        <button class="btn" id="game2048-restart">⟳</button>
+        <button class="btn" id="game2048-restart">${t.minesweeperRestart}</button>
       </div>
       <div id="game2048-board"></div>
       <div class="game2048-footer">
-        <span>Счёт: <span id="game2048-score">0</span></span>
+        <span>${t.score}: <span id="game2048-score">0</span></span>
       </div>
-      <div>Управление: стрелки или кнопки</div>
+      <div>${t.controls}</div>
       <div class="game2048-controls">
         <button class="btn" data-move="up">↑</button>
         <button class="btn" data-move="left">←</button>
@@ -253,11 +255,12 @@ window.init2048 = function() {
 };
 
 window.renderTicTacToeContent = function() {
+  const t = window.locales[window.currentLang];
   return `
     <div class="tictactoe-gnome">
       <div class="tictactoe-header">
         <span>Крестики-нолики</span>
-        <button class="btn" id="tictactoe-restart">⟳</button>
+        <button class="btn" id="tictactoe-restart">${t.minesweeperRestart}</button>
       </div>
       <div id="tictactoe-board"></div>
       <div class="tictactoe-footer">
