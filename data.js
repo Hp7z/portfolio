@@ -22,6 +22,28 @@ window.projects = {
         date: "22 июня 2023"
       },
       {
+        title: "Larfex Shop",
+        title_en: "Larfex Shop",
+        url: "https://larfex.com/",
+        preview: "img/larfex.jpg",
+        description: "Современный интернет-магазин с адаптивным дизайном, удобным каталогом и интуитивно понятной корзиной.",
+        description_en: "Modern online store with responsive design, convenient catalog, and intuitive cart.",
+        credits: "Design by Leria agency",
+        date: "5 декабря 2023"
+      },
+      {
+        title: "Larfex STM",
+        title_en: "Larfex STM",
+        url: "https://larfexstm.ru/",
+        preview: "img/larfexstm.jpg",
+        description: "Корпоративный сайт компании с презентацией услуг, портфолио и контактной информацией.",
+        description_en: "Corporate website of the company with presentation of services, portfolio, and contact information.",
+        credits: "Design by Leria agency",
+        date: "18 января 2024"
+      }
+    ],
+    shop: [
+      {
         title: "Fiorichi",
         title_en: "Fiorichi",
         url: "https://fiorichi.shop/",
@@ -32,29 +54,7 @@ window.projects = {
         date: "10 сентября 2023"
       }
     ],
-    shop: [
-      {
-        title: "Larfex Shop",
-        title_en: "Larfex Shop",
-        url: "https://larfex.com/",
-        preview: "img/larfex.jpg",
-        description: "Современный интернет-магазин с адаптивным дизайном, удобным каталогом и интуитивно понятной корзиной.",
-        description_en: "Modern online store with responsive design, convenient catalog, and intuitive cart.",
-        credits: "Design by Leria agency",
-        date: "5 декабря 2023"
-      }
-    ],
     corporate: [
-      {
-        title: "Larfex STM",
-        title_en: "Larfex STM",
-        url: "https://larfexstm.ru/",
-        preview: "img/larfexstm.jpg",
-        description: "Корпоративный сайт компании с презентацией услуг, портфолио и контактной информацией.",
-        description_en: "Corporate website of the company with presentation of services, portfolio, and contact information.",
-        credits: "Design by Leria agency",
-        date: "18 января 2024"
-      },
       {
         title: "Leri Agency",
         title_en: "Leri Agency",

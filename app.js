@@ -818,6 +818,178 @@ document.addEventListener('DOMContentLoaded', () => {
   setWallpaperForTheme(isDark ? 'dark' : 'light');
   // Таскбар
   updateTaskbar();
+
+  // --- Инициализация калькулятора услуг ---
+  function initCalculator(savedState) {
+    const t = window.locales[window.currentLang];
+    const checkboxes = document.querySelectorAll('.service-checkbox');
+    const totalPriceEl = document.getElementById('total-price');
+    const orderBtn = document.getElementById('order-button');
+    if (!checkboxes.length || !totalPriceEl || !orderBtn) return;
+
+    // --- Курс доллара (можно заменить на динамический при необходимости) ---
+    const USD_RATE = 90; // Пример: 1 USD = 90 RUB
+
+    // --- Восстановить состояние чекбоксов, если передано ---
+    if (Array.isArray(savedState)) {
+      checkboxes.forEach(cb => {
+        cb.checked = savedState.includes(cb.id);
+      });
+    }
+
+    // --- Скидка 20% на доп. услуги, если выбрана разработка ---
+    function isAnyDevChecked() {
+      return (
+        document.getElementById('landing')?.checked ||
+        document.getElementById('shop')?.checked ||
+        document.getElementById('corporate')?.checked
+      );
+    }
+
+    function formatPriceRUB(price, orig) {
+      if (orig && price !== orig) {
+        return `<span style="text-decoration:line-through;color:#888;">${orig} ₽</span> <span class="calc-discounted">— ${price} ₽</span>`;
+      }
+      return `— ${price} ₽`;
+    }
+    function formatPriceUSD(price, orig) {
+      if (orig && price !== orig) {
+        return `<span style="text-decoration:line-through;color:#888;">${orig} $</span> <span class="calc-discounted">— ${price} $</span>`;
+      }
+      return `— ${price} $`;
+    }
+
+    function recalc() {
+      let total = 0;
+      let addTotal = 0;
+      let addDiscount = false;
+      let checkedServices = [];
+      let checkedAdd = [];
+      let checkedAll = [];
+      // --- Собираем отмеченные услуги ---
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          checkedAll.push(cb.id);
+          const label = cb.nextElementSibling?.textContent || '';
+          if (cb.dataset.type === 'website') checkedServices.push(label);
+          if (cb.dataset.type === 'additional') checkedAdd.push(label);
+        }
+      });
+      // --- Скидка на доп. услуги ---
+      addDiscount = isAnyDevChecked();
+      // --- Пересчёт итоговой стоимости ---
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          let price = parseInt(cb.dataset.price, 10) || 0;
+          if (cb.dataset.type === 'additional' && addDiscount) {
+            addTotal += Math.round(price * 0.8);
+          } else if (cb.dataset.type === 'additional') {
+            addTotal += price;
+          } else {
+            total += price;
+          }
+        }
+      });
+      let fullTotal = total + addTotal;
+      // --- Вывод итоговой суммы ---
+      if (window.currentLang === 'en') {
+        const usd = Math.round(fullTotal / USD_RATE);
+        totalPriceEl.innerHTML = `<span class="calc-discounted">${usd} $</span>`;
+      } else {
+        totalPriceEl.innerHTML = `<span class="calc-discounted">${fullTotal} ₽</span>`;
+      }
+      // --- Обновить цены для всех услуг ---
+      document.querySelectorAll('.service-checkbox').forEach(cb => {
+        const label = cb.nextElementSibling;
+        const orig = parseInt(cb.dataset.price, 10) || 0;
+        const text = label.textContent.replace(/^[^а-яА-ЯA-Za-z]+/, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
+        let price, origVal, showDiscount = false;
+        if (cb.dataset.type === 'additional' && addDiscount) {
+          // Скидка
+          if (window.currentLang === 'en') {
+            origVal = Math.round(orig / USD_RATE);
+            price = Math.round(orig * 0.8 / USD_RATE);
+            label.innerHTML = `${text} ${formatPriceUSD(price, origVal)}`;
+          } else {
+            price = Math.round(orig * 0.8);
+            label.innerHTML = `${text} ${formatPriceRUB(price, orig)}`;
+          }
+        } else {
+          if (window.currentLang === 'en') {
+            price = Math.round(orig / USD_RATE);
+            label.innerHTML = `${text} — ${price} $`;
+          } else {
+            label.innerHTML = `${text} — ${orig} ₽`;
+          }
+        }
+      });
+      // --- Сохраняем состояние чекбоксов для восстановления при смене языка ---
+      window._calculatorChecked = checkedAll;
+    }
+
+    checkboxes.forEach(cb => {
+      cb.onchange = recalc;
+    });
+    recalc();
+
+    orderBtn.onclick = function() {
+      // --- Собираем отмеченные услуги ---
+      let checked = [];
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          // Очищаем цену из текста
+          const label = cb.nextElementSibling?.textContent.replace(/<[^>]+>/g, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
+          checked.push(label);
+        }
+      });
+      // --- Итоговая сумма ---
+      let total = 0, addTotal = 0, addDiscount = isAnyDevChecked();
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          let price = parseInt(cb.dataset.price, 10) || 0;
+          if (cb.dataset.type === 'additional' && addDiscount) {
+            addTotal += Math.round(price * 0.8);
+          } else if (cb.dataset.type === 'additional') {
+            addTotal += price;
+          } else {
+            total += price;
+          }
+        }
+      });
+      let fullTotal = total + addTotal;
+      let msg;
+      if (window.currentLang === 'en') {
+        msg = "Hello, I would like to order:\n";
+        checked.forEach(s => { msg += "• " + s + "\n"; });
+        msg += "\nTotal: " + (Math.round(fullTotal / USD_RATE)) + " $";
+      } else {
+        msg = "Здравствуйте, я хотел бы заказать у вас:\n";
+        checked.forEach(s => { msg += "• " + s + "\n"; });
+        msg += "\nИтог: " + fullTotal + " ₽";
+      }
+      window.open(`https://t.me/looptoquit?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+  }
+  window.initCalculator = initCalculator;
+
+  // --- В конце файла, после window.initCalculator = initCalculator; ---
+  // Добавить стили для .calc-discounted для светлой темы:
+  (function() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+      body.light-theme .calc-discounted {
+        color: #31a355 !important;
+      }  
+      body.dark-theme .calc-discounted {
+        color: #31a355 !important;
+      }
+      body.light-theme #total-price,
+      body.light-theme .calculator-note-inline {
+        color:rgb(49, 83, 60) !important;
+      }
+    `;
+    document.head.appendChild(style);
+  })();
 });
 window.addEventListener('resize', () => {
   // --- При изменении размера экрана — корректировать размеры всех окон на мобилках/планшетах ---
@@ -1246,20 +1418,22 @@ function toggleLang() {
         if (['about', 'portfolio', 'services'].includes(type)) {
           setupTabs(win.body);
         }
+        // --- Инициализация калькулятора после перерисовки, с восстановлением состояния чекбоксов ---
         if (type === 'calculator' && typeof window.initCalculator === 'function') {
-          setTimeout(window.initCalculator, 10);
+          setTimeout(() => window.initCalculator(window._calculatorChecked || []), 10);
         }
-        if (type === 'kitty' && typeof window.initKittyGallery === 'function') {
-          setTimeout(window.initKittyGallery, 10);
-        }
-        if (type === 'minesweeper' && typeof window.initMinesweeper === 'function') {
-          setTimeout(window.initMinesweeper, 100);
-        }
-        if (type === 'game2048' && typeof window.init2048 === 'function') {
-          setTimeout(window.init2048, 100);
-        }
-        if (type === 'tictactoe' && typeof window.initTicTacToe === 'function') {
-          setTimeout(window.initTicTacToe, 100);
+        // --- Исправление: активируем первую подвкладку и её контент ---
+        if (type === 'portfolio') {
+          // Активировать первую main-tab и первую sub-tab, если не активны
+          const mainTab = win.body.querySelector('.main-tabs .tab.active');
+          if (mainTab) mainTab.click();
+          // Активировать первую sub-tab в текущем main-tab
+          const activeMainTabId = mainTab ? mainTab.getAttribute('data-tab') : null;
+          if (activeMainTabId) {
+            const subTabs = win.body.querySelectorAll(`#${activeMainTabId}-tab .sub-tabs .tab`);
+            const activeSubTab = Array.from(subTabs).find(tab => tab.classList.contains('active'));
+            if (activeSubTab) activeSubTab.click();
+          }
         }
       }
     }
