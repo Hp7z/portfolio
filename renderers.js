@@ -23,28 +23,28 @@ window.renderAboutContent = function() {
       <h2>${t.experienceTitle}</h2>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Freelancer</div>
+          <div class="project-title">${t.freelancertitle}</div>
           <p>2018 — present</p>
           <p>${t.freelancerDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Leria Agency</div>
+          <div class="project-title">${t.leriaAgencytitle}</div>
           <p>2024 — present</p>
           <p>${t.leriaAgencyDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Kaspersky Lab</div>
+          <div class="project-title">${t.kasperskyLabtitle}</div>
           <p>2020 — 2021</p>
           <p>${t.kasperskyLabDescription}</p>
         </div>
       </div>
       <div class="project-container experience-text">
         <div class="experience-info">
-          <div class="project-title">Web Developer, XYZ company</div>
+          <div class="project-title">${t.xyzCompanytitle}</div>
           <p>2019 — 2020</p>
           <p>${t.xyzCompanyDescription}</p>
         </div>

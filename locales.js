@@ -29,6 +29,10 @@ window.locales = {
       "Разработка игр (Unity, Unreal Engine, геймдизайн)"
     ],
     experienceTitle: "Опыт работы",
+    freelancertitle: "Фрилансер",
+    leriaAgencytitle: "Leria Agency",
+    kasperskyLabtitle: "Лаборатория Касперского",
+    xyzCompanytitle: "Веб-разработчик, компании XYZ",
     freelancerDescription: "Веб-разработка, дизайн, 3D моделирование, геймдев. Реализация проектов любой сложности: от лендингов и интернет-магазинов до интерактивных 3D-сцен и игровых прототипов. Креативный подход, современный стек, внимание к деталям.",
     leriaAgencyDescription: "Веб-разработка, администрирование.",
     kasperskyLabDescription: "Malware-аналитик. Анализ вредоносного ПО, исследование угроз, участие в разработке средств защиты.",
@@ -174,6 +178,10 @@ window.locales = {
       "Game development (Unity, Unreal Engine, game design)"
     ],
     experienceTitle: "Work Experience",
+    freelancertitle: "Freelancer",
+    leriaAgencytitle: "Leria Agency",
+    kasperskyLabtitle: "Kaspersky Lab",
+    xyzCompanytitle: "Web Developer, XYZ Company",
     freelancerDescription: "Web development, design, 3D modeling, gamedev. Implementation of projects of any complexity: from landing pages and online stores to interactive 3D scenes and game prototypes. Creative approach, modern stack, attention to detail.",
     leriaAgencyDescription: "Web development, administration.",
     kasperskyLabDescription: "Malware analyst. Malware analysis, threat research, participation in the development of protection tools.",
