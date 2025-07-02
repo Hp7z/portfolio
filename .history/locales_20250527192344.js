@@ -7,7 +7,7 @@ window.locales = {
     contacts: "Контакты",
     calculator: "Калькулятор услуг",
     github: "GitHub статистика",
-    kitty: "Лучший друг",
+    kitty: "Лучший компаньон",
     minesweeper: "Сапер",
     game2048: "2048",
     tictactoe: "Крестики-нолики",
@@ -37,7 +37,6 @@ window.locales = {
     leriaAgencyDescription: "Веб-разработка, администрирование.",
     kasperskyLabDescription: "Malware-аналитик. Анализ вредоносного ПО, исследование угроз, участие в разработке средств защиты.",
     xyzCompanyDescription: "Разработка и поддержка веб-сайтов для клиентов из различных отраслей.",
-    present: "Настоящее время",
     // --- Ключи для сервисов ---
     servicesWeb: "Разработка сайтов",
     servicesDesign: "Дизайн",
@@ -113,7 +112,7 @@ window.locales = {
     author: "Автор",
     date: "Дата",
     // --- Kitty ---
-    kittyTitle: "Доча: Мой лучший друг и напарник",
+    kittyTitle: "Доча: Кошачий напарник",
     kittyDesc: "<b>Мяу! Я Даша, но дома меня зовут просто Доча.</b><br>Я — пушистая хозяйка этого дома. Люблю спать на клавиатуре, ловить курсор, требовать вкусняшки и, конечно, позировать для фотосессий.<br><br><i>“Если ты устал — просто посмотри на меня, и настроение сразу станет лучше! Я всегда рядом, чтобы согреть тебя своим мурчанием.”</i><br><br><b>Мои любимые занятия:</b> валяться на солнышке, наблюдать за птицами из окна, и напоминать, что без меня тут было бы скучно.<br><br><b>Автор:</b> Даша (Доча)",
     kittyAuthor: "Даша",
     // --- GitHub ---
@@ -148,6 +147,7 @@ window.locales = {
     dateFormat: "ru-RU",
     // --- 3D вкладка ---
     models3d: "Модели",
+    present: "настоящее время",
   },
   en: {
     langLabel: "RU",
@@ -157,7 +157,7 @@ window.locales = {
     contacts: "Contacts",
     calculator: "Service Calculator",
     github: "GitHub Stats",
-    kitty: "Best friend",
+    kitty: "Best Companion",
     minesweeper: "Minesweeper",
     game2048: "2048",
     tictactoe: "Tic-Tac-Toe",
@@ -187,7 +187,6 @@ window.locales = {
     leriaAgencyDescription: "Web development, administration.",
     kasperskyLabDescription: "Malware analyst. Malware analysis, threat research, participation in the development of protection tools.",
     xyzCompanyDescription: "Development and support of websites for clients from various industries.",
-    present: "Present",
     // --- Services ---
     servicesWeb: "Website Development",
     servicesDesign: "Design",
@@ -263,7 +262,7 @@ window.locales = {
     author: "Author",
     date: "Date",
     // --- Kitty ---
-    kittyTitle: "Docha: Best friend and companion",
+    kittyTitle: "Docha: Cat companion",
     kittyDesc: "<b>Meow! I'm Dasha, but at home they just call me Docha.</b><br>I am the fluffy mistress of this house. I love sleeping on the keyboard, chasing the cursor, demanding treats, and of course, posing for photos.<br><br><i>“If you're tired — just look at me, and your mood will instantly improve! I'm always here to warm you with my purring.”</i><br><br><b>My favorite activities:</b> basking in the sun, watching birds from the window, and reminding you that it would be boring here without me.<br><br><b>Author:</b> Dasha (Docha)",
     kittyAuthor: "Dasha",
     // --- GitHub ---
@@ -298,6 +297,7 @@ window.locales = {
     dateFormat: "en-GB",
     // --- 3D вкладка ---
     models3d: "Models",
+    present: "present",
   }
 };
 window.getLocaleString = function(key) {
