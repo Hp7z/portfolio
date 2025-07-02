@@ -31,7 +31,7 @@ window.renderAboutContent = function() {
       <div class="project-container experience-text">
         <div class="experience-info">
           <div class="project-title">${t.leriaAgencytitle}</div>
-          <p>2024 — ${t.present}</p>
+          <p>2024 — present</p>
           <p>${t.leriaAgencyDescription}</p>
         </div>
       </div>
