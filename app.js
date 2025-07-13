@@ -828,7 +828,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!checkboxes.length || !totalPriceEl || !orderBtn) return;
 
     // --- Курс доллара (можно заменить на динамический при необходимости) ---
-    const USD_RATE = 90; // Пример: 1 USD = 90 RUB
+    const USD_RATE = 85; // Пример: 1 USD = 90 RUB
 
     // --- Восстановить состояние чекбоксов, если передано ---
     if (Array.isArray(savedState)) {
@@ -906,7 +906,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let price, origVal, showDiscount = false;
         if (cb.dataset.type === 'additional' && addDiscount) {
           // Скидка
-          if (window.currentLang === 'en') {
+          if (window.currentLang === 'en') { 
             origVal = Math.round(orig / USD_RATE);
             price = Math.round(orig * 0.8 / USD_RATE);
             label.innerHTML = `${text} ${formatPriceUSD(price, origVal)}`;

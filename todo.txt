@@ -1,3 +1,4 @@
-Middle_modeling{
-    portfolio/models/preview/Middle_modeling/carty.jpg portfolio/models/preview/Middle_modeling/cave fantasy.jpg portfolio/models/preview/Middle_modeling/compic.jpg portfolio/models/preview/Middle_modeling/comso ship.jpg portfolio/models/preview/Middle_modeling/lesson 3.jpg portfolio/models/preview/Middle_modeling/lesson 4.jpg portfolio/models/preview/Middle_modeling/mountain.jpg portfolio/models/preview/Middle_modeling/planet.jpg
-}
+Проверь пожалуйста весь код, на дубликаты, оптимизацию, ошибки, сделай читабельность и правильность
+Все стили должны быть в стилях, все функции должны быть расположены по разным файлам, согласно логике
+
+почему то на некоторых разрешениях, контент в experience-info переворачивается вверх ногами, заголовок получается в конце почему то
