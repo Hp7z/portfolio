@@ -859,6 +859,16 @@ document.addEventListener('DOMContentLoaded', () => {
       return `— ${price} $`;
     }
 
+    checkboxes.forEach(cb => {
+      // Сохраняем оригинальный текст label в data-label (один раз)
+      const label = cb.nextElementSibling;
+      if (label && !label.dataset.label) {
+        label.dataset.label = label.textContent.replace(/^[^а-яА-ЯA-Za-z]+/, '').replace(/\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
+      }
+      cb.onchange = recalc;
+    });
+    recalc();
+
     function recalc() {
       let total = 0;
       let addTotal = 0;
@@ -870,7 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
       checkboxes.forEach(cb => {
         if (cb.checked) {
           checkedAll.push(cb.id);
-          const label = cb.nextElementSibling?.textContent || '';
+          const label = cb.nextElementSibling?.dataset.label || '';
           if (cb.dataset.type === 'website') checkedServices.push(label);
           if (cb.dataset.type === 'additional') checkedAdd.push(label);
         }
@@ -901,25 +911,24 @@ document.addEventListener('DOMContentLoaded', () => {
       // --- Обновить цены для всех услуг ---
       document.querySelectorAll('.service-checkbox').forEach(cb => {
         const label = cb.nextElementSibling;
+        const origText = label?.dataset.label || '';
         const orig = parseInt(cb.dataset.price, 10) || 0;
-        const text = label.textContent.replace(/^[^а-яА-ЯA-Za-z]+/, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
-        let price, origVal, showDiscount = false;
+        let price, origVal;
         if (cb.dataset.type === 'additional' && addDiscount) {
-          // Скидка
           if (window.currentLang === 'en') { 
             origVal = Math.round(orig / USD_RATE);
             price = Math.round(orig * 0.8 / USD_RATE);
-            label.innerHTML = `${text} ${formatPriceUSD(price, origVal)}`;
+            label.innerHTML = `${origText} ${formatPriceUSD(price, origVal)}`;
           } else {
             price = Math.round(orig * 0.8);
-            label.innerHTML = `${text} ${formatPriceRUB(price, orig)}`;
+            label.innerHTML = `${origText} ${formatPriceRUB(price, orig)}`;
           }
         } else {
           if (window.currentLang === 'en') {
             price = Math.round(orig / USD_RATE);
-            label.innerHTML = `${text} — ${price} $`;
+            label.innerHTML = `${origText} — ${price} $`;
           } else {
-            label.innerHTML = `${text} — ${orig} ₽`;
+            label.innerHTML = `${origText} — ${orig} ₽`;
           }
         }
       });
@@ -1466,3 +1475,92 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// --- Стили для мобильных/планшетов, центрирования и отступа maximized окон ---
+(function() {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    /* Мобильные/планшеты: плавный скролл и touch */
+    .adwaita-theme .wb-body {
+      -webkit-overflow-scrolling: touch;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      touch-action: pan-y pinch-zoom;
+      scroll-behavior: smooth;
+    }
+    @media (max-width: 992px) {
+      .adwaita-theme {
+        border-radius: 12px !important;
+        box-shadow: 0 2px 16px #0002 !important;
+      }
+      .adwaita-theme .wb-body {
+        padding: 12px 6px 18px 6px !important;
+        font-size: 1.04em;
+      }
+    }
+    /* Центрирование контента для десктопа (развернутое окно) */
+    .adwaita-theme.maximized .wb-body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100%;
+    }
+    /* Для развернутого окна: отступ 2px по всем сторонам */
+    .adwaita-theme.maximized {
+      left: 2px !important;
+      top: 2px !important;
+      width: calc(100vw - 4px) !important;
+      height: calc(100vh - 4px) !important;
+      max-width: calc(100vw - 4px) !important;
+      max-height: calc(100vh - 4px) !important;
+      box-sizing: border-box !important;
+    }
+  `;
+  document.head.appendChild(style);
+})();
+
+// --- Поддержка касаний для окон (скролл, drag, resize) ---
+document.addEventListener('touchstart', function(e) {
+  const win = e.target.closest('.adwaita-theme');
+  if (win) {
+    win.style.touchAction = 'none';
+    // Позволяем скроллить только тело окна
+    const body = win.querySelector('.wb-body');
+    if (body) body.style.touchAction = 'pan-y pinch-zoom';
+  }
+}, {passive: true});
+document.addEventListener('touchmove', function(e) {
+  // Не мешаем скроллу внутри окна
+}, {passive: true});
+
+// --- Центрирование контента при разворачивании окна ---
+function centerContentOnMaximize(win) {
+  if (win && win.dom && win.dom.classList.contains('maximized')) {
+    const body = win.dom.querySelector('.wb-body');
+    if (body) {
+      body.style.display = 'flex';
+      body.style.flexDirection = 'column';
+      body.style.alignItems = 'center';
+      body.style.justifyContent = 'center';
+      body.style.minHeight = '100%';
+    }
+  }
+}
+// --- Хук на разворачивание окна ---
+const origOpenWindow = window.openWindow;
+window.openWindow = function(type) {
+  const win = origOpenWindow.apply(this, arguments);
+  if (win && win.dom) {
+    win.dom.addEventListener('transitionend', function() {
+      if (win.dom.classList.contains('maximized')) {
+        centerContentOnMaximize(win);
+      }
+    });
+    // При открытии сразу центрируем, если уже развернуто
+    if (win.dom.classList.contains('maximized')) {
+      centerContentOnMaximize(win);
+    }
+  }
+  return win;
+};
