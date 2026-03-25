@@ -405,6 +405,13 @@ window.renderCalculatorContent = function() {
       </div>
     </div>
     <div class="calculator-section">
+      <h3>${t.calculator3d}</h3>
+      <div class="calculator-item">
+        <input type="checkbox" id="model" class="service-checkbox" data-price="800" data-type="model">
+        <label for="model">${t.calculatorModel.replace(/\s*\(.*?\)/, '').trim()}</label>
+      </div>
+    </div>
+    <div class="calculator-section">
       <h3>${t.calculatorAdd}</h3>
       <div class="calculator-item">
         <input type="checkbox" id="design" class="service-checkbox" data-price="35000" data-type="additional">
@@ -421,6 +428,10 @@ window.renderCalculatorContent = function() {
       <div class="calculator-item">
         <input type="checkbox" id="hosting" class="service-checkbox" data-price="5000" data-type="additional">
         <label for="hosting">${t.calculatorHosting.replace(/\s*\(.*?\)/, '').trim()}</label>
+      </div>
+      <div class="calculator-item">
+        <input type="checkbox" id="paint" class="service-checkbox" data-price="600" data-type="no-discount">
+        <label for="paint">${t.calculatorPaint.replace(/\s*\(.*?\)/, '').trim()}</label>
       </div>
     </div>
     <div class="calculator-result">
