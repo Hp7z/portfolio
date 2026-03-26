@@ -564,16 +564,16 @@ function openWindow(type) {
         width: Math.max(w - 4, 320),
         height: Math.max(h - 40, 320),
         x: 0,
-        y: 36,
-        top: 36
+        y: 33,
+        top: 33
       };
     } else {
       winboxOpts = {
         width: Math.min(900, w - 44),
         height: Math.min(540, h - 64),
         x: Math.max(0, Math.floor((w - Math.min(900, w - 44)) / 2)),
-        y: Math.max(36, Math.floor((h - Math.min(540, h - 64)) / 2)),
-        top: 36
+        y: Math.max(33, Math.floor((h - Math.min(540, h - 64)) / 2)),
+        top: 33
       };
     }
   } else if (type === 'kitty') {
@@ -583,8 +583,8 @@ function openWindow(type) {
         width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
         x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-        y: Math.max(30, Math.floor((h - Math.min(520, h - 60)) / 2)),
-        top: 30
+        y: Math.max(33, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 33
       };
     } else if (mobileOpts) {
       winboxOpts = { ...mobileOpts };
@@ -593,8 +593,8 @@ function openWindow(type) {
         width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
         x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-        y: Math.max(30, Math.floor((h - Math.min(520, h - 60)) / 2)),
-        top: 30
+        y: Math.max(33, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 33
       };
     }
   } else if (mobileOpts) {
@@ -604,8 +604,8 @@ function openWindow(type) {
       width: Math.min(900, w - 44),
       height: Math.min(540, h - 64),
       x: Math.max(0, Math.floor((w - Math.min(900, w - 44)) / 2)),
-      y: Math.max(36, Math.floor((h - Math.min(540, h - 64)) / 2)),
-      top: 36
+      y: Math.max(33, Math.floor((h - Math.min(540, h - 64)) / 2)),
+      top: 33
     };
   }
 
@@ -622,9 +622,10 @@ function openWindow(type) {
     // --- После создания окна, если мобильник/планшет — растянуть на весь экран ---
     if (mobileOpts && this.dom) {
       this.dom.style.left = '0px';
-      this.dom.style.top = '30px';
-      this.dom.style.width = `calc(100vw - 4px)`;
-      this.dom.style.height = `calc(100vh - 40px)`;
+      this.dom.style.top = '33px';
+      this.dom.style.width = '100vw';
+      this.dom.style.height = 'calc(100vh - 33px)';
+      this.dom.style.overflowX = 'hidden';
     }
     // Для kitty: добавить отступ описанию на мобилке/планшете
     if (type === 'kitty' && this.body) {
@@ -1351,22 +1352,22 @@ function getMobileWinboxOptions() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   if (w <= 600) {
-    // Смартфон - полноразмерные окна (весь экран за вычетом 4px справа/снизу для border)
+    // Смартфон - полноразмерные окна на весь экран
     return {
-      width: Math.max(w - 4, 320),
-      height: Math.max(h - 40, 320),
+      width: w,
+      height: Math.max(h - 33, 280),
       x: 0,
-      y: 36,
-      top: 36
+      y: 33,
+      top: 33
     };
   } else if (w <= 992) {
-    // Планшет - полноразмерные окна (весь экран за вычетом 4px справа/снизу для border)
+    // Планшет - полноразмерные окна на весь экран
     return {
-      width: Math.max(w - 4, 480),
-      height: Math.max(h - 40, 400),
+      width: w,
+      height: Math.max(h - 33, 360),
       x: 0,
-      y: 36,
-      top: 36
+      y: 33,
+      top: 33
     };
   }
   // Десктоп — стандартные значения
