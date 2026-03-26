@@ -561,18 +561,18 @@ function openWindow(type) {
   ) {
     if (w <= 992) {
       winboxOpts = {
-        width: w,
-        height: h - 36,
+        width: Math.max(w - 4, 320),
+        height: Math.max(h - 40, 320),
         x: 0,
         y: 36,
         top: 36
       };
     } else {
       winboxOpts = {
-        width: Math.min(900, w - 40),
-        height: Math.min(540, h - 60),
-        x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-        y: Math.max(36, Math.floor((h - Math.min(540, h - 60)) / 2)),
+        width: Math.min(900, w - 44),
+        height: Math.min(540, h - 64),
+        x: Math.max(0, Math.floor((w - Math.min(900, w - 44)) / 2)),
+        y: Math.max(36, Math.floor((h - Math.min(540, h - 64)) / 2)),
         top: 36
       };
     }
@@ -583,8 +583,8 @@ function openWindow(type) {
         width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
         x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-        y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
-        top: 36
+        y: Math.max(30, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 30
       };
     } else if (mobileOpts) {
       winboxOpts = { ...mobileOpts };
@@ -593,18 +593,18 @@ function openWindow(type) {
         width: Math.min(900, w - 40),
         height: Math.min(520, h - 60),
         x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-        y: Math.max(36, Math.floor((h - Math.min(520, h - 60)) / 2)),
-        top: 36
+        y: Math.max(30, Math.floor((h - Math.min(520, h - 60)) / 2)),
+        top: 30
       };
     }
   } else if (mobileOpts) {
     winboxOpts = { ...mobileOpts };
   } else {
     winboxOpts = {
-      width: Math.min(900, w - 40),
-      height: Math.min(540, h - 60),
-      x: Math.max(0, Math.floor((w - Math.min(900, w - 40)) / 2)),
-      y: Math.max(36, Math.floor((h - Math.min(540, h - 60)) / 2)),
+      width: Math.min(900, w - 44),
+      height: Math.min(540, h - 64),
+      x: Math.max(0, Math.floor((w - Math.min(900, w - 44)) / 2)),
+      y: Math.max(36, Math.floor((h - Math.min(540, h - 64)) / 2)),
       top: 36
     };
   }
@@ -622,11 +622,9 @@ function openWindow(type) {
     // --- После создания окна, если мобильник/планшет — растянуть на весь экран ---
     if (mobileOpts && this.dom) {
       this.dom.style.left = '0px';
-      this.dom.style.top = '36px';
-      this.dom.style.width = `${winboxOpts.width}px`;
-      this.dom.style.height = `${winboxOpts.height}px`;
-      this.dom.style.maxWidth = '100vw';
-      this.dom.style.maxHeight = `calc(100vh - 36px)`;
+      this.dom.style.top = '30px';
+      this.dom.style.width = `calc(100vw - 4px)`;
+      this.dom.style.height = `calc(100vh - 40px)`;
     }
     // Для kitty: добавить отступ описанию на мобилке/планшете
     if (type === 'kitty' && this.body) {
@@ -701,14 +699,12 @@ function openWindow(type) {
       }, 10);
     }
   }
-  // --- После вставки DOM, если мобильник/планшет — корректируем размеры ---
+  // --- После вставки DOM, если мобильник/планшет — корректируем размеры на весь экран ---
   if (win.dom && mobileOpts) {
     win.dom.style.left = '0px';
-    win.dom.style.top = '36px';
-    win.dom.style.width = `${winboxOpts.width}px`;
-    win.dom.style.height = `${winboxOpts.height}px`;
-    win.dom.style.maxWidth = '100vw';
-    win.dom.style.maxHeight = `calc(100vh - 36px)`;
+    win.dom.style.top = '30px';
+    win.dom.style.width = `calc(100vw - 4px)`;
+    win.dom.style.height = `calc(100vh - 40px)`;
   }
   // Вкладки и проекты
   // setupTabs теперь вызывается только в oncreate
@@ -1258,8 +1254,8 @@ function openFullscreenGallery(images, startIdx, model) {
       <button id="fullscreen-prev" style="position:relative;left:0;z-index:2;font-size:40px;color:#fff;background:none;border:none;cursor:pointer;margin-right:20px;">&#8592;</button>
       <div style="display:flex;flex-direction:column;align-items:center;">
         <img id="fullscreen-img" src="${images[current]}" style="max-width:80vw;max-height:80vh;border-radius:12px;box-shadow:0 2px 20px #000a;display:block;">
-        <div style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;">
-          ${images.map((img, i) => `<img src="${img}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
+        <div id="thumbnails-container" style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;overflow-x:auto;max-width:80vw;padding:5px 0;">
+          ${images.map((img, i) => `<img src="${img}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};flex-shrink:0;">`).join('')}
         </div>
       </div>
       <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;color:#fff;background:none;border:none;cursor:pointer;margin-left:20px;">&#8594;</button>
@@ -1271,6 +1267,30 @@ function openFullscreenGallery(images, startIdx, model) {
     overlay.querySelectorAll('.fullscreen-thumb').forEach((thumb, i) => {
       thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
     });
+    // Автопрокрутка мини-галереи чтобы активный thumbnail был видим в центре
+    const container = overlay.querySelector('#thumbnails-container');
+    const activeThumbnail = overlay.querySelector('.fullscreen-thumb.active');
+    if (container && activeThumbnail) {
+      // Найти корректный активный thumbnail после обновления стилей
+      const allThumbs = Array.from(overlay.querySelectorAll('.fullscreen-thumb'));
+      const activeThumb = allThumbs.find((thumb, i) => i === current);
+      if (activeThumb) {
+        const thumbWidth = 70;
+        const gap = 10;
+        const containerWidth = container.clientWidth;
+        const scrollLeft = container.scrollLeft;
+        const thumbIndex = current;
+        const thumbLeft = thumbIndex * (thumbWidth + gap);
+        const thumbRight = thumbLeft + thumbWidth;
+        
+        // Проверить видимость и скроллить если нужно
+        if (thumbLeft < scrollLeft) {
+          container.scrollLeft = Math.max(0, thumbLeft - gap);
+        } else if (thumbRight > scrollLeft + containerWidth) {
+          container.scrollLeft = thumbRight - containerWidth + gap;
+        }
+      }
+    }
   }
   overlay.querySelector('#fullscreen-prev').onclick = (e) => {
     e.stopPropagation();
@@ -1331,19 +1351,19 @@ function getMobileWinboxOptions() {
   const w = window.innerWidth;
   const h = window.innerHeight;
   if (w <= 600) {
-    // Смартфон
+    // Смартфон - полноразмерные окна (весь экран за вычетом 4px справа/снизу для border)
     return {
-      width: Math.max(w - 8, 320),
-      height: Math.max(h - 44, 320),
+      width: Math.max(w - 4, 320),
+      height: Math.max(h - 40, 320),
       x: 0,
       y: 36,
       top: 36
     };
   } else if (w <= 992) {
-    // Планшет
+    // Планшет - полноразмерные окна (весь экран за вычетом 4px справа/снизу для border)
     return {
-      width: Math.max(w - 32, 480),
-      height: Math.max(h - 52, 400),
+      width: Math.max(w - 4, 480),
+      height: Math.max(h - 40, 400),
       x: 0,
       y: 36,
       top: 36

@@ -247,7 +247,7 @@ window.locales = {
     calculatorContent: "Content filling",
     calculatorHosting: "Hosting for 1 year",
     calculatorPaint: "Manual painting",
-    calculatorDiscountNote: "* 20% discount on all additional services when ordering website development or 3D model",
+    calculatorDiscountNote: "* 20% discount on all additional services when ordering website development. Note: 3D model does not receive a discount",
     calculatorDesignNote: "* Final design price may vary depending on individual requests",
     calculatorTotal: "Total cost",
     calculatorOrder: "Order",
