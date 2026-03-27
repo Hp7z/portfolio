@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Сохраняем оригинальный текст label в data-label (один раз)
       const label = cb.nextElementSibling;
       if (label && !label.dataset.label) {
-        label.dataset.label = label.textContent.replace(/^[^а-яА-ЯA-Za-z]+/, '').replace(/\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
+        label.dataset.label = label.textContent.replace(/\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
       }
       cb.onchange = recalc;
     });
