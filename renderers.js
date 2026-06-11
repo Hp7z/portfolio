@@ -474,13 +474,16 @@ window.renderCalculatorContent = function() {
       </div>
       <div id="feedback-block" class="calculator-feedback-panel" style="display:none;">
         <label>${t.feedbackNameLabel}:
-          <input type="text" id="feedback-name" placeholder="${t.feedbackNameLabel}" />
+          <input type="text" id="feedback-name" placeholder="${t.feedbackNamePlaceholder || t.feedbackNameLabel}" />
         </label>
         <label>${t.feedbackPhoneLabel}:
-          <input type="text" id="feedback-phone" placeholder="${t.feedbackPhoneLabel}" />
+          <input type="text" id="feedback-phone" placeholder="${t.feedbackPhonePlaceholder || t.feedbackPhoneLabel}" />
+        </label>
+        <label>${t.feedbackEmailLabel}:
+          <input type="email" id="feedback-email" placeholder="${t.feedbackEmailPlaceholder || ''}" />
         </label>
         <label>${t.feedbackPreferredLabel}:
-          <textarea id="feedback-preferred" placeholder="${t.feedbackPreferredLabel}"></textarea>
+          <textarea id="feedback-preferred" placeholder="${t.feedbackPreferredPlaceholder || t.feedbackPreferredLabel}"></textarea>
         </label>
         <div id="feedback-services" class="calculator-feedback-services"></div>
       </div>

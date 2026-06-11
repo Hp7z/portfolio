@@ -106,6 +106,7 @@ async function handleFormSubmit(request) {
     `<b>${title}</b>`,
     `<b>Имя:</b> ${payload.name || '-'}`,
     `<b>Телефон:</b> ${payload.phone || '-'}`,
+    `<b>Почта:</b> ${payload.email || '-'}`,
     `<b>Удобный способ связи:</b> ${payload.preferredContact || '-'}`,
     `<b>Метод:</b> ${payload.method || '-'}`,
     `<b>Сумма:</b> ${payload.total || '-'} ${currency}`,

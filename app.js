@@ -826,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const feedbackPanel = document.getElementById('feedback-block');
     const feedbackName = document.getElementById('feedback-name');
     const feedbackPhone = document.getElementById('feedback-phone');
+    const feedbackEmail = document.getElementById('feedback-email');
     const feedbackPreferred = document.getElementById('feedback-preferred');
     const feedbackServices = document.getElementById('feedback-services');
     const contactData = window.contactData || { email: 'luzan.maksim@mail.ru', vkUrl: 'https://vk.com/hp7zk', telegramUrl: 'https://t.me/looptoquit' };
@@ -1010,6 +1011,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = {
           name: feedbackName?.value.trim() || '',
           phone: feedbackPhone?.value.trim() || '',
+          email: feedbackEmail?.value.trim() || '',
           preferredContact: feedbackPreferred?.value.trim() || '',
           services: checked,
           total: fullTotal,
