@@ -1,6 +1,43 @@
-<svg width="16" height="16" version="1.1" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <style type="text/css" id="current-color-scheme">.ColorScheme-Text { color:#282828; } .ColorScheme-Highlight { color:#458588; }</style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="16"
+   height="16"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="website-dark.svg"
+   inkscape:version="1.4.4 (dcaf3e7d9e, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="52.4375"
+     inkscape:cx="8"
+     inkscape:cy="8"
+     inkscape:window-width="1920"
+     inkscape:window-height="1040"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <defs
+     id="defs1">
+    <style
+       type="text/css"
+       id="current-color-scheme">.ColorScheme-Text { color:#282828; } .ColorScheme-Highlight { color:#458588; }</style>
   </defs>
-  <path class="ColorScheme-Text" d="m1.023 1v2.502c6.224 0.2724 11.2 5.262 11.46 11.49h2.504c-0.2636-7.606-6.363-13.71-13.97-13.99zm-0.01563 7.018c3.735 0.2604 6.706 3.235 6.961 6.971h2.523c-0.2621-5.124-4.36-9.219-9.484-9.477zm2 2.982c-1.105 0-2 0.8954-2 2s0.8954 2 2 2 2-0.8954 2-2-0.8954-2-2-2z" fill="currentColor"/>
+  <path
+     class="ColorScheme-Text"
+     d="m1.023 1v2.502c6.224 0.2724 11.2 5.262 11.46 11.49h2.504c-0.2636-7.606-6.363-13.71-13.97-13.99zm-0.01563 7.018c3.735 0.2604 6.706 3.235 6.961 6.971h2.523c-0.2621-5.124-4.36-9.219-9.484-9.477zm2 2.982c-1.105 0-2 0.8954-2 2s0.8954 2 2 2 2-0.8954 2-2-0.8954-2-2-2z"
+     fill="currentColor"
+     id="path1"
+     style="fill:#f2f2f2;fill-opacity:1" />
 </svg>

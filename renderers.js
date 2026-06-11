@@ -182,32 +182,41 @@ window.renderServicesContent = function() {
   `;
 };
 
+window.contactData = window.contactData || {
+  email: 'luzan.maksim@mail.ru',
+  phone: '+7 999 475-95-92',
+  vkUrl: 'https://vk.com/hp7zk',
+  telegramUrl: 'https://t.me/looptoquit',
+  gitHubUrl: 'https://github.com/hp7z'
+};
+
 window.renderContactsContent = function() {
   const t = window.locales[window.currentLang];
+  const data = window.contactData;
   return `
     <div class="contacts-container">
       <h2>${t.contactsTitle}</h2>
       <h3>${t.contactsName}</h3>
-      <p><strong>${t.contactsEmailLabel}:</strong> luzan.maksim@mail.ru</p>
-      <p><strong>${t.contactsPhoneLabel}:</strong> +7 999 475-95-92</p>
+      <p><strong>${t.contactsEmailLabel}:</strong> ${data.email}</p>
+      <p><strong>${t.contactsPhoneLabel}:</strong> ${data.phone}</p>
       <div class="social-links-container">
         <h3>${t.contactsSocials}</h3>
         <div class="social-links">
-          <a href="https://vk.com/hp7zk" target="_blank" class="social-link vk-link" title="ВКонтакте">
+          <a href="${data.vkUrl}" target="_blank" class="social-link vk-link" title="ВКонтакте">
             <span class="social-link-icon">
               <img src="icons/vk-dark.svg" class="dark-theme-icon" alt="VK" style="width:35px;height:35px;">
               <img src="icons/vk-light.svg" class="light-theme-icon" alt="VK" style="width:35px;height:35px;">
             </span>
             <span class="social-link-text">${t.contactsVk}</span>
           </a>
-          <a href="https://t.me/looptoquit" target="_blank" class="social-link telegram-link" title="Telegram">
+          <a href="${data.telegramUrl}" target="_blank" class="social-link telegram-link" title="Telegram">
             <span class="social-link-icon">
               <img src="icons/telegram-dark.svg" class="light-theme-icon" alt="Telegram" style="width:35px;height:35px;">
               <img src="icons/telegram-light.svg" class="dark-theme-icon" alt="Telegram" style="width:35px;height:35px;">
             </span>
             <span class="social-link-text">${t.contactsTelegram}</span>
           </a>
-          <a href="https://github.com/hp7z" target="_blank" class="social-link github-link" title="GitHub">
+          <a href="${data.gitHubUrl}" target="_blank" class="social-link github-link" title="GitHub">
             <span class="social-link-icon">
               <img src="icons/github-dark.svg" class="dark-theme-icon" alt="GitHub" style="width:35px;height:35px;">
               <img src="icons/github-light.svg" class="light-theme-icon" alt="GitHub" style="width:35px;height:35px;">
@@ -443,6 +452,37 @@ window.renderCalculatorContent = function() {
       </div>
       <div class="calculator-total">
         <h3>${t.calculatorTotal}: <span id="total-price">0</span></h3>
+      </div>
+      <div class="calculator-contact-method-title">${t.calculatorContactMethodTitle}</div>
+      <div class="calculator-contact-method">
+        <label>
+          <input type="radio" name="contact-method" value="vk" class="order-contact-method" checked>
+          ${t.calculatorContactVk}
+        </label>
+        <label>
+          <input type="radio" name="contact-method" value="telegram" class="order-contact-method">
+          ${t.calculatorContactTelegram}
+        </label>
+        <label>
+          <input type="radio" name="contact-method" value="email" class="order-contact-method">
+          ${t.calculatorContactEmail}
+        </label>
+        <label>
+          <input type="radio" name="contact-method" value="feedback" class="order-contact-method">
+          ${t.calculatorContactFeedback}
+        </label>
+      </div>
+      <div id="feedback-block" class="calculator-feedback-panel" style="display:none;">
+        <label>${t.feedbackNameLabel}:
+          <input type="text" id="feedback-name" placeholder="${t.feedbackNameLabel}" />
+        </label>
+        <label>${t.feedbackPhoneLabel}:
+          <input type="text" id="feedback-phone" placeholder="${t.feedbackPhoneLabel}" />
+        </label>
+        <label>${t.feedbackPreferredLabel}:
+          <textarea id="feedback-preferred" placeholder="${t.feedbackPreferredLabel}"></textarea>
+        </label>
+        <div id="feedback-services" class="calculator-feedback-services"></div>
       </div>
       <button class="btn" id="order-button">${t.calculatorOrder}</button>
     </div>

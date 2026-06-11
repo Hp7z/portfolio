@@ -107,6 +107,100 @@ body {
   fill: #000;
 }
 
+.light-theme .light-theme-icon,
+body.light-theme .shortcut-icon img,
+body.light-theme .activities-icon img,
+body.light-theme .social-link-icon img,
+body.light-theme .taskbar-item img,
+body.light-theme .menu-item img,
+body.light-theme .adwaita-theme .wb-icon,
+body.light-theme .adwaita-theme .wb-icon img {
+  /* Черная обводка для всех иконок светлой темы, включая меню и wb-icon */
+  filter: drop-shadow(1px 0 0 black) drop-shadow(-1px 0 0 black) drop-shadow(0 1px 0 black) drop-shadow(0 -1px 0 black);
+}
+
+body.light-theme .fa-sun.light-theme-icon,
+body.light-theme .fas.fa-sun.light-theme-icon {
+  /* Убираем обводку для иконки солнца в теме */
+  filter: none !important;
+}
+
+.calculator-contact-method-title {
+  margin-top: 10px;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.calculator-contact-method {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 10px;
+}
+
+.calculator-contact-method label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.calculator-contact-method label:hover {
+  background: rgba(53, 132, 228, 0.1);
+}
+
+.calculator-feedback-panel {
+  display: none;
+  margin-top: 14px;
+  padding: 14px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background: var(--panel-bg);
+}
+
+.calculator-feedback-panel label {
+  display: block;
+  margin-bottom: 12px;
+  color: var(--text-color);
+  font-size: 14px;
+}
+
+.calculator-feedback-panel input,
+.calculator-feedback-panel textarea {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--input-border);
+  border-radius: 10px;
+  background: var(--input-bg);
+  color: var(--text-color);
+  resize: vertical;
+}
+
+.calculator-feedback-panel textarea {
+  min-height: 100px;
+}
+
+.calculator-feedback-services {
+  margin-top: 10px;
+  font-size: 14px;
+  color: var(--text-color);
+}
+
+.calculator-feedback-services ul {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.calculator-feedback-services li {
+  margin-bottom: 2px;
+}
+
 /* Layout components */
 .desktop {
   padding: 20px;
@@ -1792,6 +1886,7 @@ body.light-theme .light-theme-icon {
 
 #order-button {
   background: var(--gnome-green);
+  margin-top: 10px;
 }
 
 #order-button:hover {
@@ -2312,8 +2407,3 @@ body.light-theme .light-theme-icon {
   background: var(--button-hover-bg);
 }
 
-/* --- Белая обводка для svg-иконок ярлыков в светлой теме --- */
-body.light-theme .shortcut-icon img.light-theme-icon {
-  /* Для SVG-иконок: белая обводка */
-  filter: drop-shadow(0 0 0.5px #fff) drop-shadow(0 0 1.5px #fff) drop-shadow(0 0 2.5px #fff);
-}

@@ -822,7 +822,40 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkboxes = document.querySelectorAll('.service-checkbox');
     const totalPriceEl = document.getElementById('total-price');
     const orderBtn = document.getElementById('order-button');
+    const contactRadios = document.querySelectorAll('.order-contact-method');
+    const feedbackPanel = document.getElementById('feedback-block');
+    const feedbackName = document.getElementById('feedback-name');
+    const feedbackPhone = document.getElementById('feedback-phone');
+    const feedbackPreferred = document.getElementById('feedback-preferred');
+    const feedbackServices = document.getElementById('feedback-services');
+    const contactData = window.contactData || { email: 'luzan.maksim@mail.ru', vkUrl: 'https://vk.com/hp7zk', telegramUrl: 'https://t.me/looptoquit' };
+    const FEEDBACK_WORKER_URL = window.feedbackWorkerUrl || 'https://jolly-wave-b463.fendom-otaku.workers.dev/submit';
     if (!checkboxes.length || !totalPriceEl || !orderBtn) return;
+
+    function getSelectedContactMethod() {
+      const selected = document.querySelector('.order-contact-method:checked');
+      return selected ? selected.value : 'telegram';
+    }
+
+    function showFeedbackPanel() {
+      if (!feedbackPanel) return;
+      feedbackPanel.style.display = getSelectedContactMethod() === 'feedback' ? 'block' : 'none';
+    }
+
+    function updateFeedbackServices(checkedLabels) {
+      if (!feedbackServices) return;
+      if (checkedLabels.length) {
+        const title = t.feedbackServicesTitle || 'Выбранные услуги';
+        feedbackServices.innerHTML = `<strong>${title}:</strong><ul>${checkedLabels.map(s => `<li>${s}</li>`).join('')}</ul>`;
+      } else {
+        feedbackServices.innerHTML = `<em>${t.feedbackNoServices || 'Выберите хотя бы одну услугу.'}</em>`;
+      }
+    }
+
+    contactRadios.forEach(radio => {
+      radio.onchange = showFeedbackPanel;
+    });
+    showFeedbackPanel();
 
     // --- Курс доллара (можно заменить на динамический при необходимости) ---
     const USD_RATE = 85; // Пример: 1 USD = 90 RUB
@@ -878,7 +911,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (cb.checked) {
           checkedAll.push(cb.id);
           const label = cb.nextElementSibling?.dataset.label || '';
-          if (cb.dataset.type === 'website') checkedServices.push(label);
+          checkedServices.push(label);
           if (cb.dataset.type === 'additional') checkedAdd.push(label);
         }
       });
@@ -931,6 +964,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       // --- Сохраняем состояние чекбоксов для восстановления при смене языка ---
       window._calculatorChecked = checkedAll;
+      updateFeedbackServices(checkedServices);
     }
 
     checkboxes.forEach(cb => {
@@ -938,17 +972,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     recalc();
 
-    orderBtn.onclick = function() {
+    orderBtn.onclick = async function() {
       // --- Собираем отмеченные услуги ---
       let checked = [];
       checkboxes.forEach(cb => {
         if (cb.checked) {
-          // Очищаем цену из текста
-          const label = cb.nextElementSibling?.textContent.replace(/<[^>]+>/g, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
+          const labelText = cb.nextElementSibling?.textContent || '';
+          const label = labelText.replace(/<[^>]+>/g, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
           checked.push(label);
         }
       });
-      // --- Итоговая сумма ---
       let total = 0, addTotal = 0, addDiscount = isAnyDevChecked();
       checkboxes.forEach(cb => {
         if (cb.checked) {
@@ -963,17 +996,68 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
       let fullTotal = total + addTotal;
-      let msg;
-      if (window.currentLang === 'en') {
-        msg = "Hello, I would like to order:\n";
-        checked.forEach(s => { msg += "• " + s + "\n"; });
-        msg += "\nTotal: " + (Math.round(fullTotal / USD_RATE)) + " $";
-      } else {
-        msg = "Здравствуйте, я хотел бы заказать у вас:\n";
-        checked.forEach(s => { msg += "• " + s + "\n"; });
-        msg += "\nИтог: " + fullTotal + " ₽";
+      const selectedMethod = getSelectedContactMethod();
+      const messageBase = window.currentLang === 'en' ? (t.calculatorOrderMsgEn || "Hello! I want to order a website. My total is: ") : (t.calculatorOrderMsgRu || "Здравствуйте! Хочу заказать сайт. Мой итог: ");
+      let msg = `${messageBase}\n`;
+      checked.forEach(s => { msg += `• ${s}\n`; });
+      msg += window.currentLang === 'en' ? `\nTotal: ${Math.round(fullTotal / USD_RATE)} $` : `\nИтог: ${fullTotal} ₽`;
+
+      if (selectedMethod === 'feedback') {
+        if (!feedbackPreferred?.value.trim()) {
+          alert(t.feedbackPreferredLabel || 'Удобный способ связи');
+          return;
+        }
+        const payload = {
+          name: feedbackName?.value.trim() || '',
+          phone: feedbackPhone?.value.trim() || '',
+          preferredContact: feedbackPreferred?.value.trim() || '',
+          services: checked,
+          total: fullTotal,
+          method: 'feedback',
+          lang: window.currentLang,
+          contactData,
+        };
+        if (!FEEDBACK_WORKER_URL) {
+          alert(t.feedbackPreparedMessage || 'Данные готовы к отправки. Вставьте URL воркера и повторите.');
+          console.warn('Feedback worker URL is not configured');
+          return;
+        }
+        try {
+          const response = await fetch(FEEDBACK_WORKER_URL, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+          if (response.ok) {
+            alert(t.feedbackSent || 'Заявка отправлена.');
+          } else {
+            alert(t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.');
+          }
+        } catch (error) {
+          console.error(error);
+          alert(t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.');
+        }
+        return;
       }
-      window.open(`https://t.me/looptoquit?text=${encodeURIComponent(msg)}`, '_blank');
+
+      if (selectedMethod === 'telegram') {
+        window.open(`${contactData.telegramUrl}?text=${encodeURIComponent(msg)}`, '_blank');
+      } else if (selectedMethod === 'email') {
+        const subject = encodeURIComponent(t.calculatorOrder || 'Заказать');
+        window.open(`mailto:${contactData.email}?subject=${subject}&body=${encodeURIComponent(msg)}`);
+      } else if (selectedMethod === 'vk') {
+        try {
+          await navigator.clipboard.writeText(msg);
+          alert(t.feedbackVkCopied || 'Сообщение скопировано в буфер обмена для ВКонтакте.');
+        } catch (e) {
+          console.warn('Clipboard write failed', e);
+        }
+        window.open(contactData.vkUrl, '_blank');
+      } else {
+        window.open(`${contactData.telegramUrl}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
     };
   }
   window.initCalculator = initCalculator;
