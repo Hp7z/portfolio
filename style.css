@@ -1335,6 +1335,41 @@ body.light-theme .light-theme-icon {
   left: 10px;
 }
 
+.model-video-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  padding: 5px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  border-radius: 999px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+button.viewer-tab {
+  border: 1px solid var(--window-border);
+  background: transparent;
+  color: var(--text-color);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  margin-right: 10px;
+  font-size: 13px;
+}
+
+button.viewer-tab.active {
+  background: #3584e4;
+  color: #fff;
+  border-color: #3584e4;
+}
+
+#gallery-next {
+  right: 10px;
+}
+
 #gallery-next {
   right: 10px;
 }
@@ -2501,3 +2536,6 @@ body.light-theme .light-theme-icon {
   background: var(--button-hover-bg);
 }
 
+.tool-icons{
+  filter: drop-shadow(1px 0 0 black) drop-shadow(-1px 0 0 black) drop-shadow(0 1px 0 black) drop-shadow(0 -1px 0 black);
+}

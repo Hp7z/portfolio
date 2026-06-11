@@ -1218,7 +1218,15 @@ function openModelGallery(modelId) {
   const arrowColor = isDarkTheme ? '#fff' : '#000';
   const model = window.projects.models3d.static.find(m => m.id === modelId);
   if (!model) return;
-  const images = [model.preview].concat(model.gallery || []);
+  const galleryItems = [
+    { type: 'image', src: model.preview, thumb: model.preview }
+  ];
+  if (Array.isArray(model.gallery)) {
+    galleryItems.push(...model.gallery.map(src => ({ type: 'image', src, thumb: src })));
+  }
+  if (model.video) {
+    galleryItems.push({ type: 'video', src: model.video, thumb: model.preview });
+  }
   let current = 0;
   // Инструменты и логотипи
   const tools = [
@@ -1227,20 +1235,20 @@ function openModelGallery(modelId) {
   ];
   function renderGallery(win) {
     win.body.innerHTML = `
-      <div class="gallery-window-flex" style="display:flex;flex-direction:row;height:100%;">
-        <div class="gallery-viewer-col" style="flex:0 0 65%;min-width:0;display:flex;align-items:center;justify-content:center;height:100%;">
-          <div class="gallery-main-img-wrapper" style="position:relative;width:100%;height:340px;display:flex;align-items:center;justify-content:center;">
-            <button class="gallery-nav-btn" id="gallery-prev" style="left:10px;">&#8592;</button>
-            <img src="${images[current]}" id="gallery-main-img" style="max-width:100%;max-height:340px;border-radius:12px;box-shadow:0 2px 10px #0003;display:block;margin:0 auto;touch-action:pan-y;">
-            <button class="gallery-nav-btn" id="gallery-next" style="right:10px;">&#8594;</button>
-            <div style="position:absolute;bottom:-60px;left:0;width:100%;display:flex;gap:10px;justify-content:center;">
-              ${images.map((img, i) => `<img src="${img}" class="model-gallery-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:60px;height:45px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};">`).join('')}
+      <div class="gallery-window-flex" style="height:100%;">
+        <div class="gallery-viewer-col">
+          <div class="gallery-main-img-wrapper">
+            <button class="gallery-nav-btn" id="gallery-prev">&#8592;</button>
+            <div id="gallery-main-media" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"></div>
+            <button class="gallery-nav-btn" id="gallery-next">&#8594;</button>
+            <div>
+              ${galleryItems.map((item, i) => `<img src="${item.thumb}" class="model-gallery-thumb${i === current ? ' active' : ''}" data-idx="${i}" data-type="${item.type}">`).join('')}
             </div>
           </div>
         </div>
-        <div class="gallery-info-col" style="flex:0 0 35%;min-width:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;height:100%;">
-          <div class="model-title" style="font-size:22px;font-weight:bold;margin-bottom:10px;">${model.title}</div>
-          <div class="model-description" style="margin-bottom:15px;">${model.description || ''}</div>
+        <div class="gallery-info-col">
+          <div class="model-title">${model.title}</div>
+          <div class="model-description">${model.description || ''}</div>
           <div class="model-tools" style="margin-bottom:15px;">
             <b>Инструменты:</b>
             ${tools.map(t => `<img src="${t.icon}" alt="${t.name}" title="${t.name}" style="width:28px;height:28px;vertical-align:middle;margin:0 6px 0 0;">`).join('')}
@@ -1254,11 +1262,11 @@ function openModelGallery(modelId) {
     `;
     // Навигация
     win.body.querySelector('#gallery-prev').onclick = () => {
-      current = (current - 1 + images.length) % images.length;
+      current = (current - 1 + galleryItems.length) % galleryItems.length;
       renderGallery(win);
     };
     win.body.querySelector('#gallery-next').onclick = () => {
-      current = (current + 1) % images.length;
+      current = (current + 1) % galleryItems.length;
       renderGallery(win);
     };
     win.body.querySelectorAll('.model-gallery-thumb').forEach(thumb => {
@@ -1268,12 +1276,24 @@ function openModelGallery(modelId) {
       };
     });
     // Полноэкранный просмотр
-    win.body.querySelector('#gallery-main-img').onclick = () => {
-      openFullscreenGallery(images, current, model);
+    win.body.querySelector('#gallery-main-media').onclick = () => {
+      openFullscreenGallery(galleryItems, current, model);
     };
 
+    function renderMainMedia() {
+      const item = galleryItems[current];
+      const mediaContainer = win.body.querySelector('#gallery-main-media');
+      if (!mediaContainer) return;
+      if (item.type === 'video') {
+        mediaContainer.innerHTML = `<video id="gallery-main-video" src="${item.src}" controls playsinline style="max-width:100%;max-height:100%;object-fit:contain;outline:none;border-radius:12px;"></video>`;
+      } else {
+        mediaContainer.innerHTML = `<img id="gallery-main-img" src="${item.src}" class="gallery-main-img" alt="${model.title}" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:12px;">`;
+      }
+    }
+    renderMainMedia();
+
     // --- Свайп и drag для переключения изображений ---
-    const img = win.body.querySelector('#gallery-main-img');
+    const img = win.body.querySelector('#gallery-main-media');
     let startX = null, dragging = false;
     // Touch events
     img.ontouchstart = function(e) {
@@ -1284,9 +1304,9 @@ function openModelGallery(modelId) {
         const dx = e.touches[0].clientX - startX;
         if (Math.abs(dx) > 40) {
           if (dx < 0) { // swipe left
-            current = (current + 1) % images.length;
+              current = (current + 1) % galleryItems.length;
           } else { // swipe right
-            current = (current - 1 + images.length) % images.length;
+              current = (current - 1 + galleryItems.length) % galleryItems.length;
           }
           startX = null;
           renderGallery(win);
@@ -1306,9 +1326,9 @@ function openModelGallery(modelId) {
         const dx = e.clientX - startX;
         if (Math.abs(dx) > 40) {
           if (dx < 0) {
-            current = (current + 1) % images.length;
+            current = (current + 1) % galleryItems.length;
           } else {
-            current = (current - 1 + images.length) % images.length;
+            current = (current - 1 + galleryItems.length) % galleryItems.length;
           }
           dragging = false;
           startX = null;
@@ -1357,6 +1377,7 @@ window.openModelGallery = openModelGallery;
 
 // --- Полноэкранная галерея для статичных моделей ---
 function openFullscreenGallery(images, startIdx, model) {
+  const galleryItems = images.map(item => typeof item === 'string' ? { type: 'image', src: item, thumb: item } : item);
   let current = startIdx;
   let overlay = document.createElement('div');
   overlay.style.position = 'fixed';
@@ -1374,22 +1395,33 @@ function openFullscreenGallery(images, startIdx, model) {
     <button id="fullscreen-close" style="position:absolute;top:30px;right:40px;z-index:2;font-size:32px;color:#fff;background:none;border:none;cursor:pointer;">&times;</button>
     <div style="display:flex;align-items:center;justify-content:center;width:100vw;position:relative;">
       <button id="fullscreen-prev" style="position:relative;left:0;z-index:2;font-size:40px;color:#fff;background:none;border:none;cursor:pointer;margin-right:20px;">&#8592;</button>
-      <div style="display:flex;flex-direction:column;align-items:center;">
-        <img id="fullscreen-img" src="${images[current]}" style="max-width:80vw;max-height:80vh;border-radius:12px;box-shadow:0 2px 20px #000a;display:block;">
-        <div id="thumbnails-container" style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;overflow-x:auto;max-width:80vw;padding:5px 0;">
-          ${images.map((img, i) => `<img src="${img}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};flex-shrink:0;">`).join('')}
+      <div style="display:flex;flex-direction:column;align-items:center;max-width:80vw;min-width:320px;">
+        <div id="fullscreen-main-media" style="width:100%;height:100%;max-width:80vw;max-height:80vh;display:flex;align-items:center;justify-content:center;border-radius:12px;box-shadow:0 2px 20px #000a;overflow:hidden;background:#000;"></div>
+          <div id="thumbnails-container" style="display:flex;gap:10px;margin:10px 0 0 0;justify-content:center;overflow-x:auto;max-width:100%;padding:5px 0;">
+          ${galleryItems.map((item, i) => `<img src="${item.thumb}" class="fullscreen-thumb${i === current ? ' active' : ''}" data-idx="${i}" data-type="${item.type}" style="width:70px;height:50px;object-fit:cover;border-radius:6px;cursor:pointer;border:2px solid ${i === current ? '#3584e4' : '#ccc'};flex-shrink:0;">`).join('')}
         </div>
       </div>
       <button id="fullscreen-next" style="position:relative;right:0;z-index:2;font-size:40px;color:#fff;background:none;border:none;cursor:pointer;margin-left:20px;">&#8594;</button>
     </div>
   `;
   document.body.appendChild(overlay);
+  function renderMainMedia() {
+    const item = galleryItems[current];
+    const mainMedia = overlay.querySelector('#fullscreen-main-media');
+    if (!mainMedia) return;
+    if (item.type === 'video') {
+      mainMedia.innerHTML = `<video id="fullscreen-video" src="${item.src}" controls playsinline style="width:100%;height:100%;object-fit:contain;outline:none;"></video>`;
+    } else {
+      mainMedia.innerHTML = `<img id="fullscreen-img" src="${item.src}" style="max-width:100%;max-height:100%;width:auto;height:auto;border:none;display:block;">`;
+    }
+  }
+  renderMainMedia();
   function updateFullscreen() {
-    overlay.querySelector('#fullscreen-img').src = images[current];
+    renderMainMedia();
     overlay.querySelectorAll('.fullscreen-thumb').forEach((thumb, i) => {
       thumb.style.border = i === current ? '2px solid #3584e4' : '2px solid #ccc';
+      thumb.classList.toggle('active', i === current);
     });
-    // Автопрокрутка мини-галереи чтобы активный thumbnail был видим в центре
     const container = overlay.querySelector('#thumbnails-container');
     const activeThumbnail = overlay.querySelector('.fullscreen-thumb.active');
     if (container && activeThumbnail) {
@@ -1416,12 +1448,12 @@ function openFullscreenGallery(images, startIdx, model) {
   }
   overlay.querySelector('#fullscreen-prev').onclick = (e) => {
     e.stopPropagation();
-    current = (current - 1 + images.length) % images.length;
+    current = (current - 1 + galleryItems.length) % galleryItems.length;
     updateFullscreen();
   };
   overlay.querySelector('#fullscreen-next').onclick = (e) => {
     e.stopPropagation();
-    current = (current + 1) % images.length;
+    current = (current + 1) % galleryItems.length;
     updateFullscreen();
   };
   overlay.querySelectorAll('.fullscreen-thumb').forEach(thumb => {

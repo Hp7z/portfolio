@@ -298,6 +298,7 @@ window.render3DModels = function(models) {
   return models.map(model => {
     const title = lang === 'en' && model.title_en ? model.title_en : model.title;
     const description = lang === 'en' && model.description_en ? model.description_en : (model.description || '');
+    const hasVideo = Boolean(model.video);
     let date = model.date;
     if (date && t.dateFormat && lang === 'en') {
       const match = date.match(/^(\d{1,2})\s([а-яА-ЯёЁ]+)\s(\d{4})$/);
@@ -321,6 +322,7 @@ window.render3DModels = function(models) {
             <div class="model-content">
               <div class="model-title color-text">${title}</div>
               <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
+              ${hasVideo ? '<div class="model-video-badge">Видео</div>' : ''}
               <div class="model-preview static-model-preview" onclick="open3DModelViewer('${model.id}')">
                 <img src="${model.preview}" alt="${title}">
                 <div class="model-play-btn"></div>
@@ -357,6 +359,7 @@ window.render3DModels = function(models) {
             <div class="model-content">
               <div class="model-title color-text">${title}</div>
               <p class="model-description color-text">${description || 'Описание модели отсутствует'}</p>
+              ${hasVideo ? '<div class="model-video-badge">Видео</div>' : ''}
               <div class="model-footer">
                 <span class="model-credits color-text">${model.credits}</span>
                 <span class="model-date color-text">${model.date || ''}</span>
@@ -798,28 +801,24 @@ window.openStaticGalleryCollection = function(key) {
     const imgDesc = typeof currentImage.description === 'object' ? (currentImage.description[lang] || currentImage.description['ru']) : currentImage.description;
 
     win.body.innerHTML = `
-      <div class="gallery-window-flex">
-        <div class="gallery-viewer-col">
-          <div class="gallery-main-img-wrapper">
-            <button class="gallery-nav-btn" id="gallery-prev">&#8592;</button>
-            <img src="models/preview/${col.folder}/${currentImage.file}" id="gallery-main-img" class="gallery-main-img">
-            <button class="gallery-nav-btn" id="gallery-next">&#8594;</button>
-            <div>
-              ${thumbs.map((img, i) => {
-                const realIdx = thumbStart + i;
-                return `<img src="models/preview/${col.folder}/${img.file}" class="model-gallery-thumb${realIdx === current ? ' active' : ''}" data-idx="${realIdx}">`;
-              }).join('')}
-            </div>
+      <div class="kitty-gallery-flex" style="display:flex;flex-direction:row;height:100%;">
+        <div class="kitty-gallery-viewer-col" style="flex:0 0 65%;max-width:65%;position:relative;">
+          <div class="kitty-gallery-main-img-wrapper" style="position:relative;width:100%;height:70%;display:flex;align-items:center;justify-content:center;">
+            <button class="gallery-nav-btn" id="static-gallery-prev" style="left:10px;position:absolute;top:50%;transform:translateY(-50%);">&#8592;</button>
+            <img src="models/preview/${col.folder}/${currentImage.file}" id="static-gallery-main-img" class="gallery-main-img" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;box-shadow:0 2px 10px #0003;">
+            <button class="gallery-nav-btn" id="static-gallery-next" style="right:10px;position:absolute;top:50%;transform:translateY(-50%);">&#8594;</button>
+          </div>
+          <div style="width:100%;display:flex;gap:8px;justify-content:center;margin-top:12px;flex-wrap:nowrap;overflow-x:auto;padding-bottom:6px;">
+            ${col.images.map((img, i) => `<img src="models/preview/${col.folder}/${img.file}" class="static-gallery-thumb${i === current ? ' active' : ''}" data-idx="${i}" style="width:84px;height:56px;object-fit:cover;border-radius:6px;border:2px solid ${i===current? '#3584e4':'transparent'};cursor:pointer;">`).join('')}
           </div>
         </div>
-        <div class="gallery-info-col">
-          <div class="model-title">${imgTitle}</div>
-          <div class="model-description" style="margin-bottom:18px;">${imgDesc}</div>
-          <div class="model-tools">
-            <b>${t.tools}:</b>
-            <span class="tool-icons"></span>
+        <div class="kitty-gallery-info-col" style="flex:0 0 35%;max-width:35%;padding:0 22px 22px 22px;box-sizing:border-box;overflow-y:auto;display:flex;flex-direction:column;justify-content:flex-start;">
+          <div style="margin-bottom:auto;">
+            <div class="model-title" style="font-size:20px;font-weight:600;margin:0 0 8px 0;">${imgTitle}</div>
+            <div class="model-description" style="margin-bottom:18px;">${imgDesc}</div>
+            <div class="model-tools" style="margin-bottom:12px;"><b>${t.tools}:</b> <span class="tool-icons" ></span></div>
           </div>
-          <div class="model-footer">
+          <div class="model-footer" style="margin-top:auto;">
             <div class="model-credits"><b>${t.author}:</b> ${currentImage.credits}</div>
             <div class="model-date"><b>${t.date}:</b> ${currentImage.date}</div>
           </div>
@@ -841,21 +840,21 @@ window.openStaticGalleryCollection = function(key) {
       }).join('');
     }
 
-    win.body.querySelector('#gallery-prev').onclick = () => {
+    win.body.querySelector('#static-gallery-prev').onclick = () => {
       current = (current - 1 + col.images.length) % col.images.length;
       renderGallery(win);
     };
-    win.body.querySelector('#gallery-next').onclick = () => {
+    win.body.querySelector('#static-gallery-next').onclick = () => {
       current = (current + 1) % col.images.length;
       renderGallery(win);
     };
-    win.body.querySelectorAll('.model-gallery-thumb').forEach(thumb => {
+    win.body.querySelectorAll('.static-gallery-thumb').forEach(thumb => {
       thumb.onclick = () => {
         current = parseInt(thumb.dataset.idx);
         renderGallery(win);
       };
     });
-    win.body.querySelector('#gallery-main-img').onclick = () => {
+    win.body.querySelector('#static-gallery-main-img').onclick = () => {
       openFullscreenGalleryStatic(col, current);
     };
   }
@@ -873,8 +872,9 @@ window.openStaticGalleryCollection = function(key) {
     if (typeof window.activateWindow === 'function') window.activateWindow(type);
     return;
   }
+  let winTitle = typeof col.title === 'object' ? (col.title[lang] || col.title['ru']) : col.title;
   let win = new WinBox({
-    title: col.title,
+    title: winTitle,
     class: ['adwaita-theme', 'active'],
     width: 900,
     height: 500,
@@ -1287,10 +1287,10 @@ const origRenderPortfolioContent = window.renderPortfolioContent;
 window.renderPortfolioContent = function() {
   const html = origRenderPortfolioContent();
   // После вставки HTML, восстановим вкладки (если есть контейнер)
-  setTimeout(() => {
-    const container = document.querySelector('.adwaita-theme.active .wb-body') || document.body;
-    restoreActiveTabsState(container);
-  }, 0);
+  // setTimeout(() => {
+  //   const container = document.querySelector('.adwaita-theme.active .wb-body') || document.body;
+  //   if (typeof restoreActiveTabsState === 'function') restoreActiveTabsState(container);
+  // }, 0);
   return html;
 };
 

@@ -61,6 +61,7 @@ window.open3DModelViewer = async function(modelId) {
       <div class="model3d-info-col" style="flex:0 0 ${isMobile ? '100%' : '35%'};max-width:${isMobile ? '100%' : '35%'};min-width:0;min-height:0;padding:30px 30px 30px 30px;display:flex;flex-direction:column;justify-content:center;${isMobile ? 'height:auto;' : 'height:100%;'}box-sizing:border-box;overflow-y:auto;">
         <div class="model-title">${model ? model.title : 'Ошибка'}</div>
         <div class="model-description">${model ? (model.description || '') : errorMsg}</div>
+        ${model && model.video ? '<div style="margin:12px 0;"><button id="toggle-video-btn" class="viewer-tab">Видео</button></div>' : ''}
         <div class="model-tools">
           <b>Инструменты:</b>
           ${(model && model.tools ? model.tools : ['Blender', 'ArmorPaint']).map(t => {
@@ -140,6 +141,45 @@ window.open3DModelViewer = async function(modelId) {
   if (win.dom) document.body.appendChild(win.dom);
   if (typeof window.updateTaskbar === 'function') window.updateTaskbar();
 
+  // --- Переключатель Видео / 3D ---
+  if (model && model.video) {
+    const toggleBtn = win.body.querySelector('#toggle-video-btn');
+    let videoElem = null;
+    let stopAnimation = false;
+    let resumeAnimation = null;
+    // Хук управления анимацией: используем методы на объекте окна `win` ниже
+    toggleBtn.onclick = async () => {
+      const container = document.getElementById(`threejs-viewer-${modelId}`);
+      if (!container) return;
+      // Если видео уже показано — вернёмся к 3D
+      if (videoElem) {
+        videoElem.pause();
+        videoElem.remove();
+        videoElem = null;
+        // показать canvas и возобновить анимацию
+        const canvas = container.querySelector('canvas');
+        if (canvas) canvas.style.display = 'block';
+        if (typeof win._threeAnimationResume === 'function') win._threeAnimationResume();
+        return;
+      }
+      // Скрыть canvas и остановить анимацию
+      const canvas = container.querySelector('canvas');
+      if (canvas) canvas.style.display = 'none';
+      if (typeof win._threeAnimationStop === 'function') win._threeAnimationStop();
+      // Создать видеоэлемент
+      videoElem = document.createElement('video');
+      videoElem.src = model.video;
+      videoElem.controls = true;
+      videoElem.playsInline = true;
+      videoElem.style.width = '100%';
+      videoElem.style.height = '100%';
+      videoElem.style.objectFit = 'contain';
+      videoElem.autoplay = false;
+      container.appendChild(videoElem);
+      try { await videoElem.play(); } catch (e) { /* autoplay может блокироваться */ }
+    };
+  }
+
   // --- Three.js плеер через importmaps ---
   if (!model || !model.modelUrl) return;
 
@@ -147,6 +187,14 @@ window.open3DModelViewer = async function(modelId) {
     try {
       const THREE = await import('three');
       const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js');
+      let FBXLoader = null;
+      try {
+        const fbxMod = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/loaders/FBXLoader.js');
+        FBXLoader = fbxMod.FBXLoader || fbxMod.default || null;
+      } catch (e) {
+        console.warn('FBXLoader unavailable, will use GLTFLoader');
+        FBXLoader = null;
+      }
       const { RoomEnvironment } = await import('https://cdn.jsdelivr.net/npm/three@0.152.2/examples/jsm/environments/RoomEnvironment.js');
       // --- Удалено всё, что связано с FBXLoader ---
 
@@ -204,14 +252,37 @@ window.open3DModelViewer = async function(modelId) {
 
       // --- Удалены все источники света ---
 
-      // --- Загрузка модели: только glb/gltf через GLTFLoader ---
-      const loader = new GLTFLoader();
-      loader.load(model.modelUrl, function(gltf) {
-        const obj = gltf.scene;
-        obj.position.set(0, 0, 0);
-        obj.rotation.y = Math.PI;
-        scene.add(obj);
-
+      // --- Загрузка модели: поддержка GLTF и FBX ---
+      const ext = (model.modelUrl || '').toLowerCase().split('.').pop();
+      
+      function loadModelAndSetup() {
+        if (ext === 'fbx' && FBXLoader) {
+          const loader = new FBXLoader();
+          loader.load(model.modelUrl, function(obj) {
+            obj.position.set(0, 0, 0);
+            obj.rotation.y = Math.PI;
+            scene.add(obj);
+            startAnimation();
+          }, undefined, function(error) {
+            const container = document.getElementById(`threejs-viewer-${modelId}`);
+            if (container) container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки FBX модели</div>';
+          });
+        } else {
+          const loader = new GLTFLoader();
+          loader.load(model.modelUrl, function(gltf) {
+            const obj = gltf.scene;
+            obj.position.set(0, 0, 0);
+            obj.rotation.y = Math.PI;
+            scene.add(obj);
+            startAnimation();
+          }, undefined, function(error) {
+            const container = document.getElementById(`threejs-viewer-${modelId}`);
+            if (container) container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D модели</div>';
+          });
+        }
+      }
+      
+      function startAnimation() {
         // --- Billboard для PlaneXXX ---
         function updateBillboards() {
           scene.traverse(child => {
@@ -386,22 +457,19 @@ window.open3DModelViewer = async function(modelId) {
         }
         setTimeout(handleResize, 100);
 
+        let _stopAnim = false;
+        win._threeAnimationStop = function() { _stopAnim = true; };
+        win._threeAnimationResume = function() { if (_stopAnim) { _stopAnim = false; animate(); } };
         function animate() {
+          if (_stopAnim) return;
           updateBillboards();
           renderer.render(scene, camera);
           requestAnimationFrame(animate);
         }
         animate();
-      }, undefined, function(error) {
-        container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D модели</div>';
-      });
-
-      // --- Если модель FBX, то billboard не нужен (оставляем animate как было) ---
-      // function animate() {
-      //   renderer.render(scene, camera);
-      //   requestAnimationFrame(animate);
-      // }
-      // animate();
+      }
+      
+      loadModelAndSetup();
     } catch (e) {
       const container = document.getElementById(`threejs-viewer-${modelId}`);
       if (container) container.innerHTML = '<div style="color:red;text-align:center;margin-top:40px;">Ошибка загрузки 3D-плеера</div>';
