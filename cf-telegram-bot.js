@@ -7,6 +7,17 @@ const failedAttempts = new Map();
 const authorizedUsers = new Map();
 let ownerChatId = null;
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type'
+};
+
+function createResponse(body, init = {}) {
+  const headers = Object.assign({}, CORS_HEADERS, init.headers || {});
+  return new Response(body, Object.assign({}, init, { headers }));
+}
+
 async function telegramRequest(method, payload) {
   const response = await fetch(`${BOT_API_URL}/${method}`, {
     method: 'POST',
@@ -41,14 +52,14 @@ async function handleTelegramWebhook(request) {
   const body = await request.json();
   const message = body.message || body.channel_post;
   if (!message || !message.chat) {
-    return new Response('No message', { status: 400 });
+    return createResponse('No message', { status: 400 });
   }
   const chatId = message.chat.id;
   const text = (message.text || '').trim();
 
   if (blacklisted.has(chatId)) {
     await sendTelegramMessage(chatId, 'Вы заблокированы.');
-    return new Response('Blocked', { status: 200 });
+    return createResponse('Blocked', { status: 200 });
   }
 
   if (text.toLowerCase().startsWith('/login')) {
@@ -59,45 +70,45 @@ async function handleTelegramWebhook(request) {
       ownerChatId = chatId;
       failedAttempts.delete(chatId);
       await sendTelegramMessage(chatId, 'Авторизация прошла успешно. Теперь вы будете получать заявки из формы обратной связи.');
-      return new Response('Ok', { status: 200 });
+      return createResponse('Ok', { status: 200 });
     }
     const currentFail = (failedAttempts.get(chatId) || 0) + 1;
     failedAttempts.set(chatId, currentFail);
     if (currentFail >= MAX_FAILED_ATTEMPTS) {
       blacklisted.add(chatId);
       await sendTelegramMessage(chatId, 'Вы заблокированы после 3 неверных попыток.');
-      return new Response('Blocked', { status: 200 });
+      return createResponse('Blocked', { status: 200 });
     }
     await sendTelegramMessage(chatId, `Неверный пароль. Осталось попыток: ${MAX_FAILED_ATTEMPTS - currentFail}.`);
-    return new Response('Unauthorized', { status: 200 });
+    return createResponse('Unauthorized', { status: 200 });
   }
 
   if (text.toLowerCase().startsWith('/status')) {
     const status = authorizedUsers.has(chatId) ? 'Вы авторизованы.' : 'Вы не авторизованы. Используйте /login <пароль>.';
     await sendTelegramMessage(chatId, status);
-    return new Response('Ok', { status: 200 });
+    return createResponse('Ok', { status: 200 });
   }
 
   if (authorizedUsers.has(chatId)) {
     await sendTelegramMessage(chatId, 'Вы уже авторизованы. Заявки будут приходить на этот чат.');
-    return new Response('Ok', { status: 200 });
+    return createResponse('Ok', { status: 200 });
   }
 
   await sendTelegramMessage(chatId, 'Этот бот принимает только пароль. Чтобы авторизоваться, отправьте /login <пароль>.');
-  return new Response('Ok', { status: 200 });
+  return createResponse('Ok', { status: 200 });
 }
 
 async function handleFormSubmit(request) {
   if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 });
+    return createResponse('Method not allowed', { status: 405 });
   }
   const payload = await request.json().catch(() => null);
   if (!payload || !Array.isArray(payload.services)) {
-    return new Response(JSON.stringify({ ok: false, error: 'Invalid payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    return createResponse(JSON.stringify({ ok: false, error: 'Invalid payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
   }
   const targetChat = getTargetChatId();
   if (!targetChat) {
-    return new Response(JSON.stringify({ ok: false, error: 'Owner chat not available. Please authorize the bot with /login first.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+    return createResponse(JSON.stringify({ ok: false, error: 'Owner chat not available. Please authorize the bot with /login first.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
   }
 
   const currency = payload.lang === 'en' ? '$' : '₽';
@@ -122,11 +133,14 @@ async function handleFormSubmit(request) {
   }
 
   await sendTelegramMessage(targetChat, lines.join('\n'));
-  return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  return createResponse(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
 }
 
 export default {
   async fetch(request) {
+    if (request.method === 'OPTIONS') {
+      return createResponse(null, { status: 204 });
+    }
     const url = new URL(request.url);
     if (url.pathname === '/webhook') {
       return handleTelegramWebhook(request);
@@ -134,6 +148,6 @@ export default {
     if (url.pathname === '/submit') {
       return handleFormSubmit(request);
     }
-    return new Response('Telegram Cloudflare bot is running.', { status: 200 });
+    return createResponse('Telegram Cloudflare bot is running.', { status: 200 });
   }
 };
