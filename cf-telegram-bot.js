@@ -37,8 +37,9 @@ async function sendTelegramMessage(chatId, text) {
   });
 }
 
-function getTargetChatId() {
+function getTargetChatId(env) {
   if (ownerChatId) return ownerChatId;
+  if (env && env.OWNER_CHAT_ID) return env.OWNER_CHAT_ID;
   const first = authorizedUsers.keys().next();
   return first.done ? null : first.value;
 }
@@ -62,6 +63,20 @@ async function handleTelegramWebhook(request) {
     return createResponse('Blocked', { status: 200 });
   }
 
+  if (text.toLowerCase().startsWith('/start') || text.toLowerCase().startsWith('/help')) {
+    const helpMessage = [
+      '<b>Бот формы обратной связи</b>',
+      '\n',
+      '• /login <пароль> — авторизоваться и получать заявки из формы',
+      '• /status — проверить авторизацию',
+      '• /help — показать это меню',
+      '\n',
+      'После авторизации заявки из формы будут поступать в этот чат.'
+    ].join('\n');
+    await sendTelegramMessage(chatId, helpMessage);
+    return createResponse('Ok', { status: 200 });
+  }
+
   if (text.toLowerCase().startsWith('/login')) {
     const parts = text.split(' ');
     const password = parts.slice(1).join(' ').trim();
@@ -83,8 +98,8 @@ async function handleTelegramWebhook(request) {
     return createResponse('Unauthorized', { status: 200 });
   }
 
-  if (text.toLowerCase().startsWith('/status')) {
-    const status = authorizedUsers.has(chatId) ? 'Вы авторизованы.' : 'Вы не авторизованы. Используйте /login <пароль>.';
+  if (text.toLowerCase().startsWith('/menu') || text.toLowerCase().startsWith('/status')) {
+    const status = authorizedUsers.has(chatId) ? 'Вы авторизованы. Заявки будут приходить в этот чат.' : 'Вы не авторизованы. Используйте /login <пароль>.';
     await sendTelegramMessage(chatId, status);
     return createResponse('Ok', { status: 200 });
   }
@@ -98,22 +113,23 @@ async function handleTelegramWebhook(request) {
   return createResponse('Ok', { status: 200 });
 }
 
-async function handleFormSubmit(request) {
-  if (request.method !== 'POST') {
-    return createResponse('Method not allowed', { status: 405 });
-  }
-  const payload = await request.json().catch(() => null);
-  if (!payload || !Array.isArray(payload.services)) {
-    return createResponse(JSON.stringify({ ok: false, error: 'Invalid payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
-  }
-  const targetChat = getTargetChatId();
-  if (!targetChat) {
-    return createResponse(JSON.stringify({ ok: false, error: 'Owner chat not available. Please authorize the bot with /login first.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
-  }
+async function handleFormSubmit(request, env) {
+  try {
+    if (request.method !== 'POST') {
+      return createResponse('Method not allowed', { status: 405 });
+    }
+    const payload = await request.json().catch(() => null);
+    if (!payload || !Array.isArray(payload.services)) {
+      return createResponse(JSON.stringify({ ok: false, error: 'Invalid payload' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    }
+    const targetChat = getTargetChatId(env);
+    if (!targetChat) {
+      return createResponse(JSON.stringify({ ok: false, error: 'Owner chat not available. Please authorize the bot with /login or set OWNER_CHAT_ID in the worker environment.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }
 
-  const currency = payload.lang === 'en' ? '$' : '₽';
-  const title = 'Новая заявка из формы обратной связи';
-  const lines = [
+    const currency = payload.lang === 'en' ? '$' : '₽';
+    const title = 'Новая заявка из формы обратной связи';
+    const lines = [
     `<b>${title}</b>`,
     `<b>Имя:</b> ${payload.name || '-'}`,
     `<b>Телефон:</b> ${payload.phone || '-'}`,
@@ -132,12 +148,15 @@ async function handleFormSubmit(request) {
     lines.push(`<b>Контакты:</b> ${payload.contactData.email || '-'} | ${payload.contactData.vkUrl || '-'} | ${payload.contactData.telegramUrl || '-'} `);
   }
 
-  await sendTelegramMessage(targetChat, lines.join('\n'));
-  return createResponse(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+    await sendTelegramMessage(targetChat, lines.join('\n'));
+    return createResponse(JSON.stringify({ ok: true }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+  } catch (error) {
+    return createResponse(JSON.stringify({ ok: false, error: error.message || 'Internal Server Error' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
+  }
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     if (request.method === 'OPTIONS') {
       return createResponse(null, { status: 204 });
     }
@@ -146,7 +165,7 @@ export default {
       return handleTelegramWebhook(request);
     }
     if (url.pathname === '/submit') {
-      return handleFormSubmit(request);
+      return handleFormSubmit(request, env);
     }
     return createResponse('Telegram Cloudflare bot is running.', { status: 200 });
   }

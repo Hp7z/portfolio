@@ -1004,8 +1004,28 @@ document.addEventListener('DOMContentLoaded', () => {
       msg += window.currentLang === 'en' ? `\nTotal: ${Math.round(fullTotal / USD_RATE)} $` : `\nИтог: ${fullTotal} ₽`;
 
       if (selectedMethod === 'feedback') {
+        function showFeedbackPopup(message, isError = false) {
+          let popup = document.getElementById('feedback-popup');
+          if (!popup) {
+            popup = document.createElement('div');
+            popup.id = 'feedback-popup';
+            popup.className = 'feedback-popup';
+            popup.innerHTML = `
+              <div class="feedback-popup-body">
+                <div class="feedback-popup-text"></div>
+                <button type="button" class="feedback-popup-close">OK</button>
+              </div>
+            `;
+            document.body.appendChild(popup);
+            popup.querySelector('.feedback-popup-close').addEventListener('click', () => popup.classList.remove('visible'));
+          }
+          popup.querySelector('.feedback-popup-text').textContent = message;
+          popup.classList.toggle('error', isError);
+          popup.classList.add('visible');
+        }
+
         if (!feedbackPreferred?.value.trim()) {
-          alert(t.feedbackPreferredLabel || 'Удобный способ связи');
+          showFeedbackPopup(t.feedbackPreferredLabel || 'Удобный способ связи', true);
           return;
         }
         const payload = {
@@ -1020,7 +1040,7 @@ document.addEventListener('DOMContentLoaded', () => {
           contactData,
         };
         if (!FEEDBACK_WORKER_URL) {
-          alert(t.feedbackPreparedMessage || 'Данные готовы к отправки. Вставьте URL воркера и повторите.');
+          showFeedbackPopup(t.feedbackPreparedMessage || 'Данные готовы к отправки. Вставьте URL воркера и повторите.', true);
           console.warn('Feedback worker URL is not configured');
           return;
         }
@@ -1032,14 +1052,17 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             body: JSON.stringify(payload)
           });
-          if (response.ok) {
-            alert(t.feedbackSent || 'Заявка отправлена.');
+          const responseJson = await response.json().catch(() => null);
+          const success = response.ok && (responseJson === null || responseJson.ok !== false);
+          const errorMessage = responseJson?.error || t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.';
+          if (success) {
+            showFeedbackPopup(t.feedbackSent || 'Заявка отправлена.', false);
           } else {
-            alert(t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.');
+            showFeedbackPopup(errorMessage, true);
           }
         } catch (error) {
           console.error(error);
-          alert(t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.');
+          showFeedbackPopup(error?.message || (t.feedbackError || 'Не удалось отправить заявку. Попробуйте позже.'), true);
         }
         return;
       }
