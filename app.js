@@ -976,19 +976,27 @@ document.addEventListener('DOMContentLoaded', () => {
     orderBtn.onclick = async function() {
       // --- Собираем отмеченные услуги ---
       let checked = [];
+      let checkedLines = [];
+      let addDiscount = isAnyDevChecked();
+      let total = 0, addTotal = 0;
       checkboxes.forEach(cb => {
         if (cb.checked) {
-          const labelText = cb.nextElementSibling?.textContent || '';
-          const label = labelText.replace(/<[^>]+>/g, '').replace(/^\s*-?\s*\d+\s*[₽$]/, '').replace(/—\s*\d+\s*[₽$]/, '').trim();
-          checked.push(label);
-        }
-      });
-      let total = 0, addTotal = 0, addDiscount = isAnyDevChecked();
-      checkboxes.forEach(cb => {
-        if (cb.checked) {
-          let price = parseInt(cb.dataset.price, 10) || 0;
+          const plainLabel = cb.nextElementSibling?.dataset.label || cb.nextElementSibling?.textContent || '';
+          const price = parseInt(cb.dataset.price, 10) || 0;
+          let effectivePrice = price;
           if (cb.dataset.type === 'additional' && addDiscount) {
-            addTotal += Math.round(price * 0.8);
+            effectivePrice = Math.round(price * 0.8);
+          }
+          const priceText = window.currentLang === 'en'
+            ? `${Math.round(effectivePrice / USD_RATE)} $`
+            : `${effectivePrice} ₽`;
+          const discountSuffix = cb.dataset.type === 'additional' && addDiscount
+            ? window.currentLang === 'en' ? ' (20% off)' : ' (скидка 20%)'
+            : '';
+          checked.push(plainLabel);
+          checkedLines.push(`${plainLabel} — ${priceText}${discountSuffix}`);
+          if (cb.dataset.type === 'additional' && addDiscount) {
+            addTotal += effectivePrice;
           } else if (cb.dataset.type === 'additional') {
             addTotal += price;
           } else {
@@ -1000,7 +1008,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const selectedMethod = getSelectedContactMethod();
       const messageBase = window.currentLang === 'en' ? (t.calculatorOrderMsgEn || "Hello! I want to order a website. My total is: ") : (t.calculatorOrderMsgRu || "Здравствуйте! Хочу заказать сайт. Мой итог: ");
       let msg = `${messageBase}\n`;
-      checked.forEach(s => { msg += `• ${s}\n`; });
+      checkedLines.forEach(s => { msg += `• ${s}\n`; });
+      if (addDiscount) {
+        msg += window.currentLang === 'en' ? '\nDiscount: 20% on additional services\n' : '\nСкидка: 20% на дополнительные услуги\n';
+      }
       msg += window.currentLang === 'en' ? `\nTotal: ${Math.round(fullTotal / USD_RATE)} $` : `\nИтог: ${fullTotal} ₽`;
 
       if (selectedMethod === 'feedback') {
@@ -1033,8 +1044,9 @@ document.addEventListener('DOMContentLoaded', () => {
           phone: feedbackPhone?.value.trim() || '',
           email: feedbackEmail?.value.trim() || '',
           preferredContact: feedbackPreferred?.value.trim() || '',
-          services: checked,
+          services: checkedLines,
           total: fullTotal,
+          discount: addDiscount ? 20 : 0,
           method: 'feedback',
           lang: window.currentLang,
           contactData,

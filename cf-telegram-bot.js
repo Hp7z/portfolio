@@ -2,10 +2,11 @@ const BOT_TOKEN = '8920240879:AAE8wYL01BJZyxUBhpu5nhyEzXfOLNZp8WI';
 const BOT_PASSWORD = 'stormglass78';
 const BOT_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 const MAX_FAILED_ATTEMPTS = 3;
+const OWNER_CHAT_ID = '398350224';
 const blacklisted = new Set();
 const failedAttempts = new Map();
 const authorizedUsers = new Map();
-let ownerChatId = null;
+let ownerChatId = OWNER_CHAT_ID;
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -124,7 +125,7 @@ async function handleFormSubmit(request, env) {
     }
     const targetChat = getTargetChatId(env);
     if (!targetChat) {
-      return createResponse(JSON.stringify({ ok: false, error: 'Owner chat not available. Please authorize the bot with /login or set OWNER_CHAT_ID in the worker environment.' }), { status: 200, headers: { 'Content-Type': 'application/json' } });
+      return createResponse(JSON.stringify({ ok: false, error: 'Owner chat not available. Please set OWNER_CHAT_ID in the worker environment.' }), { status: 500, headers: { 'Content-Type': 'application/json' } });
     }
 
     const currency = payload.lang === 'en' ? '$' : '₽';
@@ -143,9 +144,6 @@ async function handleFormSubmit(request, env) {
     payload.services.forEach(service => lines.push(`• ${service}`));
   } else {
     lines.push('- Не выбраны услуги -');
-  }
-  if (payload.contactData) {
-    lines.push(`<b>Контакты:</b> ${payload.contactData.email || '-'} | ${payload.contactData.vkUrl || '-'} | ${payload.contactData.telegramUrl || '-'} `);
   }
 
     await sendTelegramMessage(targetChat, lines.join('\n'));
