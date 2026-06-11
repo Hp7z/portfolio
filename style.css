@@ -1634,6 +1634,26 @@ body.light-theme .light-theme-icon {
   background: var(--tab-active-bg);
   cursor: default;
 }
+.light-theme .minesweeper-cell.open {
+  background: #e8eaed;
+}
+.dark-theme .minesweeper-cell:not(.open) {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+.dark-theme .minesweeper-cell.open {
+  background: rgba(0, 0, 0, 0.45);
+}
+.dark-theme .minesweeper-cell.open.num1,
+.dark-theme .minesweeper-cell.open.num2,
+.dark-theme .minesweeper-cell.open.num3,
+.dark-theme .minesweeper-cell.open.num4,
+.dark-theme .minesweeper-cell.open.num5,
+.dark-theme .minesweeper-cell.open.num6,
+.dark-theme .minesweeper-cell.open.num7,
+.dark-theme .minesweeper-cell.open.num8 {
+  background: var(--tab-active-bg);
+}
 .minesweeper-cell.mine {
   color: #e01b24;
 }
