@@ -56,6 +56,7 @@ body.light-theme {
   --button-hover: #1c71d8;
   --icon-color: #2e3436;
   --button-hover-bg: rgba(0, 0, 0, 0.1);
+  --preview-btn-bg: #2e3436;
   --input-bg: #ffffff;
   --input-border: #deddda;
   --input-focus-border: #3584e4;
@@ -979,10 +980,26 @@ body.light-theme .light-theme-icon {
 }
 
 /* Project and model containers */
-.project-container,
 .model-container {
   display: flex;
   height: 250px;
+  flex-direction: row;
+  align-items: center;
+  padding-left: 20px;
+  margin-bottom: 25px;
+  background: var(--tab-bg);
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
+  transition: all 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
+}
+
+.project-container {
+  display: flex;
+  height: 300px;
   flex-direction: row;
   align-items: center;
   padding-left: 20px;
@@ -1054,17 +1071,26 @@ body.light-theme .light-theme-icon {
   text-align: left;
 }
 
-.project-preview,
 .model-preview {
-  width: 40%;
+  width: 50%;
   max-width: 100%;
   height: inherit;
-  max-height: 250px;
   overflow: hidden;
   border-radius: var(--gnome-border-radius);
   border: 1px solid var(--window-border);
   position: relative;
 }
+
+.project-preview {
+  width: 100%;
+  max-width: 100%;
+  height: inherit;
+  overflow: hidden;
+  border-radius: var(--gnome-border-radius);
+  border: 1px solid var(--window-border);
+  position: relative;
+}
+
 
 .project-preview img,
 .model-preview img {
@@ -1110,20 +1136,43 @@ body.light-theme .light-theme-icon {
   text-align: left;
 }
 
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
 .project-link {
-  width: 40%;
+  min-width: 110px;
   text-align: center;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 15px;
   background: var(--button-bg);
   color: white;
   text-decoration: none;
   border-radius: var(--gnome-border-radius);
-  margin-right: 15px;
   font-size: 14px;
   transition: background 0.2s;
   box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-  margin-bottom: 15px;
+  border: none;
+  cursor: pointer;
+}
+
+.project-preview-btn {
+  background: var(--preview-btn-bg, #2e3436);
+  color: #fff;
+  font-weight: 600;
+}
+
+body.dark-theme .project-preview-btn {
+  background: var(--button-hover);
+}
+
+body.light-theme .project-preview-btn:hover {
+  background: #1f2327;
 }
 
 .project-link:hover {
@@ -2364,6 +2413,7 @@ button.viewer-tab.active {
     margin-bottom: 10px;
     order: 3;
   }
+
   .project-footer, .model-footer {
     order: 4;
   }
@@ -2511,7 +2561,50 @@ button.viewer-tab.active {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* Остальные стили как у .project-info */
+}
+
+.experience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.experience-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  min-height: 180px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--window-border);
+  border-radius: var(--gnome-border-radius);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.experience-card-title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.experience-card-period {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.experience-card-description {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body.light-theme .experience-card {
+  background: rgba(0,0,0,0.04);
+}
+
+@media (max-width: 768px) {
+  .experience-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .lang-toggle {
@@ -2534,6 +2627,105 @@ button.viewer-tab.active {
 }
 .lang-toggle:hover {
   background: var(--button-hover-bg);
+}
+
+.model-tools {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.16);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
+body.light-theme .model-tools {
+  background: rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+}
+
+.model-tools b {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.9;
+}
+
+.tool-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: center;
+  width: 100%;
+}
+
+.tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  min-height: 22px;
+  border-radius: 999px;
+  background: rgba(53, 132, 228, 0.16);
+  border: 1px solid rgba(53, 132, 228, 0.3);
+  font-size: 15px;
+  color: var(--text-color);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.tool-badge img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: block;
+}
+
+body.dark-theme .tool-badge {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.16);
+}
+
+body.light-theme .tool-badge,
+body.light-theme .tool-badge span {
+  color: #ffffff;
+}
+
+body.light-theme .tool-badge {
+  background: rgba(53, 132, 228, 0.9);
+  border-color: rgba(53, 132, 228, 0.95);
+}
+
+.project-cms {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  margin-bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(53, 132, 228, 0.12);
+  border: 1px solid rgba(53, 132, 228, 0.24);
+  font-size: 12px;
+  color: var(--text-color);
+}
+
+.project-cms-label {
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+.project-cms-value {
+  opacity: 0.95;
+}
+
+body.light-theme .project-cms {
+  background: rgba(53, 132, 228, 0.16);
+  border-color: rgba(53, 132, 228, 0.28);
 }
 
 .tool-icons{

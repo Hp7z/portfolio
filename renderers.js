@@ -182,7 +182,7 @@ window.renderServicesContent = function() {
   `;
 };
 
-window.contactData = window.contactData || {
+window.contactData = window.contactData || window.portfolioData?.contacts || {
   email: 'luzan.maksim@mail.ru',
   phone: '+7 999 475-95-92',
   vkUrl: 'https://vk.com/hp7zk',
@@ -260,9 +260,13 @@ window.renderProjects = function(projects) {
             <div class="project-title">${title}</div>
             <p class="project-description">${description || getLocaleString('noProjectDescription')}</p>
             <div class="project-preview">
-              <img src="${project.preview}" alt="${title}">
+              <img src="${project.cardImage || project.preview}" alt="${title}">
             </div>
-            <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
+            <div class="project-actions">
+              <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
+              <button type="button" class="project-link project-preview-btn" data-preview="${project.previewImage || project.preview}" data-title="${title}" data-url="${project.url}">${window.portfolioData?.preview?.buttonLabel?.[lang] || window.portfolioData?.preview?.buttonLabel?.ru || 'Превью'}</button>
+            </div>
+            ${project.cms ? `<div class="project-cms"><span class="project-cms-label">CMS:</span> <span class="project-cms-value">${project.cms}</span></div>` : ''}
             <div class="project-footer">
               <span class="project-credits">${project.credits}</span>
               <span class="project-date">${date || ''}</span>
@@ -276,14 +280,18 @@ window.renderProjects = function(projects) {
           <div class="project-content">
             <div class="project-title">${title}</div>
             <p class="project-description">${description || getLocaleString('noProjectDescription')}</p>
-            <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
+            <div class="project-actions">
+              <a href="#" class="project-link" data-url="${project.url}">${getLocaleString('openProject') || 'Открыть проект'}</a>
+              <button type="button" class="project-link project-preview-btn" data-preview="${project.previewImage || project.preview}" data-title="${title}" data-url="${project.url}">${window.portfolioData?.preview?.buttonLabel?.[lang] || window.portfolioData?.preview?.buttonLabel?.ru || 'Превью'}</button>
+            </div>
+            ${project.cms ? `<div class="project-cms"><span class="project-cms-label">CMS:</span> <span class="project-cms-value">${project.cms}</span></div>` : ''}
             <div class="project-footer">
               <span class="project-credits">${project.credits}</span>
               <span class="project-date">${date || ''}</span>
             </div>
           </div>
           <div class="project-preview">
-            <img src="${project.preview}" alt="${title}">
+            <img src="${project.cardImage || project.preview}" alt="${title}">
           </div>
         </div>
       `;
@@ -397,55 +405,32 @@ window.render3DModels = function(models) {
 // Вот правильный блок:
 window.renderCalculatorContent = function() {
   const t = window.locales[window.currentLang];
-  // Убираем цену в скобках из названий услуг
+  const calculatorData = window.portfolioData?.calculator || {};
+  const services = calculatorData.services || [];
+  const contactMethods = calculatorData.contactMethods || [];
+  const websiteServices = services.filter(service => service.group === 'website');
+  const modelServices = services.filter(service => service.group === 'model');
+  const additionalServices = services.filter(service => service.group === 'additional');;
+
+  const renderServiceList = (groupServices, sectionTitleKey) => `
+    <div class="calculator-section">
+      <h3>${t[sectionTitleKey]}</h3>
+      ${groupServices.map(service => {
+        const label = typeof service.label === 'object' ? service.label[window.currentLang] || service.label.ru : service.label;
+        return `
+          <div class="calculator-item">
+            <input type="checkbox" id="${service.id}" class="service-checkbox" data-price="${service.price}" data-type="${service.type}">
+            <label for="${service.id}">${label}</label>
+          </div>`;
+      }).join('')}
+    </div>`;
+
   return `
     <h2>${t.calculator}</h2>
     <p>${t.calculatorDesc}</p>
-    <div class="calculator-section">
-      <h3>${t.calculatorWeb}</h3>
-      <div class="calculator-item">
-        <input type="checkbox" id="landing" class="service-checkbox" data-price="20000" data-type="website">
-        <label for="landing">${t.calculatorLanding.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="shop" class="service-checkbox" data-price="50000" data-type="website">
-        <label for="shop">${t.calculatorShop.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="corporate" class="service-checkbox" data-price="80000" data-type="website">
-        <label for="corporate">${t.calculatorCorp.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-    </div>
-    <div class="calculator-section">
-      <h3>${t.calculator3d}</h3>
-      <div class="calculator-item">
-        <input type="checkbox" id="model" class="service-checkbox" data-price="800" data-type="model">
-        <label for="model">${t.calculatorModel.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-    </div>
-    <div class="calculator-section">
-      <h3>${t.calculatorAdd}</h3>
-      <div class="calculator-item">
-        <input type="checkbox" id="design" class="service-checkbox" data-price="35000" data-type="additional">
-        <label for="design">${t.calculatorDesign.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="seo" class="service-checkbox" data-price="20000" data-type="additional">
-        <label for="seo">${t.calculatorSeo.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="content" class="service-checkbox" data-price="10000" data-type="additional">
-        <label for="content">${t.calculatorContent.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="hosting" class="service-checkbox" data-price="5000" data-type="additional">
-        <label for="hosting">${t.calculatorHosting.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-      <div class="calculator-item">
-        <input type="checkbox" id="paint" class="service-checkbox" data-price="600" data-type="no-discount">
-        <label for="paint">${t.calculatorPaint.replace(/\s*\(.*?\)/, '').trim()}</label>
-      </div>
-    </div>
+    ${renderServiceList(websiteServices, 'calculatorWeb')}
+    ${renderServiceList(modelServices, 'calculator3d')}
+    ${renderServiceList(additionalServices, 'calculatorAdd')}
     <div class="calculator-result">
       <div class="calculator-note">
         <p>${t.calculatorDiscountNote}</p>
@@ -458,22 +443,11 @@ window.renderCalculatorContent = function() {
       </div>
       <div class="calculator-contact-method-title">${t.calculatorContactMethodTitle}</div>
       <div class="calculator-contact-method">
-        <label>
-          <input type="radio" name="contact-method" value="vk" class="order-contact-method" checked>
-          ${t.calculatorContactVk}
-        </label>
-        <label>
-          <input type="radio" name="contact-method" value="telegram" class="order-contact-method">
-          ${t.calculatorContactTelegram}
-        </label>
-        <label>
-          <input type="radio" name="contact-method" value="email" class="order-contact-method">
-          ${t.calculatorContactEmail}
-        </label>
-        <label>
-          <input type="radio" name="contact-method" value="feedback" class="order-contact-method">
-          ${t.calculatorContactFeedback}
-        </label>
+        ${contactMethods.map(method => `
+          <label>
+            <input type="radio" name="contact-method" value="${method.id}" class="order-contact-method" ${method.id === 'vk' ? 'checked' : ''}>
+            ${t[method.labelKey]}
+          </label>`).join('')}
       </div>
       <div id="feedback-block" class="calculator-feedback-panel" style="display:none;">
         <label>${t.feedbackNameLabel}:
@@ -495,242 +469,10 @@ window.renderCalculatorContent = function() {
   `;
 };
 
-// --- Полная локализация staticModelCollections (title/description для коллекций и изображений) ---
-const staticModelCollections = {
-  favourite: {
-    title: { ru: 'Любимые сцены', en: 'Favourite Scenes' },
-    folder: 'My_favourite',
-    description: {
-      ru: 'Атмосферные и любимые сцены с особым настроением.',
-      en: 'Atmospheric and favourite scenes with a special mood.'
-    },
-    images: [
-      {
-        file: 'amlet.jpg',
-        title: { ru: 'Завтрак', en: 'Breakfast' },
-        description: { ru: 'Уютная сцена с французским завтраком в неоновом освещении.', en: 'Cozy scene with French breakfast in neon light.' },
-        tools: ['Blender', 'ArmorPaint'],
-        credits: 'Hp7z',
-        date: '2023-01-10'
-      },
-      {
-        file: 'bottle.jpg',
-        title: { ru: 'Бутылочка', en: 'Bottle' },
-        description: { ru: 'Стеклянная бутылка с жидкостью и подсветкой.', en: 'Glass bottle with liquid and lighting.' },
-        tools: ['Blender', 'ArmorPaint'],
-        credits: 'Hp7z',
-        date: '2023-02-14'
-      },
-      {
-        file: 'cake-with-cat.png',
-        title: { ru: 'Кото-торт', en: 'Cat Cake' },
-        description: { ru: 'Милый торт в виде спящего котика.', en: 'Cute cake in the form of a sleeping cat.' },
-        tools: ['Blender', 'ArmorPaint'],
-        credits: 'Hp7z',
-        date: '2023-02-14'
-      },
-      {
-        file: 'Mango.png',
-        title: { ru: 'Манго', en: 'Mango' },
-        description: { ru: 'Реалистичное манго со свежими каплями воды.', en: 'Realistic mango with fresh water drops.' },
-        tools: ['Blender', 'ArmorPaint'],
-        credits: 'Hp7z',
-        date: '2023-02-14'
-      }
-    ]
-  },
-  start: {
-    title: { ru: 'Первые шаги', en: 'Start Modeling' },
-    folder: 'Start_modeling',
-    description: {
-      ru: 'Первые шаги в мире 3D моделирования.',
-      en: 'First steps in the world of 3D modeling.'
-    },
-    images: [
-      {
-        file: 'beach_cave.jpg',
-        title: { ru: 'Пляжная пещера', en: 'Beach Cave' },
-        description: { ru: 'Живописный вид на пещеру у моря.', en: 'Picturesque view of a cave by the sea.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-10-01'
-      },
-      {
-        file: 'bird.jpg',
-        title: { ru: 'Птица', en: 'Bird' },
-        description: { ru: 'Модель птицы.', en: 'Bird model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-10-15'
-      },
-      {
-        file: 'cattendo.jpg',
-        title: { ru: 'Кити-приставка', en: 'Kitty Console' },
-        description: { ru: 'Игровая приставка в стиле кошки.', en: 'Game console in cat style.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-10-15'
-      },
-      {
-        file: 'cofee brake.jpg',
-        title: { ru: 'Кофе-брейк', en: 'Coffee Break' },
-        description: { ru: 'Сцена с кофе.', en: 'Scene with coffee.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-11-01'
-      },
-      {
-        file: 'coffee murshmallow.jpg',
-        title: { ru: 'Кофе с маршмеллоу', en: 'Coffee with Marshmallow' },
-        description: { ru: 'Уютная сцена с горячим напитком.', en: 'Cozy scene with a hot drink.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-11-05'
-      },
-      {
-        file: 'first cake.jpg',
-        title: { ru: 'Первый торт', en: 'First Cake' },
-        description: { ru: 'Первая модель торта.', en: 'First cake model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-11-10'
-      },
-      {
-        file: 'lesson 1.jpg',
-        title: { ru: 'Урок 1', en: 'Lesson 1' },
-        description: { ru: 'Результат первого урока.', en: 'Result of the first lesson.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-09-01'
-      },
-      {
-        file: 'lesson 2.jpg',
-        title: { ru: 'Урок 2', en: 'Lesson 2' },
-        description: { ru: 'Результат второго урока.', en: 'Result of the second lesson.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-09-15'
-      },
-      {
-        file: 'soke.jpg',
-        title: { ru: 'Сок', en: 'Juice' },
-        description: { ru: 'Модель стакана с соком.', en: 'Glass of juice model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-11-20'
-      },
-      {
-        file: 'toast cat.jpg',
-        title: { ru: 'Кот-тост', en: 'Cat Toast' },
-        description: { ru: 'Милый кот в виде тоста.', en: 'Cute cat in the form of toast.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-12-01'
-      },
-      {
-        file: 'toast.jpg',
-        title: { ru: 'Тост', en: 'Toast' },
-        description: { ru: 'Модель тоста.', en: 'Toast model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-12-05'
-      },
-      {
-        file: 'tv day.jpg',
-        title: { ru: 'Телевизор днём', en: 'TV Day' },
-        description: { ru: 'Сцена с телевизором в дневное время.', en: 'Scene with TV during the day.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-12-10'
-      },
-      {
-        file: 'tv night.jpg',
-        title: { ru: 'Телевизор ночью', en: 'TV Night' },
-        description: { ru: 'Атмосферная сцена с телевизором ночью.', en: 'Atmospheric scene with TV at night.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2022-12-15'
-      }
-    ]
-  },
-  middle: {
-    title: { ru: 'Средний уровень', en: 'Middle Modeling' },
-    folder: 'Middle_modeling',
-    description: {
-      ru: 'Более сложные работы со вниманием к деталям.',
-      en: 'More complex works with attention to detail.'
-    },
-    images: [
-      {
-        file: 'carty.jpg',
-        title: { ru: 'Тележка', en: 'Cart' },
-        description: { ru: 'Модель тележки.', en: 'Cart model.' },
-        tools: ['Blender', 'ArmorPaint'],
-        credits: 'Hp7z',
-        date: '2023-05-20'
-      },
-      {
-        file: 'cave fantasy.jpg',
-        title: { ru: 'Фантастическая пещера', en: 'Fantasy Cave' },
-        description: { ru: 'Фэнтезийная сцена в пещере.', en: 'Fantasy scene in a cave.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-06-01'
-      },
-      {
-        file: 'compic.jpg',
-        title: { ru: 'Компьютер', en: 'Computer' },
-        description: { ru: 'Модель компьютера.', en: 'Computer model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-06-15'
-      },
-      {
-        file: 'comso ship.jpg',
-        title: { ru: 'Космический корабль', en: 'Space Ship' },
-        description: { ru: 'Модель космического корабля.', en: 'Space ship model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-07-01'
-      },
-      {
-        file: 'lesson 3.jpg',
-        title: { ru: 'Урок 3', en: 'Lesson 3' },
-        description: { ru: 'Результат третьего урока.', en: 'Result of the third lesson.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-07-15'
-      },
-      {
-        file: 'lesson 4.jpg',
-        title: { ru: 'Урок 4', en: 'Lesson 4' },
-        description: { ru: 'Результат четвёртого урока.', en: 'Result of the fourth lesson.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-08-01'
-      },
-      {
-        file: 'mountain.jpg',
-        title: { ru: 'Горы', en: 'Mountains' },
-        description: { ru: 'Горный пейзаж.', en: 'Mountain landscape.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-08-15'
-      },
-      {
-        file: 'planet.jpg',
-        title: { ru: 'Планета', en: 'Planet' },
-        description: { ru: 'Модель планеты.', en: 'Planet model.' },
-        tools: ['Blender'],
-        credits: 'Hp7z',
-        date: '2023-09-01'
-      }
-    ]
-  }
-};
-
 // --- renderStaticModelCollections с полной локализацией ---
 function renderStaticModelCollections() {
+  const staticModelCollections = window.portfolioData?.staticModelCollections || {};
+
   const lang = window.currentLang;
   if (!window._staticGalleryPreviewIndexes) window._staticGalleryPreviewIndexes = {};
   const previewIndexes = window._staticGalleryPreviewIndexes;
@@ -779,6 +521,7 @@ function renderStaticModelCollections() {
 window.openStaticGalleryCollection = function(key) {
   const lang = window.currentLang;
   const t = window.locales[lang];
+  const staticModelCollections = window.portfolioData?.staticModelCollections || {};
   const col = staticModelCollections[key];
   if (!col) return;
 
@@ -825,18 +568,17 @@ window.openStaticGalleryCollection = function(key) {
         </div>
       </div>
     `;
-    // Показываем только одну иконку инструмента по теме
     const toolIcons = win.body.querySelector('.tool-icons');
     if (toolIcons && currentImage.tools) {
       const isDark = document.body.classList.contains('dark-theme');
       toolIcons.innerHTML = currentImage.tools.map(t => {
         const tool = t.toLowerCase();
         if (tool === 'blender') {
-          return `<img src="icons/blender-${isDark ? 'light' : 'dark'}.svg" alt="Blender" title="Blender" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;">`;
+          return `<div class="tool-badge"><img src="icons/blender-${isDark ? 'light' : 'dark'}.svg" alt="Blender" title="Blender"><span>Blender</span></div>`;
         } else if (tool === 'armorpaint') {
-          return `<img src="icons/armoryicon-${isDark ? 'light' : 'dark'}.svg" alt="ArmorPaint" title="Armor paint" style="width:28px;height:28px;vertical-align:middle;margin-right:6px;">`;
+          return `<div class="tool-badge"><img src="icons/armoryicon-${isDark ? 'light' : 'dark'}.svg" alt="ArmorPaint" title="Armor paint"><span>Armor paint</span></div>`;
         }
-        return '';
+        return `<div class="tool-badge"><span>${t}</span></div>`;
       }).join('');
     }
 

@@ -64,19 +64,21 @@ window.open3DModelViewer = async function(modelId) {
         ${model && model.video ? '<div style="margin:12px 0;"><button id="toggle-video-btn" class="viewer-tab">Видео</button></div>' : ''}
         <div class="model-tools">
           <b>Инструменты:</b>
-          ${(model && model.tools ? model.tools : ['Blender', 'ArmorPaint']).map(t => {
-            const tool = t.toLowerCase();
-            if (tool === 'blender') {
-              return isDarkTheme
-                ? `<img src="icons/blender-light.svg" alt="Blender" title="Blender"><span class="tool-label">Blender</span>`
-                : `<img src="icons/blender-dark.svg" alt="Blender" title="Blender"><span class="tool-label">Blender</span>`;
-            } else if (tool === 'armorpaint') {
-              return isDarkTheme
-                ? `<img src="icons/armoryicon-light.svg" alt="ArmorPaint" title="Armor paint"><span class="tool-label">Armor paint</span>`
-                : `<img src="icons/armoryicon-dark.svg" alt="ArmorPaint" title="Armor paint"><span class="tool-label">Armor paint</span>`;
-            }
-            return '';
-          }).join('')}
+          <div class="tool-icons">
+            ${(model && model.tools ? model.tools : ['Blender', 'ArmorPaint']).map(t => {
+              const tool = t.toLowerCase();
+              if (tool === 'blender') {
+                return isDarkTheme
+                  ? `<div class="tool-badge"><img src="icons/blender-light.svg" alt="Blender" title="Blender"><span>Blender</span></div>`
+                  : `<div class="tool-badge"><img src="icons/blender-dark.svg" alt="Blender" title="Blender"><span>Blender</span></div>`;
+              } else if (tool === 'armorpaint') {
+                return isDarkTheme
+                  ? `<div class="tool-badge"><img src="icons/armoryicon-light.svg" alt="ArmorPaint" title="Armor paint"><span>Armor paint</span></div>`
+                  : `<div class="tool-badge"><img src="icons/armoryicon-dark.svg" alt="ArmorPaint" title="Armor paint"><span>Armor paint</span></div>`;
+              }
+              return `<div class="tool-badge"><span>${t}</span></div>`;
+            }).join('')}
+          </div>
         </div>
         <div class="model-footer">
           <div class="model-credits"><b>Автор:</b> ${model ? model.credits : ''}</div>

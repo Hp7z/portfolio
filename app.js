@@ -253,188 +253,73 @@ function updateTaskbar() {
 
 // --- Вкладки ---
 function setupTabs(container) {
-  // Сбросить старые обработчики
   container.querySelectorAll('.tab').forEach(tab => {
     tab.replaceWith(tab.cloneNode(true));
   });
 
-  // Главные вкладки
-  container.querySelectorAll('.main-tabs .tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      const tabs = Array.from(container.querySelectorAll('.main-tabs .tab'));
-      const activeTab = container.querySelector('.main-tabs .tab.active');
-      if (activeTab === this) return;
-      const activeTabId = activeTab.getAttribute('data-tab');
-      const activeContent = container.querySelector(`#${activeTabId}-tab`);
-      const clickedTabIndex = tabs.indexOf(this);
-      const activeTabIndex = tabs.indexOf(activeTab);
-      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      tabs.forEach(t => t.classList.remove('active'));
-      container.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      if (activeContent) {
-        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-        setTimeout(() => {
-          activeContent.classList.remove('active');
-          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-          this.classList.add('active');
-          const tabId = this.getAttribute('data-tab');
-          const newContent = container.querySelector(`#${tabId}-tab`);
-          if (newContent) {
-            newContent.classList.add(`slide-${direction}`);
-            newContent.classList.add('active');
-            setTimeout(() => {
-              newContent.classList.remove(`slide-${direction}`);
-            }, 10);
-            // --- Исправление: активируем первую подвкладку и её контент ---
-            const subTabs = newContent.querySelectorAll('.sub-tabs .tab');
+  const rootContainer = container;
+
+  container.querySelectorAll('.tabs').forEach(tabsContainer => {
+    const tabs = Array.from(tabsContainer.querySelectorAll('.tab'));
+    if (!tabs.length) return;
+
+    tabs.forEach(tab => {
+      tab.addEventListener('click', function() {
+        if (this.classList.contains('active')) return;
+
+        const activeTab = tabsContainer.querySelector('.tab.active');
+        const activeIndex = activeTab ? tabs.indexOf(activeTab) : -1;
+        const clickedIndex = tabs.indexOf(this);
+        const direction = clickedIndex > activeIndex ? 'right' : 'left';
+
+        tabs.forEach(item => item.classList.remove('active'));
+        this.classList.add('active');
+
+        const tabId = this.getAttribute('data-tab');
+        const contentRoot = tabsContainer.classList.contains('sub-tabs')
+          ? tabsContainer.closest('.tab-content') || rootContainer
+          : rootContainer;
+
+        if (tabsContainer.classList.contains('main-tabs')) {
+          rootContainer.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          const targetContent = rootContainer.querySelector(`#${tabId}-tab`);
+          if (targetContent) {
+            targetContent.classList.add(`slide-${direction}`);
+            targetContent.classList.add('active');
+            setTimeout(() => targetContent.classList.remove(`slide-${direction}`), 10);
+            const subTabs = targetContent.querySelectorAll('.sub-tabs .tab');
             if (subTabs.length) {
-              subTabs.forEach(t => t.classList.remove('active'));
+              subTabs.forEach(item => item.classList.remove('active'));
               const firstSubTab = subTabs[0];
               firstSubTab.classList.add('active');
-              // Показать соответствующий контент
-              const subTabId = firstSubTab.getAttribute('data-tab');
-              newContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-              const subTabContent = newContent.querySelector(`#${subTabId}-tab`);
-              if (subTabContent) subTabContent.classList.add('active');
+              const firstSubTabId = firstSubTab.getAttribute('data-tab');
+              targetContent.querySelectorAll(':scope > .tab-content').forEach(contentBlock => contentBlock.classList.remove('active'));
+              const firstSubContent = targetContent.querySelector(`#${firstSubTabId}-tab`);
+              if (firstSubContent) firstSubContent.classList.add('active');
             }
           }
-        }, 300);
-      } else {
-        this.classList.add('active');
-        const tabId = this.getAttribute('data-tab');
-        const newContent = container.querySelector(`#${tabId}-tab`);
-        if (newContent) {
-          newContent.classList.add(`slide-${direction}`);
-          newContent.classList.add('active');
-          setTimeout(() => {
-            newContent.classList.remove(`slide-${direction}`);
-          }, 10);
-          // --- Исправление: активируем первую подвкладку и её контент ---
-          const subTabs = newContent.querySelectorAll('.sub-tabs .tab');
-          if (subTabs.length) {
-            subTabs.forEach(t => t.classList.remove('active'));
-            const firstSubTab = subTabs[0];
-            firstSubTab.classList.add('active');
-            const subTabId = firstSubTab.getAttribute('data-tab');
-            newContent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            const subTabContent = newContent.querySelector(`#${subTabId}-tab`);
-            if (subTabContent) subTabContent.classList.add('active');
+        } else if (tabsContainer.classList.contains('sub-tabs')) {
+          const parentContent = tabsContainer.closest('.tab-content');
+          if (parentContent) {
+            parentContent.querySelectorAll(':scope > .tab-content').forEach(contentBlock => contentBlock.classList.remove('active'));
+            const targetContent = parentContent.querySelector(`#${tabId}-tab`);
+            if (targetContent) {
+              targetContent.classList.add(`slide-${direction}`);
+              targetContent.classList.add('active');
+              setTimeout(() => targetContent.classList.remove(`slide-${direction}`), 10);
+            }
+          }
+        } else {
+          contentRoot.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+          const targetContent = contentRoot.querySelector(`#${tabId}-tab`);
+          if (targetContent) {
+            targetContent.classList.add('active');
           }
         }
-      }
-    }, { passive: false });
+      }, { passive: false });
+    });
   });
 
-  // Подвкладки для веб-сайтов
-  container.querySelectorAll('#websites-tab .sub-tabs .tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      const tabs = Array.from(container.querySelectorAll('#websites-tab .sub-tabs .tab'));
-      const activeTab = container.querySelector('#websites-tab .sub-tabs .tab.active');
-      if (activeTab === this) return;
-      const activeTabId = activeTab.getAttribute('data-tab');
-      const parent = container.querySelector('#websites-tab');
-      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
-      const clickedTabIndex = tabs.indexOf(this);
-      const activeTabIndex = tabs.indexOf(activeTab);
-      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      tabs.forEach(t => t.classList.remove('active'));
-      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      if (activeContent) {
-        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-        setTimeout(() => {
-          activeContent.classList.remove('active');
-          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-          this.classList.add('active');
-          const tabId = this.getAttribute('data-tab');
-          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
-          if (newContent) {
-            newContent.classList.add(`slide-${direction}`);
-            newContent.classList.add('active');
-            setTimeout(() => {
-              newContent.classList.remove(`slide-${direction}`);
-            }, 10);
-          }
-        }, 300);
-      } else {
-        this.classList.add('active');
-        const tabId = this.getAttribute('data-tab');
-        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
-        if (newContent) {
-          newContent.classList.add(`slide-${direction}`);
-          newContent.classList.add('active');
-          setTimeout(() => {
-            newContent.classList.remove(`slide-${direction}`);
-          }, 10);
-        }
-      }
-    }, { passive: false });
-  });
-
-  // Подвкладки для 3D моделей
-  container.querySelectorAll('#models3d-tab .sub-tabs .tab').forEach(tab => {
-    tab.addEventListener('click', function() {
-      const tabs = Array.from(container.querySelectorAll('#models3d-tab .sub-tabs .tab'));
-      const activeTab = container.querySelector('#models3d-tab .sub-tabs .tab.active');
-      if (activeTab === this) return;
-      const activeTabId = activeTab.getAttribute('data-tab');
-      const parent = container.querySelector('#models3d-tab');
-      const activeContent = parent ? parent.querySelector(`#${activeTabId}-tab`) : null;
-      const clickedTabIndex = tabs.indexOf(this);
-      const activeTabIndex = tabs.indexOf(activeTab);
-      const direction = clickedTabIndex > activeTabIndex ? 'right' : 'left';
-      tabs.forEach(t => t.classList.remove('active'));
-      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      if (activeContent) {
-        activeContent.classList.add(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-        setTimeout(() => {
-          activeContent.classList.remove('active');
-          activeContent.classList.remove(`slide-out-${direction === 'right' ? 'left' : 'right'}`);
-          this.classList.add('active');
-          const tabId = this.getAttribute('data-tab');
-          const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
-          if (newContent) {
-            newContent.classList.add(`slide-${direction}`);
-            newContent.classList.add('active');
-            setTimeout(() => {
-              newContent.classList.remove(`slide-${direction}`);
-            }, 10);
-          }
-        }, 300);
-      } else {
-        this.classList.add('active');
-        const tabId = this.getAttribute('data-tab');
-        const newContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
-        if (newContent) {
-          newContent.classList.add(`slide-${direction}`);
-          newContent.classList.add('active');
-          setTimeout(() => {
-            newContent.classList.remove(`slide-${direction}`);
-          }, 10);
-        }
-      }
-    }, { passive: false });
-  });
-
-  // Для остальных вкладок (обычные .tabs)
-  container.querySelectorAll('.tabs .tab:not(.main-tabs .tab):not(.sub-tabs .tab)').forEach(tab => {
-    tab.addEventListener('click', function() {
-      const tabsContainer = this.closest('.tabs');
-      if (!tabsContainer) return;
-      tabsContainer.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      const parent = tabsContainer.parentElement;
-      if (parent) parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      this.classList.add('active');
-      const tabId = this.getAttribute('data-tab');
-      const tabContent = parent ? parent.querySelector(`#${tabId}-tab`) : null;
-      if (tabContent) {
-        setTimeout(() => {
-          tabContent.classList.add('active');
-        }, 50);
-      }
-    }, { passive: false });
-  });
-
-  // Волна при наведении на проекты и модели
   container.querySelectorAll('.project-container, .model-container, .color-block').forEach(element => {
     element.addEventListener('mouseenter', function() {
       this.classList.add('wave-effect');
@@ -714,7 +599,13 @@ function openWindow(type) {
       link.addEventListener('click', function(e) {
         e.preventDefault();
         const url = this.getAttribute('data-url');
-        openProjectWindow(url);
+        if (this.classList.contains('project-preview-btn')) {
+          const preview = this.getAttribute('data-preview');
+          const title = this.getAttribute('data-title');
+          openPreviewWindow(preview, title);
+        } else {
+          openProjectWindow(url);
+        }
       });
     });
   }
@@ -1006,7 +897,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       let fullTotal = total + addTotal;
       const selectedMethod = getSelectedContactMethod();
-      const messageBase = window.currentLang === 'en' ? (t.calculatorOrderMsgEn || "Hello! I want to order a website. My total is: ") : (t.calculatorOrderMsgRu || "Здравствуйте! Хочу заказать сайт. Мой итог: ");
+      const messageBase = window.currentLang === 'en' ? (t.calculatorOrderMsgEn || "Hello! I want to order a service. My total is: ") : (t.calculatorOrderMsgRu || "Здравствуйте! Хочу заказать услугу(и). Мой итог: ");
       let msg = `${messageBase}\n`;
       checkedLines.forEach(s => { msg += `• ${s}\n`; });
       if (addDiscount) {
@@ -1218,6 +1109,7 @@ function openModelGallery(modelId) {
   const arrowColor = isDarkTheme ? '#fff' : '#000';
   const model = window.projects.models3d.static.find(m => m.id === modelId);
   if (!model) return;
+  const modelTools = Array.isArray(model.tools) ? model.tools : [];
   const galleryItems = [
     { type: 'image', src: model.preview, thumb: model.preview }
   ];
@@ -1228,11 +1120,20 @@ function openModelGallery(modelId) {
     galleryItems.push({ type: 'video', src: model.video, thumb: model.preview });
   }
   let current = 0;
-  // Инструменты и логотипи
-  const tools = [
-    { name: 'Blender', icon: 'icons/blender.svg' },
-    { name: 'ArmorPaint', icon: 'icons/armorpaint.svg' }
-  ];
+  function renderToolBadges() {
+    if (!modelTools.length) return '';
+    return modelTools.map(tool => {
+      const normalizedTool = tool.toLowerCase();
+      if (normalizedTool === 'blender') {
+        return `<div class="tool-badge"><img src="icons/blender-${isDarkTheme ? 'light' : 'dark'}.svg" alt="Blender" title="Blender"><span>Blender</span></div>`;
+      }
+      if (normalizedTool === 'armorpaint') {
+        return `<div class="tool-badge"><img src="icons/armoryicon-${isDarkTheme ? 'light' : 'dark'}.svg" alt="ArmorPaint" title="Armor paint"><span>Armor paint</span></div>`;
+      }
+      return `<div class="tool-badge"><span>${tool}</span></div>`;
+    }).join('');
+  }
+
   function renderGallery(win) {
     win.body.innerHTML = `
       <div class="gallery-window-flex" style="height:100%;">
@@ -1250,8 +1151,8 @@ function openModelGallery(modelId) {
           <div class="model-title">${model.title}</div>
           <div class="model-description">${model.description || ''}</div>
           <div class="model-tools" style="margin-bottom:15px;">
-            <b>Инструменты:</b>
-            ${tools.map(t => `<img src="${t.icon}" alt="${t.name}" title="${t.name}" style="width:28px;height:28px;vertical-align:middle;margin:0 6px 0 0;">`).join('')}
+            <b>${window.locales?.[window.currentLang]?.tools || 'Инструменты'}:</b>
+            <div class="tool-icons">${renderToolBadges()}</div>
           </div>
           <div class="model-footer">
             <div class="model-credits"><b>Автор:</b> ${model.credits}</div>
@@ -1480,6 +1381,36 @@ function openFullscreenGallery(images, startIdx, model) {
 // --- Добавить функцию для открытия сайта в новой вкладке ---
 function openProjectWindow(url) {
   if (url) window.open(url, '_blank');
+}
+
+function resolvePreviewUrl(preview) {
+  if (!preview) return '';
+  const ext = preview.split('.').pop()?.toLowerCase();
+  if (ext === 'jpg' || ext === 'jpeg' || ext === 'png') {
+    const webp = preview.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+    return webp;
+  }
+  return preview;
+}
+
+function openPreviewWindow(preview, title) {
+  const previewUrl = resolvePreviewUrl(preview);
+  if (!previewUrl) return;
+  new WinBox({
+    title: title || (window.portfolioData?.preview?.windowTitle?.[window.currentLang] || window.portfolioData?.preview?.windowTitle?.ru || 'Preview'),
+    class: ['adwaita-theme', 'active'],
+    width: Math.min(1100, window.innerWidth - 40),
+    height: Math.min(760, window.innerHeight - 60),
+    x: 40,
+    y: 40,
+    top: 40,
+    background: document.body.classList.contains('dark-theme') ? '#2e3436' : '#f6f5f4',
+    border: document.body.classList.contains('dark-theme') ? '1px solid #1e1e1e' : '1px solid #d3d2d2',
+    borderRadius: '8px',
+    max: false,
+    html: `<div class="preview-window-content" style="height:100%;overflow:auto;padding:16px;box-sizing:border-box;"><img src="${previewUrl}" alt="${title || 'Preview'}" style="display:block;width:100%;height:auto;border-radius:10px;object-fit:contain;"></div>`,
+    header: 36
+  });
 }
 
 // --- Автоматическое обновление иконок 3D окон и галерей при смене темы ---
